@@ -471,7 +471,7 @@ def extract_invoke_sites(body_lines):
             continue
         op=op_match.group(1)
         match=detail_re.search(line)
-        if match:
+        if match and not match.group(1).startswith(("invoke-custom","invoke-polymorphic")):
             opcode,register_text,owner,name,descriptor=match.groups()
             site={"instruction":instruction_index,"line":line_no,"opcode":opcode,
                   "owner":owner,"name":name,"descriptor":descriptor,
@@ -539,6 +539,9 @@ def build_interprocedural_value_graph(methods):
         uses={(item["instruction"],item["register"]):item
               for item in caller_flow.get("uses",[])}
         if caller.get("invoke_sites_truncated"):
+            truncated_callsite_methods+=1
+            continue
+        if caller.get("invoke_sites_incomplete"):
             truncated_callsite_methods+=1
             continue
         for site in caller.get("invoke_sites",[]):
@@ -705,11 +708,17 @@ def analyze_smali(root):
                     current["register_dataflow"]=analyze_register_dataflow(
                         current["body_lines"],cfg,current["parameter_registers"])
                     invoke_sites=extract_invoke_sites(current["body_lines"])
+                    invoke_opcode_count=sum(1 for body_line in current["body_lines"]
+                        if (OP_RE.match(body_line) and OP_RE.match(body_line).group(1).startswith("invoke-")))
                     current["invoke_sites"]=invoke_sites[:512]
                     current["invoke_sites_truncated"]=len(invoke_sites)>512
+                    current["invoke_sites_incomplete"]=len(invoke_sites)!=invoke_opcode_count
                     field_sites=extract_field_access_sites(current["body_lines"])
+                    field_opcode_count=sum(1 for body_line in current["body_lines"]
+                        if (OP_RE.match(body_line) and OP_RE.match(body_line).group(1).startswith(("iget","iput","sget","sput"))))
                     current["field_access_sites"]=field_sites[:512]
                     current["field_access_sites_truncated"]=len(field_sites)>512
+                    current["field_access_sites_incomplete"]=len(field_sites)!=field_opcode_count
                     current["invokes"]=sorted(set(current["invokes"]))[:120]
                     current["strings"]=sorted(set(current["strings"]))[:100]
                     current.pop("body_lines",None)
@@ -860,8 +869,10 @@ def main():
       "parameter_definition_count":sum(m.get("register_dataflow",{}).get("parameter_definition_count",0) for m in all_methods),
       "invoke_site_count":sum(len(m.get("invoke_sites",[])) for m in all_methods),
       "invoke_site_truncated_methods":sum(1 for m in all_methods if m.get("invoke_sites_truncated")),
+      "invoke_site_incomplete_methods":sum(1 for m in all_methods if m.get("invoke_sites_incomplete")),
       "field_access_site_count":sum(len(m.get("field_access_sites",[])) for m in all_methods),
       "field_access_site_truncated_methods":sum(1 for m in all_methods if m.get("field_access_sites_truncated")),
+      "field_access_site_incomplete_methods":sum(1 for m in all_methods if m.get("field_access_sites_incomplete")),
       "register_dataflow_evidence_truncated_methods":sum(1 for m in all_methods if m.get("register_dataflow",{}).get("reason")=="evidence-truncated"),
       "field_slot_group_count":len(field_slot_index),
       "field_slot_cross_method_pair_count":sum(x["cross_method_pair_count"] for x in field_slot_index),
