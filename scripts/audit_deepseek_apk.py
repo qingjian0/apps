@@ -104,7 +104,7 @@ def analyze_smali(root):
                 current["invokes"].append(target+"->"+name+sig)
                 current.setdefault("_edges",[]).append((target,name,sig))
             op=OP_RE.match(line)
-            if op and not line.lstrip().startswith((".",":","#)):
+            if op and not line.lstrip().startswith((".",":","#")):
                 current["opcodes"][op.group(1)] += 1
         if desc:
             classes.append({"descriptor":desc,"super":super_desc,"interfaces":interfaces,
@@ -162,6 +162,8 @@ def main():
         (comp_out/"component.json").write_text(json.dumps({"apk":apk.name,"bytes":apk.stat().st_size,
              "sha256":sha256(apk),"apktool_exit":apktool_rc,"jadx_exit":jadx_rc,
              "java_files":java_count,"dex_count":len(dex_entries)},indent=2))
+    if not all_classes or not all_methods:
+        raise SystemExit(f"No DEX methods recovered from {src.name}; apktool exit status and input package layout require investigation")
     # Keep the complete method inventory compressed in the repository; no source dump or raw logs are copied.
     with gzip.open(out/"methods.jsonl.gz","wt",encoding="utf-8") as f:
         for m in all_methods: f.write(json.dumps(m,separators=(",",":"),ensure_ascii=False)+"\n")
