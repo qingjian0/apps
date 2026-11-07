@@ -33,8 +33,8 @@ class StaticProgramGraphTest {
         val seen = mutableListOf<String>()
         StaticProgramGraph.load(methods, edges, classes, onMethodRecord = { seen += it })
         assertTrue(seen.size == 2)
-        assertTrue(seen.any { it.contains("\\\"name\\\":\\\"one\\\"") })
-        assertTrue(seen.any { it.contains("\\\"name\\\":\\\"two\\\"") })
+        assertTrue(seen.any { it.contains("\"name\":\"one\"") })
+        assertTrue(seen.any { it.contains("\"name\":\"two\"") })
     }
 
     @Test fun incompleteCfgDoesNotBecomeControlFlowEvidence() {
