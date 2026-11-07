@@ -1331,12 +1331,8 @@ class CallerControlFlowReturnBoundaryTest(unittest.TestCase):
         self.assertTrue(summary["records_truncated"])
         self.assertEqual(1, summary["call_context_records_dropped"])
         self.assertGreaterEqual(summary["queue_states_processed"], 1)
-        self.assertEqual(
-            summary["queue_states_enqueued"],
-            summary["queue_states_processed"] + len([]) + (
-                summary["queue_states_enqueued"] - summary["queue_states_processed"]
-            ),
-        )
+        self.assertEqual(4, summary["queue_states_enqueued"])
+        self.assertEqual(4, summary["queue_states_processed"])
         self.assertFalse(summary["context_expansion_complete"])
 
     def test_interprocedural_points_to_rejects_non_positive_record_budget(self):
