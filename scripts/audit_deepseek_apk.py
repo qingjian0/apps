@@ -68,8 +68,8 @@ def safe_strings(line):
     value=m.group(1)
     # Preserve Smali-escaped text verbatim; unicode_escape corrupts non-ASCII and can create surrogates.
     # Preserve schema identifiers for prompt discovery, but never index prompt bodies.
-    if SENSITIVE.search(value) and not SAFE_PROMPT_MARKER.fullmatch(value): return ["<redacted-sensitive-marker>"]
-    if re.search(r"(?i)prompt|instruction", value) and not SAFE_PROMPT_MARKER.fullmatch(value): return ["<redacted-prompt-content>"]
+    if SENSITIVE.search(value) and not SAFE_PROMPT_MARKER.fullmatch(value): return ["<redacted-content>"]
+    if re.search(r"(?i)prompt|instruction", value) and not SAFE_PROMPT_MARKER.fullmatch(value): return ["<redacted-content>"]
     return [value[:240]]
 
 def analyze_smali(root):
