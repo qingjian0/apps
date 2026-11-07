@@ -90,6 +90,29 @@ jobs:
                            package.group(1) if package else "", decl.group(1) if decl else "",
                            decl.group(2).strip() if decl else "", hits, methods, fields, constants))
           rows.sort(key=lambda x: (-x[0], x[1]))
+          xref_terms = [
+              "PowCalculator", "nativeCalculateDeepSeekHashV1Pow", "AuthedPowSolution",
+              "ServerChatChallenge", "ChallengeResponse", "X-DS-Challenge-Response",
+              "X-DS-PoW-Response", "/api/v0/chat/create_pow_challenge",
+              "/api/v0/chat/stop_stream", "/api/v0/chat/history_messages",
+              "text/event-stream", "chat.deepseek.com", "allow_parallel_streams",
+              "pow_prefetch",
+          ]
+          xrefs = {term: [] for term in xref_terms}
+          method_pattern = re.compile(r"(?m)^\\s*(?:public|protected|private)\\s+(?:(?:static|final|synchronized|native|abstract)\\s+)*[\\w.$<>?, \\[\\]]+\\s+([\\w$]+)\\s*\\(")
+          for path in java_files:
+              try: data = path.read_text(encoding="utf-8", errors="replace")
+              except Exception: continue
+              for term in xref_terms:
+                  if term not in data: continue
+                  for match in re.finditer(re.escape(term), data):
+                      before = data[:match.start()]
+                      declarations = list(method_pattern.finditer(before))
+                      method_name = declarations[-1].group(1) if declarations else "<class-or-field>"
+                      rel = str(path.relative_to(root))
+                      entry = {"path": rel, "method": method_name}
+                      if entry not in xrefs[term] and len(xrefs[term]) < 80:
+                          xrefs[term].append(entry)
           with zipfile.ZipFile(apk) as z:
               dex = [(i.filename, i.file_size) for i in z.infolist() if re.fullmatch(r"classes[0-9]*\.dex", i.filename)]
           stdout = pathlib.Path("audit/jadx.stdout.log").read_text(errors="replace").splitlines()
@@ -108,6 +131,12 @@ jobs:
           lines += [f"- {name}: {size:,} bytes" for name, size in dex]
           lines += ["", "## JADX diagnostics", ""]
           lines += [f"- {x[:300]}" for x in diagnostics[:40]] or ["- No warning/error lines captured in JADX stdout/stderr."]
+          lines += ["", "## Cross-reference map", "",
+                    "References are static symbol/string occurrences; they do not establish runtime call order.", ""]
+          for term, refs in xrefs.items():
+              lines.append(f"### {term}")
+              lines += [f"- {entry['path']} :: {entry['method']}" for entry in refs] or ["- No references found"]
+              lines.append("")
           lines += ["", "## Candidate classes", "",
                     "Ranked by matches across network, endpoint, PoW/challenge, async/stream, and agent/tool terms.",
                     "Class and method signatures are navigation evidence only, not proof of execution.", ""]
@@ -123,6 +152,7 @@ jobs:
                "matches":h,"methods":m,"fields":f,"strings":k}
               for s,p,pkg,cls,inh,h,m,f,k in rows[:500]
           ], ensure_ascii=False, indent=2), encoding="utf-8")
+          (out / "cross-references.json").write_text(json.dumps(xrefs, ensure_ascii=False, indent=2), encoding="utf-8")
           print(f"Indexed {len(rows)} candidate classes")
           PY
       - name: Upload evidence report
