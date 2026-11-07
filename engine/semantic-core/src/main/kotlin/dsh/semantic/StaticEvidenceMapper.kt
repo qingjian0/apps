@@ -40,7 +40,7 @@ class StaticEvidenceMapper {
                 if (record.invokes.isNotEmpty()) add(Evidence(EvidenceFamily.CALL_GRAPH, "outgoing-call-count=" + record.invokes.size, 0.55))
                 if (record.invokes.any { it.startsWith("Lkotlin/") || it.startsWith("Lkotlinx/") || it.startsWith("Lio/ktor/") || it.startsWith("Ljava/") || it.startsWith("Landroid/") })
                     add(Evidence(EvidenceFamily.FRAMEWORK_INTERACTION, "stable-framework-call-family", 0.75))
-                if (record.opcodeCount > 0) add(Evidence(EvidenceFamily.CONTROL_FLOW, "method-body-opcodes=" + record.opcodeCount, 0.5))
+                if (record.opcodeCount > 0) add(Evidence(EvidenceFamily.BYTECODE_SHAPE, "method-body-opcodes=" + record.opcodeCount, 0.5))
             }
             if (evidence.isEmpty()) null else SemanticCandidate(RoleId(roleName), method, host, evidence)
         }
