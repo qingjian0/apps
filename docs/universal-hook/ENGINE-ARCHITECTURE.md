@@ -351,10 +351,12 @@ initial supported sources are reference-typed method parameters, the instance re
 operations (including object field loads and object method results) become unknown rather
 than inheriting a guessed identity. A field receiver is eligible for same-instance evidence
 only when its points-to set is a singleton and is not marked unknown. Repeated accesses
-to the same field through that same abstract identity are grouped as confirmed same-instance
-within the analyzed method. Allocation sites in cyclic CFG blocks are deliberately
-marked unknown because the instruction may execute more than once and allocate distinct
-objects. This is not a global alias/no-alias proof: distinct parameter tokens may still
-denote the same runtime object, and interprocedural parameter/return propagation is not
-yet implemented. Incomplete CFGs and non-convergent analysis fail closed.
+to the same field through that same abstract identity are grouped as the same
+symbolic object within one method activation. The group does not assert that both access
+sites execute on the same path or that the identity persists across separate invocations.
+Allocation sites in cyclic CFG blocks are deliberately marked unknown because the
+instruction may execute more than once and allocate distinct objects. This is not a global
+alias/no-alias proof: distinct parameter tokens may still denote the same runtime object,
+and interprocedural parameter/return propagation is not yet implemented. Incomplete CFGs
+and non-convergent analysis fail closed.
 
