@@ -105,7 +105,7 @@ jobs:
           sources=list(src.rglob("*.java")); smali_files=list(sm.rglob("*.smali"))
           if not smali_files: raise SystemExit("APKTool produced no smali files; refusing to publish an empty DEX disassembly")
           diag=(out/"jadx.stdout.log").read_text(errors="replace")+(out/"jadx.stderr.log").read_text(errors="replace")
-          error_match=re.search(r"finished with errors, count:\\s*(\\d+)",diag,re.I)
+          error_match=re.search(r"finished with errors, count:\s*(\d+)",diag,re.I)
           jadx_errors=int(error_match.group(1)) if error_match else 0
           summary={"apk":apk.name,"bytes":apk.stat().st_size,"sha256":hashlib.sha256(apk.read_bytes()).hexdigest(),
           "dex":dex,"dex_count":len(dex),"jadx_exit":int((out/"jadx.exit-code").read_text().strip()),
