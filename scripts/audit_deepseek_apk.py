@@ -888,6 +888,15 @@ def analyze_smali(root):
                     invoke_sites=extract_invoke_sites(current["body_lines"])
                     invoke_opcode_count=sum(1 for body_line in current["body_lines"]
                         if (OP_RE.match(body_line) and OP_RE.match(body_line).group(1).startswith("invoke-")))
+                    current["invoke_sites"]=invoke_sites[:512]
+                    current["invoke_sites_truncated"]=len(invoke_sites)>512
+                    current["invoke_sites_incomplete"]=len(invoke_sites)!=invoke_opcode_count
+                    field_sites=extract_field_access_sites(current["body_lines"])
+                    field_opcode_count=sum(1 for body_line in current["body_lines"]
+                        if (OP_RE.match(body_line) and OP_RE.match(body_line).group(1).startswith(("iget","iput","sget","sput"))))
+                    current["field_access_sites"]=field_sites[:512]
+                    current["field_access_sites_truncated"]=len(field_sites)>512
+                    current["field_access_sites_incomplete"]=len(field_sites)!=field_opcode_count
                     current["object_points_to"]=analyze_object_points_to(
                         current["body_lines"],cfg,current["class"],current["name"],
                         current["descriptor"],current["access"],current.get("field_access_sites",[]))
@@ -898,15 +907,6 @@ def analyze_smali(root):
                         if receiver:
                             field_site["receiver_identity_status"]=receiver["identity_status"]
                             field_site["receiver_identity"]=receiver["identity"]
-                    current["invoke_sites"]=invoke_sites[:512]
-                    current["invoke_sites_truncated"]=len(invoke_sites)>512
-                    current["invoke_sites_incomplete"]=len(invoke_sites)!=invoke_opcode_count
-                    field_sites=extract_field_access_sites(current["body_lines"])
-                    field_opcode_count=sum(1 for body_line in current["body_lines"]
-                        if (OP_RE.match(body_line) and OP_RE.match(body_line).group(1).startswith(("iget","iput","sget","sput"))))
-                    current["field_access_sites"]=field_sites[:512]
-                    current["field_access_sites_truncated"]=len(field_sites)>512
-                    current["field_access_sites_incomplete"]=len(field_sites)!=field_opcode_count
                     current["invokes"]=sorted(set(current["invokes"]))[:120]
                     current["strings"]=sorted(set(current["strings"]))[:100]
                     current.pop("body_lines",None)
