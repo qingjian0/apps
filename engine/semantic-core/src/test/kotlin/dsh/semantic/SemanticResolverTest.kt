@@ -74,8 +74,8 @@ class SemanticResolverTest {
         val failedCandidate = candidate("bad", goodEvidence).copy(role = failedRole)
         val workingCandidate = candidate("good", goodEvidence).copy(role = workingRole)
         val resolver = SemanticResolver()
-        val failedResolution = runtimeConfirmed(resolver.resolve(host, RolePolicy(failedRole), listOf(failedCandidate)))
-        val workingResolution = runtimeConfirmed(resolver.resolve(host, RolePolicy(workingRole), listOf(workingCandidate)))
+        val failedResolution = runtimeConfirmed(resolver.resolve(host, RolePolicy(failedRole, minimumEvidenceFamilies = 3), listOf(failedCandidate)))
+        val workingResolution = runtimeConfirmed(resolver.resolve(host, RolePolicy(workingRole, minimumEvidenceFamilies = 3), listOf(workingCandidate)))
         val backend = object : HookBackend {
             override fun install(method: MethodShape, role: RoleId): HookHandle {
                 if (role == failedRole) throw IllegalStateException("simulated failure")
@@ -83,8 +83,8 @@ class SemanticResolverTest {
             }
         }
         val coordinator = HookCoordinator(backend)
-        assertEquals(InstallStatus.FAILED, coordinator.install(host, RolePolicy(failedRole), failedResolution).status)
-        assertEquals(InstallStatus.INSTALLED, coordinator.install(host, RolePolicy(workingRole), workingResolution).status)
+        assertEquals(InstallStatus.FAILED, coordinator.install(host, RolePolicy(failedRole, minimumEvidenceFamilies = 3), failedResolution).status)
+        assertEquals(InstallStatus.INSTALLED, coordinator.install(host, RolePolicy(workingRole, minimumEvidenceFamilies = 3), workingResolution).status)
         assertEquals(1, coordinator.installedCount())
     }
 
@@ -135,7 +135,7 @@ class SemanticResolverTest {
             Evidence(EvidenceFamily.TYPE_SHAPE, "prompt-dto-input", 0.8),
             Evidence(EvidenceFamily.DATA_FLOW, "dto-to-request-field", 0.9)
         ))
-        val result = SemanticResolver().resolve(host, RolePolicy(role), listOf(candidate("a", goodEvidence), weaker))
+        val result = SemanticResolver().resolve(host, RolePolicy(role, minimumEvidenceFamilies = 3), listOf(candidate("a", goodEvidence), weaker))
         assertFalse(result.accepted)
         assertEquals("ambiguous-candidates", result.rejection)
     }
