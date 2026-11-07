@@ -53,6 +53,34 @@ Hook 不绑定混淆类名，而绑定业务角色：
 
 请求构造、Flow 生命周期和事件分派通常比全局网络库 Hook 更稳定，也更容易保留宿主自身的会话和网络上下文。UI 层只作为必要的辅助入口，不作为主 transport Hook。
 
+### 2A. 全功能覆盖矩阵（目标范围）
+
+本项目的 Hook 覆盖范围不是“只要网络相关就算完成”。必须以功能域建立独立 Role Profile、证据、Hook 点、桥接事件、测试用例和完成状态。APK 中不存在或当前版本未开放的功能标记为 N/A，不得伪造 Hook。
+
+| 功能域 | 必须覆盖的子功能 | 建议语义角色（示例） | 核心观察边界 |
+|---|---|---|---|
+| 宿主与运行时 | 版本/签名/DEX/进程/ClassLoader、生命周期、线程、崩溃隔离 | `host.fingerprint`、`runtime.lifecycle` | Application、进程入口、ClassLoader、组件生命周期 |
+| 对话与消息 | 新建/切换/删除会话、消息提交、编辑、重试、继续、停止、历史、标题、反馈、分页 | `conversation.*`、`message.*` | UI Intent 到领域命令、Repository、持久化和网络边界 |
+| 提示词系统 | 系统提示词、默认提示词、用户自定义指令、模板/前后缀、角色消息、提示词拼装、优先级/覆盖、上下文注入、提示词版本与开关 | `prompt.*`、`instruction.*`、`context.assemble` | 最终请求 DTO 构造前；配置读写入口；模板/策略合并点 |
+| Agent 核心 | Agent 模式入口、任务分类/规划、步骤状态、工具选择、工具调用参数、结果回填、继续推理、终止/重试、并行任务 | `agent.plan`、`agent.step`、`agent.tool.dispatch`、`agent.result` | Agent 状态机、ToolCall 生成/分派、结果回注和循环退出 |
+| 工具生态 | 内置工具、搜索、网页/URL、文件、代码/计算、图片/视觉、附件、MCP/外部工具（仅在宿主实际存在时） | `tool.registry`、`tool.invoke`、`tool.result` | 工具注册表、参数校验、执行器、权限门、结果序列化 |
+| 本地 API / Gateway | 本机 HTTP Server、路由、鉴权、模型列表、Chat Completions、流式/非流式、请求映射、工具调用映射、错误映射、取消、并发、会话关联、LAN 开关/绑定地址 | `local_api.server`、`local_api.route`、`local_api.request`、`local_api.stream`、`local_api.auth` | Gateway 入站请求、适配器边界、宿主请求提交、流式事件回传；若某版本 APK 不含 Gateway，则归属模块侧，不冒称宿主 Hook |
+| 网络与传输 | API 路由、请求 DTO、header 插件、HTTP、SSE、心跳、错误、重试、恢复、取消、上传/下载 | `request.*`、`transport.*`、`sse.*`、`session.resume` | 请求构造、Ktor/OkHttp 传输、响应体、事件流 |
+| 序列化与协议 | JSON/Proto/自定义 Serializer、模型注册、多态、DTO 映射、版本兼容 | `serializer.*`、`protocol.mapping` | Serializer 注册、descriptor、encode/decode 和适配器 |
+| 多模态 | 图片输入/理解、文件/文档、音频/语音输入输出、视频（若版本存在）、附件上传、媒体预处理 | `multimodal.image.*`、`multimodal.audio.*`、`attachment.*` | 媒体选择/预处理、上传、请求模型、响应渲染；不记录媒体正文 |
+| 搜索与联网 | 搜索入口、查询构造、结果模型、网页内容、引用/来源、工具结果展示 | `search.*`、`web.*`、`citation.*` | 查询/工具调度、结果解析和 UI 数据模型 |
+| UI 与交互 | 页面路由、设置页、菜单、弹窗、状态展示、复制/分享、无障碍/文本选择 | `ui.navigation`、`ui.state`、`settings.*` | UI 事件到 ViewModel/状态层；避免只 Hook 点击事件 |
+| 本地存储与同步 | 会话数据库、偏好设置、缓存、草稿、附件元数据、迁移、云端同步 | `storage.*`、`sync.*` | Repository/DAO、DataStore/Preferences、迁移与同步边界 |
+| 账号与能力开关 | 登录态、订阅/额度展示、远端功能配置、灰度开关、模型能力列表 | `account.state`、`capability.config` | 只读状态和能力配置；不伪造身份、额度或绕过服务端限制 |
+| 安全与权限 | 权限门、隐私策略、敏感字段过滤、证书/网络安全状态、Hook fail-closed | `policy.guard`、`privacy.redaction` | 策略判定和脱敏边界；不 Hook 绕过认证、PoW 或安全校验 |
+| 可观测性 | 调用链、耗时、线程、错误、流状态、Hook 安装状态、诊断导出 | `telemetry.*`、`diagnostic.*` | 统一事件桥；只保存脱敏元数据 |
+
+**提示词专项要求：** 至少分别识别默认系统提示词、用户自定义指令、Agent/工具提示词、上下文/历史消息拼装、最终请求序列化五个阶段；追踪开关与优先级，但默认只记录来源标签、长度、模板 ID/哈希和开关状态，不记录提示词原文或用户内容。只有用户明确启用受控诊断时，才允许在本地临时查看非敏感测试样本。
+
+**本地 API 专项要求：** 明确区分“宿主 APK 内部的请求/响应 Hook”与“模块自身的 Local API Gateway”。Gateway 的 HTTP 路由、鉴权、模型映射、流转换和 LAN 监听属于模块工程；宿主 Hook 只负责安全地桥接 DeepSeek 原生会话/能力。两者必须有独立测试，不得把 APK 中不存在的本地 HTTP Server 误判为宿主功能。
+
+**完成判据：** 每个功能域都必须登记 `DISCOVERED → STATIC_CONFIRMED → RUNTIME_CONFIRMED → BRIDGED → TESTED` 状态；支持的版本逐一记录。静态字符串命中不等于功能存在，候选方法不等于 Hook 可用，Hook 安装成功不等于业务闭环通过。最终交付必须提供功能覆盖矩阵、版本差异表、Hook Profile、测试证据和明确的未覆盖清单。
+
 ### 3. 候选证据评分
 
 候选必须同时检查下列独立证据族：
