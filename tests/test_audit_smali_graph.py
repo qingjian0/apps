@@ -1107,5 +1107,81 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertNotEqual("singleton", sink_receiver["identity_status"])
 
 
+class InterproceduralExceptionReturnTest(unittest.TestCase):
+    def test_exceptional_wrapper_does_not_project_nested_return_identity(self):
+        def method(owner, name, descriptor, body):
+            cfg = AUDIT.build_smali_cfg(body)
+            invokes = AUDIT.extract_invoke_sites(body)
+            fields = AUDIT.extract_field_access_sites(body)
+            pts = AUDIT.analyze_object_points_to(
+                body, cfg, owner, name, descriptor, "static", fields, invokes)
+            return {
+                "class": owner, "name": name, "descriptor": descriptor,
+                "component": "base", "invoke_sites": invokes,
+                "invoke_sites_truncated": False, "invoke_sites_incomplete": False,
+                "object_points_to": pts,
+                "control_flow": {
+                    "branch_count": sum(
+                        1 for line in body if AUDIT.BRANCH_RE.match(line)
+                    ),
+                    "return_count": sum(
+                        1 for line in body
+                        if AUDIT.OP_RE.match(line)
+                        and AUDIT.OP_RE.match(line).group(1).startswith("return")
+                    ),
+                    "cfg": cfg,
+                },
+            }
+
+        caller = method("Lx/Caller;", "run", "()V", [
+            "    invoke-static {}, Lx/Wrapper;->make()Lx/Thing;",
+            "    move-result-object v0",
+            "    invoke-static {v0}, Lx/Sink;->consume(Lx/Thing;)V",
+            "    return-void",
+        ])
+        wrapper = method("Lx/Wrapper;", "make", "()Lx/Thing;", [
+            "    invoke-static {}, Lx/Factory;->make()Lx/Thing;",
+            "    move-result-object v0",
+            "    :try_start_0",
+            "    invoke-static {}, Lx/Worker;->mayThrow()V",
+            "    :try_end_0",
+            "    return-object v0",
+            "    :catch_0",
+            "    move-exception v1",
+            "    return-object v0",
+            "    .catch Ljava/lang/Exception; {:try_start_0 .. :try_end_0} :catch_0",
+        ])
+        factory = method("Lx/Factory;", "make", "()Lx/Thing;", [
+            "    new-instance v0, Lx/Thing;",
+            "    return-object v0",
+        ])
+        worker = method("Lx/Worker;", "mayThrow", "()V", ["    return-void"])
+        sink = method("Lx/Sink;", "consume", "(Lx/Thing;)V", [
+            "    iget-object v0, p0, Lx/Thing;->value:Ljava/lang/Object;",
+            "    return-void",
+        ])
+
+        self.assertTrue(any(
+            edge["kind"] == "exception"
+            for edge in wrapper["control_flow"]["cfg"]["edges"]
+        ))
+        self.assertEqual(0, wrapper["control_flow"]["branch_count"])
+
+        graph = AUDIT.build_interprocedural_points_to_graph(
+            [caller, wrapper, factory, worker, sink]
+        )
+        wrapper_call = next(
+            row for row in graph["call_contexts"]
+            if row["callee"] == "Lx/Wrapper;->make()Lx/Thing;"
+        )
+        self.assertEqual("unknown", wrapper_call["return_value"]["identity_status"])
+        sink_receiver = next(
+            row for row in graph["contextual_receivers"]
+            if row["callee"] == "Lx/Sink;->consume(Lx/Thing;)V"
+        )
+        self.assertEqual("unknown", sink_receiver["identity_status"])
+        self.assertEqual(0, graph["summary"]["return_identity_propagations"])
+
+
 if __name__ == "__main__":
     unittest.main()
