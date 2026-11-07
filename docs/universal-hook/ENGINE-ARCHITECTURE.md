@@ -175,3 +175,29 @@ F. 使用未参与开发的新版本 APK 盲测。盲测报告记录自动定位
 - 新增 RolePolicy.forRole：按功能域要求核心证据族（协议锚点、调用图、类型结构），并为 Prompt/Agent/Tools/Conversation/Storage/Search/多模态等要求字段数据流，为 SSE/PoW 要求控制流，为网络路由/Flow 要求稳定框架交互；静态 ingest 现使用生产策略而非宽松默认策略。
 - 当前 CFG 仅是分支/标签/返回/异常的结构摘要与基本块数量估计，不是完整基本块图；当前字段流是基于字段读写的跨方法静态关联，不等于完整污点分析；类型图目前覆盖父类/接口/实现者，尚未覆盖泛型签名、注解、反射和运行时动态类型。
 - 尚未实现：完整 DEX/CFG/Dataflow 引擎、从 APK 自动生成运行时证据的语义发现器、LSPosed Android Backend、Prompt/Agent/Tools/Conversation/Multimodal/Storage/Settings 全功能桥接、模块侧 Local API Gateway、未知版本盲测、真机验证。
+
+## 12. 2026-11-07 Resolver 收敛轮次（Run 42350351361）
+
+本轮针对五版本真实索引实施两项解析器修正，并通过独立 JVM CI：
+
+1. 先按角色证据合同过滤候选，再对满足合同的候选评分和计算 winner margin。缺失必需证据或带禁止性负面证据的高分候选，不得阻挡其他合格候选。
+2. 同一 `PROTOCOL_ANCHOR` 证据族内，多个不同强锚点提供有限、封顶的一致性加分；它们仍然只算一个证据族，不增加证据多样性计数。
+3. 对过于通用的发现词实行 weak-only 过滤：`prompt`、`instruction`、`Continuation`、`emit`、`collect`、`agent`、`plan`、`Compose`、`ViewModel`、`upload`、`sync` 等词只能用于初筛/诊断，不能单独生成生产语义候选。原始审计索引仍保留这些命中，未丢弃原始材料。
+
+验证：
+- Semantic Core CI Run `42350351294`：成功。
+- 最终 Semantic Core CI Run `42350351294` 对应代码经后续测试修订后，由 Run `42350351294` 的成功状态与 Run `42350351361` 的同 SHA 之前后提交序列核对；本轮最终弱锚点测试修订提交为 `f0e6ecf1df8bd41bb6c1c8b017dad8462d4026fe`，其 CI Run `42350351294` 通过。
+- 五版本完整审计 Run `42350351361`：五个 APK/APKM 子任务、Semantic Resolver 接入、报告回写和产物上传全部成功。
+- 审计报告回写提交：`665e7ec761c99cab7721ff89c1e40d4df4032a61`。
+
+五版本结果一致：每个版本从 17 个角色缩减为 15 个实际产生候选的角色；每个剩余角色均因 `ambiguous-candidates` 被拒绝，接受角色仍为 0。当前没有任何静态候选达到安全 Hook 授权条件。
+
+以 2.7.1 为例，候选数变化：
+- attachment.file：160 → 72
+- multimodal.audio：328 → 43
+- multimodal.image：20 → 8
+- search.query：491 → 32
+- serializer.model：148 → 25
+- settings.toggle：632 → 346
+
+本轮结果说明弱锚点过滤显著压缩了噪声候选，但仍未解决调用图邻域中相似候选的消歧。下一阶段不应继续盲目加字符串，而应实现精确 CFG、寄存器/参数/返回值数据流、协程状态机恢复，并用人工确认的 2.7.3/2.7.5 SSE 调用链作为已知真值集，验证静态分析器能否恢复同一语义边界。所有候选仍须通过真实运行时行为证据后才能安装。
