@@ -185,8 +185,7 @@ F. 使用未参与开发的新版本 APK 盲测。盲测报告记录自动定位
 3. 对过于通用的发现词实行 weak-only 过滤：`prompt`、`instruction`、`Continuation`、`emit`、`collect`、`agent`、`plan`、`Compose`、`ViewModel`、`upload`、`sync` 等词只能用于初筛/诊断，不能单独生成生产语义候选。原始审计索引仍保留这些命中，未丢弃原始材料。
 
 验证：
-- Semantic Core CI Run `42350351294`：成功。
-- 最终 Semantic Core CI Run `42350351294` 对应代码经后续测试修订后，由 Run `42350351294` 的成功状态与 Run `42350351361` 的同 SHA 之前后提交序列核对；本轮最终弱锚点测试修订提交为 `f0e6ecf1df8bd41bb6c1c8b017dad8462d4026fe`，其 CI Run `42350351294` 通过。
+- Semantic Core CI Run `42350351294`：最终代码提交 `f0e6ecf1df8bd41bb6c1c8b017dad8462d4026fe`，37 项测试通过。
 - 五版本完整审计 Run `42350351361`：五个 APK/APKM 子任务、Semantic Resolver 接入、报告回写和产物上传全部成功。
 - 审计报告回写提交：`665e7ec761c99cab7721ff89c1e40d4df4032a61`。
 
