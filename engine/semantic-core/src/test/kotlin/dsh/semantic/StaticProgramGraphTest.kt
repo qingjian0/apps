@@ -111,7 +111,7 @@ class StaticProgramGraphTest {
             """{"caller":"$caller","callee":"$target","identity_scope":"bounded-call-string-context","identity_status":"singleton","identity":"alloc:caller#0:Lx/Thing;","runtime_identity_proven":false}"""
         ))
         val completeSummary = textFile(
-            """{"interprocedural_points_to":{"records_truncated":false,"context_expansion_complete":true,"recursive_fixed_point":false,"runtime_identity_proven":false}}"""
+            """{"interprocedural_points_to":{"records_truncated":false,"context_expansion_complete":true,"recursive_fixed_point":false,"runtime_identity_proven":false,"contextual_receiver_count":1,"singleton_context_receiver_count":1}}"""
         )
         val host = HostFingerprint("com.deepseek.chat", 300, "future", "cert", "dex-300", "loader")
         val candidate = SemanticCandidate(
@@ -128,6 +128,19 @@ class StaticProgramGraphTest {
         assertTrue(graph.graphStats()["interproceduralPointsToLoaded"] == 1)
         assertTrue(graph.graphStats()["interproceduralContextualReceivers"] == 1)
         assertTrue(graph.graphStats()["interproceduralSingletonContextReceivers"] == 1)
+        assertTrue(graph.graphStats()["interproceduralPointsToExpectedReceivers"] == 1)
+        assertTrue(graph.graphStats()["interproceduralPointsToExpectedSingletonReceivers"] == 1)
+        assertTrue(graph.graphStats()["interproceduralPointsToLoadedRecords"] == 1)
+        assertTrue(graph.graphStats()["interproceduralPointsToCountsMatch"] == 1)
+        val mismatchedSummary = textFile(
+            """{"interprocedural_points_to":{"records_truncated":false,"context_expansion_complete":true,"recursive_fixed_point":false,"runtime_identity_proven":false,"contextual_receiver_count":2,"singleton_context_receiver_count":2}}"""
+        )
+        val mismatchedGraph = StaticProgramGraph.load(
+            methods, edges, classes, summaryPath = mismatchedSummary, pointsToPath = pointsTo
+        )
+        assertTrue(mismatchedGraph.graphStats()["interproceduralPointsToLoadedRecords"] == 1)
+        assertTrue(mismatchedGraph.graphStats()["interproceduralPointsToCountsMatch"] == 0)
+        assertTrue(mismatchedGraph.graphStats()["interproceduralPointsToLoaded"] == 0)
         // A static contextual points-to projection is diagnostic only, never DATA_FLOW evidence.
         assertFalse(enriched.evidence.any { it.family == EvidenceFamily.DATA_FLOW })
 
