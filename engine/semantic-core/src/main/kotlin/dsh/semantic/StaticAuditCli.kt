@@ -27,18 +27,20 @@ fun main(args: Array<String>) {
         val summaryPath = auditDirectory?.resolve("summary.json")?.takeIf { it.isFile }?.path
         val pointsToPath = auditDirectory?.resolve("interprocedural-points-to.jsonl.gz")
             ?.takeIf { it.isFile }?.path
-        val graph = StaticProgramGraph.load(
-            methodsPath, edgesPath, classesPath, valueEdgesPath, summaryPath, pointsToPath
-        )
         val byRole = mutableMapOf<RoleId, MutableList<SemanticCandidate>>()
         var methods = 0
-        BufferedReader(InputStreamReader(GZIPInputStream(FileInputStream(methodsPath)), Charsets.UTF_8)).use { input ->
-            input.lineSequence().forEach { line ->
-                methods++
-                reader.readLine(line, host, anchorFrequency).forEach { candidate ->
-                    byRole.getOrPut(candidate.role) { mutableListOf() }.add(graph.enrich(candidate))
-                }
+        val graph = StaticProgramGraph.load(
+            methodsPath, edgesPath, classesPath, valueEdgesPath, summaryPath, pointsToPath
+        ) { line ->
+            methods++
+            reader.readLine(line, host, anchorFrequency).forEach { candidate ->
+                byRole.getOrPut(candidate.role) { mutableListOf() }.add(candidate)
             }
+        }
+        // Enrich only after the complete graph is available; candidate extraction
+        // shares the graph loader's method-index pass instead of reparsing JSONL.
+        byRole.values.forEach { candidates ->
+            for (index in candidates.indices) candidates[index] = graph.enrich(candidates[index])
         }
         var acceptedRoles = 0
         val roleSummary = sortedMapOf<String, String>()
