@@ -972,6 +972,128 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4):
             return [identity],False
         return [identity],False
 
+    return_summary_recursive_cuts=0
+    return_summary_depth_cuts=0
+    return_summary_compositions=0
+
+    def resolve_contextual_return(method, context_id, bindings, path, depth, expand=True):
+        """Resolve a method's object return through bounded nested call contexts."""
+        nonlocal return_summary_recursive_cuts, return_summary_depth_cuts
+        nonlocal return_summary_compositions
+        pts=method.get("object_points_to",{})
+        parsed_method=parse_method_descriptor(method.get("descriptor",""))
+        if (not pts.get("complete") or not parsed_method
+                or not parsed_method["return_type"].startswith(("L","["))):
+            return {"points_to":[],"unknown":True,"identity_status":"unknown"}
+        key=method["_points_to_key"]
+        cfg=method.get("control_flow",{}).get("cfg",{})
+        linear_safe=(method.get("control_flow",{}).get("branch_count")==0
+            and cfg.get("complete") is True
+            and not any(edge.get("kind")=="exception" for edge in cfg.get("edges",[])))
+        overrides={}
+        args_by_instruction=collections.defaultdict(list)
+        for item in pts.get("invoke_arguments",[]):
+            args_by_instruction[item.get("call_instruction")].append(item)
+        writes_by_register=collections.defaultdict(list)
+        for write in pts.get("instruction_writes",[]):
+            for register in write.get("registers",[]):
+                writes_by_register[register].append(write["instruction"])
+
+        if expand and linear_safe:
+            for nested_site in sorted(method.get("invoke_sites",[]),key=lambda x:x["instruction"]):
+                nested_parsed=parse_method_descriptor(nested_site.get("descriptor",""))
+                if (not nested_parsed or not nested_parsed["return_type"].startswith(("L","["])
+                        or not nested_site.get("result_register")
+                        or nested_site.get("result_instruction") is None):
+                    continue
+                target=(nested_site["owner"]+"->"+nested_site["name"]+
+                        nested_site["descriptor"])
+                choices=by_signature.get(target,[])
+                same_component=[m for m in choices if m.get("component")==method.get("component")]
+                if len(same_component)==1:
+                    nested_callee=same_component[0]
+                elif len(choices)==1:
+                    nested_callee=choices[0]
+                else:
+                    continue
+                nested_key=nested_callee["_points_to_key"]
+                nested_context="{}=>{}@{}".format(context_id,key,nested_site["instruction"])
+                nested_bindings={}
+                nested_actuals=args_by_instruction.get(nested_site["instruction"],[])
+                if any(not x.get("mapping_complete") for x in nested_actuals):
+                    continue
+                for item in nested_actuals:
+                    reg=item.get("actual_register")
+                    override=overrides.get(reg) if reg else None
+                    override_valid=False
+                    if override and nested_site["instruction"]>override["definition_instruction"]:
+                        writes=[x for x in writes_by_register.get(reg,[])
+                                if override["definition_instruction"]<x<nested_site["instruction"]]
+                        override_valid=not writes
+                    if override_valid:
+                        ids=list(override["points_to"])
+                        unknown=bool(override["unknown"])
+                    else:
+                        ids=[]; unknown=bool(item.get("unknown"))
+                        for identity in item.get("points_to",[]):
+                            projected,was_unknown=substitute(
+                                identity,key,bindings,context_id,
+                                contextualize_allocations=depth>0)
+                            ids.extend(projected); unknown=unknown or was_unknown
+                    nested_bindings[item["formal_register"]]={
+                        "points_to":sorted(set(ids)),"unknown":unknown
+                    }
+                if nested_key in path:
+                    return_summary_recursive_cuts+=1
+                    nested_result={"points_to":[],"unknown":True,"identity_status":"unknown"}
+                elif depth+1>=max_call_depth:
+                    if nested_callee.get("invoke_sites"):
+                        return_summary_depth_cuts+=1
+                    nested_result=resolve_contextual_return(
+                        nested_callee,nested_context,nested_bindings,
+                        path+(key,),depth+1,expand=False)
+                else:
+                    nested_result=resolve_contextual_return(
+                        nested_callee,nested_context,nested_bindings,
+                        path+(key,),depth+1,expand=True)
+                if nested_result["identity_status"]=="singleton":
+                    overrides[nested_site["result_register"]]={
+                        "definition_instruction":nested_site["result_instruction"],
+                        "points_to":nested_result["points_to"],"unknown":False
+                    }
+                    return_summary_compositions+=1
+
+        expected=method.get("control_flow",{}).get("return_count",0)
+        return_facts=pts.get("return_values",[])
+        if expected<=0 or len(return_facts)!=expected:
+            return {"points_to":[],"unknown":True,"identity_status":"unknown"}
+        returned=set()
+        has_unknown=False
+        for fact in return_facts:
+            reg=fact.get("register")
+            override=overrides.get(reg) if reg else None
+            override_valid=False
+            if override and fact.get("instruction",-1)>override["definition_instruction"]:
+                writes=[x for x in writes_by_register.get(reg,[])
+                        if override["definition_instruction"]<x<fact["instruction"]]
+                override_valid=not writes
+            if override_valid:
+                returned.update(override["points_to"])
+                has_unknown=has_unknown or bool(override["unknown"])
+            else:
+                has_unknown=has_unknown or bool(fact.get("unknown"))
+                for identity in fact.get("points_to",[]):
+                    projected,unknown=substitute(
+                        identity,key,bindings,context_id,
+                        contextualize_allocations=depth>0)
+                    returned.update(projected)
+                    has_unknown=has_unknown or unknown
+        values=sorted(returned)
+        status=("unknown" if has_unknown else
+                "singleton" if len(values)==1 else
+                "multiple" if len(values)>1 else "unresolved")
+        return {"points_to":values,"unknown":has_unknown,"identity_status":status}
+
     while queue:
         state=queue.popleft()
         caller=state["method"]
