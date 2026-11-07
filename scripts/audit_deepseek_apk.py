@@ -920,6 +920,8 @@ def build_interprocedural_points_to_graph(methods):
     ambiguous=0
     incomplete=0
     singleton_context_receivers=0
+    records_truncated=False
+    record_limit=200000
     def contextualize(identity,callee_key,formal_map,context_id):
         prefix="param:{}:".format(callee_key)
         if identity.startswith(prefix):
@@ -967,17 +969,20 @@ def build_interprocedural_points_to_graph(methods):
                 continue
             formal_map={x["formal_register"]:x for x in actuals}
             context_id="{}@{}".format(caller_key,site["instruction"])
-            call_contexts.append({
-                "context_id":context_id,"caller":caller_key,"callee":callee_key,
-                "call_instruction":site["instruction"],"call_line":site["line"],
-                "arguments":[{
-                    "formal_register":x["formal_register"],
-                    "actual_register":x["actual_register"],
-                    "argument_kind":x["argument_kind"],
-                    "points_to":x["points_to"],"unknown":x["unknown"],
-                    "identity_status":x["identity_status"]
-                } for x in actuals]
-            })
+            if len(call_contexts)<record_limit:
+                call_contexts.append({
+                    "context_id":context_id,"caller":caller_key,"callee":callee_key,
+                    "call_instruction":site["instruction"],"call_line":site["line"],
+                    "arguments":[{
+                        "formal_register":x["formal_register"],
+                        "actual_register":x["actual_register"],
+                        "argument_kind":x["argument_kind"],
+                        "points_to":x["points_to"],"unknown":x["unknown"],
+                        "identity_status":x["identity_status"]
+                    } for x in actuals]
+                })
+            else:
+                records_truncated=True
             resolved+=1
             for fact in callee_pts.get("field_receivers",[]):
                 identities=[]
@@ -990,17 +995,20 @@ def build_interprocedural_points_to_graph(methods):
                 status=("unknown" if has_unknown else
                         "singleton" if len(identities)==1 else
                         "multiple" if len(identities)>1 else "unresolved")
-                contextual_receivers.append({
-                    "context_id":context_id,"caller":caller_key,"callee":callee_key,
-                    "call_instruction":site["instruction"],
-                    "receiver_instruction":fact.get("instruction"),
-                    "field":fact.get("field"),"access":fact.get("access"),
-                    "points_to":identities,"unknown":has_unknown,
-                    "identity_status":status,
-                    "identity":identities[0] if status=="singleton" else None,
-                    "identity_scope":"one-callsite-context",
-                    "runtime_identity_proven":False
-                })
+                if len(contextual_receivers)<record_limit:
+                    contextual_receivers.append({
+                        "context_id":context_id,"caller":caller_key,"callee":callee_key,
+                        "call_instruction":site["instruction"],
+                        "receiver_instruction":fact.get("instruction"),
+                        "field":fact.get("field"),"access":fact.get("access"),
+                        "points_to":identities,"unknown":has_unknown,
+                        "identity_status":status,
+                        "identity":identities[0] if status=="singleton" else None,
+                        "identity_scope":"one-callsite-context",
+                        "runtime_identity_proven":False
+                    })
+                else:
+                    records_truncated=True
                 if status=="singleton":
                     singleton_context_receivers+=1
     for method in methods:
@@ -1013,6 +1021,8 @@ def build_interprocedural_points_to_graph(methods):
             "ambiguous_call_sites":ambiguous,"incomplete_call_sites":incomplete,
             "contextual_receiver_count":len(contextual_receivers),
             "singleton_context_receiver_count":singleton_context_receivers,
+            "records_truncated":records_truncated,
+            "record_limit":record_limit,
             "recursive_fixed_point":False,"runtime_identity_proven":False
         }
     }
