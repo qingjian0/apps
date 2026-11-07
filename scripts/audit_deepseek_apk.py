@@ -701,7 +701,8 @@ def analyze_object_points_to(body_lines, cfg, owner, method_name, descriptor,
             groups[(fact["field"],fact["identity"])].append(fact["instruction"])
     same_instance_groups=[
         {"field":field,"identity":identity,"instructions":sorted(set(indices)),
-         "confirmed_same_instance":True}
+         "same_instance_within_single_activation":True,
+         "identity_scope":"single-method-activation"}
         for (field,identity),indices in groups.items() if len(set(indices))>1
     ]
     return {"complete":True,"reason":None,"iterations":iterations,
@@ -1094,7 +1095,7 @@ def main():
       "field_receiver_unresolved_count":sum(m.get("object_points_to",{}).get("unresolved_receiver_count",0) for m in all_methods),
       "same_instance_field_group_count":sum(len(m.get("object_points_to",{}).get("same_instance_groups",[])) for m in all_methods),
       "cyclic_allocation_site_count":sum(m.get("object_points_to",{}).get("cyclic_allocation_site_count",0) for m in all_methods),
-      "field_instance_identity_scope":"intraprocedural-singleton-points-to-only",
+      "field_instance_identity_scope":"intraprocedural-singleton-points-to-per-method-activation",
       "interprocedural_value_flow":interprocedural["summary"],
       "candidate_method_count":len(candidates),
       "native_libraries":native,"tool_limits":{"JADX":"best-effort; inspect exit status and APKTool smali evidence",
