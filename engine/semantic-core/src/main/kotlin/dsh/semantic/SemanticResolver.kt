@@ -36,12 +36,12 @@ class SemanticResolver {
 
         if (eligible.isEmpty()) {
             val best = evaluated.sortedWith(
-                compareBy<Evaluation> { it.forbidden.isNotEmpty() }
-                    .thenBy { it.families.size < policy.minimumEvidenceFamilies }
+                compareBy<Evaluation> { if (it.forbidden.isEmpty()) 0 else 1 }
+                    .thenBy { if (it.families.size >= policy.minimumEvidenceFamilies) 0 else 1 }
                     .thenBy { it.missingFamilies.size }
-                    .thenBy { it.score }
+                    .thenByDescending { it.score }
                     .thenBy { it.candidate.method.stableIdentity }
-            ).last()
+            ).first()
             val reason = when {
                 best.forbidden.isNotEmpty() -> "forbidden-negative-evidence:" + best.forbidden.sorted().joinToString()
                 best.families.size < policy.minimumEvidenceFamilies -> "insufficient-independent-evidence"
