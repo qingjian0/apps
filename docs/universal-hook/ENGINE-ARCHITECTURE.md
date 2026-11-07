@@ -268,3 +268,63 @@ The first regression cases cover a linear assignment chain, a branch join where 
 **Strict limitations:** this is not SSA construction, a verifier-grade Dalvik interpreter, interprocedural parameter/return propagation, object/field alias analysis, wide-register pair modeling, exception-sensitive register-state analysis, or coroutine state-machine reconstruction. The analysis keeps vN and pN register aliases distinct and does not infer semantic values from them. An unresolved use is not automatically a defect: it may be a method parameter, incoming value, or a value whose definition lies outside the analyzed method. The output is evidence for later graph work, not sufficient semantic proof and never Hook authorization.
 
 The next implementation step is to add parameter/return edges between methods and field-value propagation, then validate the recovered graph against manually confirmed 2.7.3/2.7.5 SSE routes and negative candidates. Any incomplete CFG, unknown opcode, index mismatch or non-convergent dataflow remains ineligible as a complete dataflow evidence family.
+
+
+## 16. 2026-11-07 跨方法参数/返回值数据流第一版
+
+本轮在单方法 CFG reaching-definitions 之上增加了跨方法值边生成器，目标是把“调用关系”提升为“参数与返回值来源关系”。
+
+### 16.1 方法描述符与参数寄存器布局
+
+- 新增 Dalvik/JVM 方法描述符解析，保留对象、数组和基本类型边界。
+- 按实例方法/静态方法区分 receiver：实例方法的 p0 为 receiver，静态方法的 p0 为首个参数。
+- long / double 按两个 Dalvik register words 计算参数槽位；数组/对象按一个 word。
+- 方法入口为参数寄存器建立 synthetic reaching definitions（entry:pN），避免把合法的 incoming parameter 错判为 unresolved。
+- 当前参数别名以 Smali pN 表示；不把 vN 与 pN 自动合并，也不尝试推断 .locals / .registers 下的物理寄存器别名。
+
+### 16.2 调用点参数映射
+
+每个可识别 invoke-* 调用点额外记录：
+- 指令索引、行号、invoke opcode；
+- 精确目标 owner、方法名和完整 descriptor；
+- 按调用寄存器顺序展开的实际参数 word 列表（支持 /range）；
+- 紧随其后的 move-result* 指令索引和目标寄存器。
+
+只有 owner + name + descriptor 精确匹配到唯一内部方法时才生成跨方法映射。若同一组件存在唯一匹配，优先使用同组件定义；多定义或无定义分别记为 ambiguous / unresolved，不以短类名或方法名猜测目标。
+
+### 16.3 参数与返回值边
+
+- 参数边从 caller 实际寄存器在调用点的 reaching definitions 指向 callee 对应 entry:pN。
+- receiver 也作为独立参数槽记录。
+- 返回边从 callee return* 读取寄存器的 reaching definitions 指向 caller move-result* 定义。
+- long / double 的参数 word 数用于参数槽对齐；当前返回值边以 move-result 目标寄存器为粒度，不做 wide-pair 语义合并。
+- caller 或 callee 的 CFG/dataflow 不完整、use/definition 证据被截断、调用点列表被截断时，不生成值边，并记录不完整调用点计数。
+
+### 16.4 字段槽索引（非对象污点传播）
+
+新增字段访问点索引，记录：
+- 精确字段描述符 owner->name:type；
+- iget/sget 读取或 iput/sput 写入；
+- value register、instance receiver register（静态字段为空）；
+- 指令索引、行号、组件和所属方法。
+
+另生成跨方法 field-slot 分组，只有同一精确字段描述符同时存在读和写时才列出潜在读写关联。**这不是对象实例级传播**：当前没有证明两个 pN/vN receiver 指向同一对象，因此 instance_identity_confirmed=false，字段槽分组不得直接作为强语义证据或 Hook 授权条件。
+
+### 16.5 产物与统计
+
+- interprocedural-value-edges.jsonl.gz：参数/返回值值边。
+- field-slot-index.jsonl.gz：精确字段槽读写分组，显式标记对象身份未确认。
+- methods.jsonl.gz：保留参数寄存器、调用点、字段访问点和方法内 reaching-definitions。
+- summary.json：增加参数定义数、invoke/field 访问点数、参数/返回边数、无法解析/歧义调用数、数据流不完整调用点数和字段槽统计。
+
+### 16.6 已知限制与下一步
+
+当前实现仍不是完整 DEX 解释器或完整程序切片：
+- 未实现对象别名/points-to 分析、数组元素传播、反射与动态 dispatch；
+- 未实现跨调用上下文敏感的递归固定点传播；
+- 未实现 wide 返回值双寄存器合并、异常路径寄存器状态和协程 Continuation 状态机恢复；
+- invoke-custom、invoke-polymorphic 等特殊调用形式需要单独验证；
+- 精确 owner/name/descriptor 无法解析时保持 unresolved，不猜测映射；
+- 字段槽读写关联不证明对象实例相同。
+
+下一阶段应先补齐 Python 单元与真实五版本索引回归，再实现基于参数边的 receiver alias propagation（带对象创建点/参数来源），最后将字段槽分组升级为带别名证据的字段值传播。只有被多条独立证据验证的传播关系才可进入生产 SemanticResolver；本轮新图不直接改变 Resolver 评分或 HookCoordinator 授权。
