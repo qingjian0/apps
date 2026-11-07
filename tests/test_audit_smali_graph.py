@@ -337,6 +337,31 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertEqual("unknown", facts["field_receivers"][0]["identity_status"])
         self.assertEqual([], facts["same_instance_groups"])
 
+    def test_object_points_to_keeps_exceptional_instruction_states(self):
+        body = [
+            "    .catch Ljava/lang/Throwable; {:try_start .. :try_end} :handler",
+            "    :try_start",
+            "    new-instance v0, Lx/First;",
+            "    new-instance v0, Lx/Second;",
+            "    :try_end",
+            "    goto :done",
+            "    :handler",
+            "    iput-object v1, v0, Lx/Holder;->value:Ljava/lang/Object;",
+            "    :done",
+            "    return-void",
+        ]
+        cfg = AUDIT.build_smali_cfg(body)
+        sites = AUDIT.extract_field_access_sites(body)
+        facts = AUDIT.analyze_object_points_to(
+            body, cfg, "Lx/Owner;", "run", "()V", "public static", sites)
+        self.assertTrue(cfg["complete"])
+        self.assertTrue(facts["complete"])
+        self.assertEqual(1, len(facts["field_receivers"]))
+        # The handler can observe the state after either allocation instruction.
+        # A single allocation-site identity here would be an unsound narrowing.
+        self.assertNotEqual("singleton", facts["field_receivers"][0]["identity_status"])
+        self.assertEqual([], facts["same_instance_groups"])
+
     def test_object_points_to_tracks_reference_parameters(self):
         body = [
             "    move-object v0, p1",
