@@ -238,6 +238,59 @@ def build_smali_cfg(body_lines):
         "blocks_truncated":False}
 
 
+def analyze_register_use_def(body_lines):
+    """Extract conservative per-instruction Dalvik register reads/writes.
+
+    This is local instruction use-def metadata, not reaching-definitions analysis.
+    Unknown opcodes are reported and never silently treated as having no uses.
+    """
+    register_re=re.compile(r"\b[vp]\d+\b")
+    result=[]; unknown=[]
+    read_all_prefixes=("invoke-", "filled-new-array")
+    write_first_prefixes=(
+        "move", "const", "new-instance", "new-array", "array-length", "instance-of",
+        "iget", "sget", "aget", "neg-", "not-", "int-to-", "long-to-", "float-to-",
+        "double-to-", "add-", "sub-", "mul-", "div-", "rem-", "and-", "or-",
+        "xor-", "shl-", "shr-", "ushr-", "cmp"
+    )
+    read_only_prefixes=("return", "throw", "if-", "packed-switch", "sparse-switch",
+                        "iput", "sput", "aput", "monitor-", "check-cast")
+    for line_no,line in enumerate(body_lines,1):
+        stripped=line.strip()
+        match=OP_RE.match(line)
+        if not match or stripped.startswith((".",":","#")):
+            continue
+        op=match.group(1)
+        regs=register_re.findall(stripped)
+        if not regs:
+            continue
+        if op.startswith(read_all_prefixes) or op.startswith(read_only_prefixes):
+            reads=regs
+            writes=[]
+            if op.startswith("check-cast"):
+                writes=regs[:1]
+        elif op.startswith(write_first_prefixes):
+            writes=regs[:1]
+            reads=regs[1:]
+        elif op.startswith(("move-exception", "move-result")):
+            writes=regs[:1]; reads=regs[1:]
+        elif op in ("nop",):
+            reads=[]; writes=[]
+        else:
+            unknown.append({"line":line_no,"opcode":op})
+            continue
+        result.append({"line":line_no,"opcode":op,"reads":sorted(set(reads)),
+                       "writes":sorted(set(writes))})
+    all_reads=sorted({r for item in result for r in item["reads"]})
+    all_writes=sorted({r for item in result for r in item["writes"]})
+    return {
+        "instruction_count":len(result),"read_registers":all_reads,
+        "written_registers":all_writes,"unknown_opcode_count":len(unknown),
+        "unknown_opcodes":unknown[:32],"complete":not unknown,
+        "instructions":result[:256],"instructions_truncated":len(result)>256
+    }
+
+
 def analyze_smali(root):
     classes=[]; methods=[]; call_edges=[]
     for file in sorted(root.rglob("*.smali")):
@@ -275,6 +328,7 @@ def analyze_smali(root):
                     current["field_reads"]=sorted(set(current["field_reads"]))[:120]
                     current["field_writes"]=sorted(set(current["field_writes"]))[:120]
                     cfg=build_smali_cfg(current["body_lines"])
+                    current["register_flow"]=analyze_register_use_def(current["body_lines"])
                     current["control_flow"]={"branch_count":current["branch_count"],"label_count":current["label_count"],
                         "return_count":current["return_count"],"throw_count":current["throw_count"],
                         "basic_block_estimate":cfg["block_count"],"cfg":cfg}
