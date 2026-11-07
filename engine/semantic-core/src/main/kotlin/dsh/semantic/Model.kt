@@ -23,7 +23,7 @@ data class MethodShape(val ownerDescriptor: String, val name: String, val descri
 
 data class SemanticCandidate(val role: RoleId, val method: MethodShape, val host: HostFingerprint, val evidence: List<Evidence>, val negativeEvidence: Set<String> = emptySet(), val sourceVersion: String? = host.versionName)
 
-data class RolePolicy(val role: RoleId, val minimumEvidenceFamilies: Int = 3, val minimumScore: Double = 2.0, val minimumWinnerMargin: Double = 0.35, val requiredFamilies: Set<EvidenceFamily> = emptySet(), val forbiddenNegativeEvidence: Set<String> = emptySet()) {
+data class RolePolicy(val role: RoleId, val minimumEvidenceFamilies: Int = 3, val minimumScore: Double = 2.0, val minimumWinnerMargin: Double = 0.5, val requiredFamilies: Set<EvidenceFamily> = emptySet(), val forbiddenNegativeEvidence: Set<String> = emptySet()) {
     init { require(minimumEvidenceFamilies >= 1); require(minimumScore >= 0.0); require(minimumWinnerMargin >= 0.0) }
 }
 
