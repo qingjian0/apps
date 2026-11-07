@@ -31,9 +31,9 @@ fun main(args: Array<String>) {
         var methods = 0
         val graph = StaticProgramGraph.load(
             methodsPath, edgesPath, classesPath, valueEdgesPath, summaryPath, pointsToPath
-        ) { line ->
+        ) { record ->
             methods++
-            reader.readLine(line, host, anchorFrequency).forEach { candidate ->
+            reader.readObject(record, host, anchorFrequency).forEach { candidate ->
                 byRole.getOrPut(candidate.role) { mutableListOf() }.add(candidate)
             }
         }
