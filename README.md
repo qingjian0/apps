@@ -19,6 +19,8 @@
 - 候选歧义、证据不足、负面证据时 fail-closed；
 - 角色级幂等 HookCoordinator 和可注入 HookBackend；
 - 独立 GitHub Actions 单元测试工作流。
+- 新增 StaticProgramGraph：接入真实调用边、跨方法字段读写关联和控制流结构摘要；候选锚点按全宿主索引稀有度加权。
+- 五版本首轮真实接入的 19 个角色全部因候选歧义被拒绝，明确保持 fail-closed；本轮已加入图证据与 Smali 解析回归测试，等待 CI 验证。
 
 **当前限制：** 这是引擎核心原型，不是已完成的 DEX 自动语义发现器，也没有接入 LSPosed Android Backend。Agent、提示词、本地 API 等全功能域已列入覆盖目标，但必须逐域完成静态证据、运行时验证、桥接和回归测试后才能标记完成。详情：[全功能覆盖矩阵](docs/universal-hook/README.md) · [Kotlin Semantic Core](engine/semantic-core/)。
 
