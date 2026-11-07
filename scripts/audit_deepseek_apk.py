@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Repository-only DeepSeek APK audit. Emits compact, privacy-safe evidence indexes."""
 from __future__ import annotations
-import argparse, collections, gzip, hashlib, json, pathlib, re, shutil, struct, subprocess, zipfile
+import argparse, collections, gzip, hashlib, json, pathlib, re, shutil, struct, subprocess, zipfile, xml.etree.ElementTree as ET
 
 ROUTES = (
     "/api/v0/chat/completion", "/api/v0/chat/regenerate", "/api/v0/chat/continue",
@@ -156,12 +156,24 @@ def main():
             for x in meth: x["component"]=apk.name
             for x in edges: x["component"]=apk.name
             all_classes.extend(cls); all_methods.extend(meth); all_edges.extend(edges)
+        manifest={}
+        manifest_path=smali/"AndroidManifest.xml"
+        if manifest_path.exists():
+            try:
+                root=ET.parse(manifest_path).getroot()
+                android_ns="{http://schemas.android.com/apk/res/android}"
+                manifest={"package":root.attrib.get("package"),"split":root.attrib.get("split"),
+                          "version_code":root.attrib.get(android_ns+"versionCode"),
+                          "version_code_major":root.attrib.get(android_ns+"versionCodeMajor"),
+                          "version_name":root.attrib.get(android_ns+"versionName")}
+            except (ET.ParseError,OSError) as exc:
+                manifest={"parse_error":type(exc).__name__}
         jadx_dir=work/f"jadx-{i}"
         jadx_rc=run([a.jadx,"--show-bad-code","--no-res","--threads-count","2","-d",str(jadx_dir),str(apk)],comp_out/"jadx.log")
         java_count=len(list((jadx_dir/"sources").rglob("*.java"))) if (jadx_dir/"sources").exists() else 0
         (comp_out/"component.json").write_text(json.dumps({"apk":apk.name,"bytes":apk.stat().st_size,
-             "sha256":sha256(apk),"apktool_exit":apktool_rc,"jadx_exit":jadx_rc,
-             "java_files":java_count,"dex_count":len(dex_entries)},indent=2))
+             "sha256":sha256(apk),"manifest":manifest,"apktool_exit":apktool_rc,"jadx_exit":jadx_rc,
+             "java_files":java_count,"dex_count":len(dex_entries)},indent=2,ensure_ascii=True))
     if not all_classes or not all_methods:
         raise SystemExit(f"No DEX methods recovered from {src.name}; apktool exit status and input package layout require investigation")
     # Keep the complete method inventory compressed in the repository; no source dump or raw logs are copied.
@@ -181,7 +193,7 @@ def main():
                 "invokes":m["invokes"][:40],"opcode_count":m["opcode_count"]})
     candidates.sort(key=lambda x:(-x["score"],x["class"],x["name"]))
     summary={"version_label":a.version,"source_file":src.name,"source_bytes":src.stat().st_size,
-      "source_sha256":sha256(src),"components":[x.name for x in components],"dex":inventory,
+      "source_sha256":sha256(src),"components":[x.name for x in components],"component_metadata":[json.loads((out/x.stem/"component.json").read_text()) for x in components],"dex":inventory,
       "dex_count":len(inventory),"class_count":len(all_classes),"method_count":len(all_methods),
       "call_edge_count":len(all_edges),"candidate_method_count":len(candidates),
       "native_libraries":native,"tool_limits":{"JADX":"best-effort; inspect exit status and APKTool smali evidence",
