@@ -8,8 +8,8 @@ value class RoleId(val value: String) {
 enum class EvidenceFamily { PROTOCOL_ANCHOR, TYPE_SHAPE, CALL_GRAPH, CONTROL_FLOW, BYTECODE_SHAPE, DATA_FLOW, FRAMEWORK_INTERACTION, RUNTIME_BEHAVIOR, HOST_IDENTITY }
 
 data class HostFingerprint(val packageName: String, val versionCode: Long?, val versionName: String?, val signingDigest: String?, val dexDigest: String, val classLoaderId: String) {
-    fun isUsableForHooking() = packageName == "com.deepseek.chat" && dexDigest.isNotBlank() && classLoaderId.isNotBlank()
-    fun hasCompleteRuntimeIdentity() = isUsableForHooking() && versionCode != null && !versionName.isNullOrBlank() && !signingDigest.isNullOrBlank()
+    fun isRecognizedTargetHost() = packageName == "com.deepseek.chat" && dexDigest.isNotBlank()
+    fun hasCompleteRuntimeIdentity() = isRecognizedTargetHost() && versionCode != null && !versionName.isNullOrBlank() && !signingDigest.isNullOrBlank() && classLoaderId.isNotBlank()
 }
 
 data class Evidence(val family: EvidenceFamily, val key: String, val weight: Double, val detail: String = "") {
