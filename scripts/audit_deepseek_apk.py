@@ -102,6 +102,137 @@ def safe_strings(line):
     if re.search(r"(?i)prompt|instruction", value) and not SAFE_PROMPT_MARKER.fullmatch(value): return ["<redacted-content>"]
     return [value[:240]]
 
+def build_smali_cfg(body_lines):
+    """Build a conservative instruction-index CFG from one Smali method body.
+
+    Payload pseudo-instructions are excluded from executable instruction indices.
+    The result explicitly reports unresolved labels and truncation; it is not a
+    verifier-grade DEX CFG and must not be treated as complete when flagged.
+    """
+    instructions=[]; labels={}; payload_labels=set(); switch_payloads={}
+    catches=[]; active_payload=None; active_payload_label=None
+    label_re=re.compile(r"^\s*(:[A-Za-z0-9_$-]+)\s*$")
+    catch_re=re.compile(r"^\s*\.catch(?:all)?\b.*?\{\s*(:[\w$-]+)\s+\.\.\s+(:[\w$-]+)\s*\}\s*(:[\w$-]+)")
+    switch_entry_re=re.compile(r"^\s*(?:-?0x[0-9a-fA-F]+|-?\d+)\s*->\s*(:[\w$-]+)")
+    for line_no,line in enumerate(body_lines,1):
+        stripped=line.strip()
+        lm=label_re.match(line)
+        if lm:
+            label=lm.group(1)
+            labels[label]=len(instructions)
+            if active_payload is not None:
+                payload_labels.add(label)
+                active_payload_label=label
+            continue
+        if active_payload is not None:
+            if stripped.startswith(".end "):
+                active_payload=None; active_payload_label=None
+            else:
+                sm=switch_entry_re.match(line)
+                if sm and active_payload_label:
+                    switch_payloads.setdefault(active_payload_label,[]).append(sm.group(1))
+            continue
+        if stripped.startswith(".packed-switch") or stripped.startswith(".sparse-switch"):
+            active_payload="switch"
+            continue
+        if stripped.startswith(".array-data"):
+            active_payload="array"
+            continue
+        cm=catch_re.match(line)
+        if cm:
+            catches.append(cm.groups())
+            continue
+        if not stripped or stripped.startswith((".", "#")):
+            continue
+        opm=OP_RE.match(line)
+        if opm:
+            instructions.append({"op":opm.group(1),"text":stripped,"line":line_no})
+
+    count=len(instructions)
+    if count == 0:
+        return {"instruction_count":0,"block_count":0,"edge_count":0,
+                "unresolved_target_count":0,"complete":True,"edges":[],"edges_truncated":False}
+    leaders={0}; unresolved=[]
+    branch_target_re=re.compile(r"(:[A-Za-z0-9_$-]+)")
+    terminal=lambda op: op.startswith(("return","throw"))
+    conditional=lambda op: op.startswith("if-")
+    goto=lambda op: op.startswith("goto")
+    switch=lambda op: op in ("packed-switch","sparse-switch")
+    for index,ins in enumerate(instructions):
+        op=ins["op"]; text=ins["text"]
+        if conditional(op) or goto(op):
+            matches=branch_target_re.findall(text)
+            target=matches[-1] if matches else None
+            if target and target in labels and target not in payload_labels:
+                leaders.add(labels[target])
+            else:
+                unresolved.append(target or "<missing-branch-label>")
+            if index+1<count: leaders.add(index+1)
+        elif switch(op):
+            matches=branch_target_re.findall(text)
+            payload=matches[-1] if matches else None
+            if payload not in labels or payload in payload_labels:
+                unresolved.append(payload or "<missing-switch-payload>")
+            else:
+                if index+1<count: leaders.add(index+1)
+                for target in switch_payloads.get(payload,[]):
+                    if target in labels and target not in payload_labels:
+                        leaders.add(labels[target])
+                    else:
+                        unresolved.append(target)
+        elif terminal(op) and index+1<count:
+            leaders.add(index+1)
+
+    catch_ranges=[]
+    for start_label,end_label,handler_label in catches:
+        if start_label not in labels or end_label not in labels or handler_label not in labels:
+            unresolved.append("catch-range:" + ",".join((start_label,end_label,handler_label)))
+            continue
+        start,end,handler=labels[start_label],labels[end_label],labels[handler_label]
+        leaders.add(start)
+        if end<count: leaders.add(end)
+        leaders.add(handler)
+        catch_ranges.append((start,end,handler))
+
+    starts=sorted(x for x in leaders if 0 <= x < count)
+    block_for={}; blocks=[]
+    for block_id,start in enumerate(starts):
+        end=(starts[block_id+1]-1) if block_id+1<len(starts) else count-1
+        blocks.append({"id":block_id,"start":start,"end":end})
+        for ix in range(start,end+1): block_for[ix]=block_id
+    edges=set()
+    def add_edge(src_index,target_index,kind):
+        if target_index is None or target_index<0 or target_index>=count: return
+        src=block_for[src_index]; dst=block_for[target_index]
+        if src != dst: edges.add((src,dst,kind))
+    for block in blocks:
+        ix=block["end"]; ins=instructions[ix]; op=ins["op"]; matches=branch_target_re.findall(ins["text"])
+        if conditional(op):
+            target=matches[-1] if matches else None
+            if target in labels and target not in payload_labels: add_edge(ix,labels[target],"conditional")
+            if ix+1<count: add_edge(ix,ix+1,"fallthrough")
+        elif goto(op):
+            target=matches[-1] if matches else None
+            if target in labels and target not in payload_labels: add_edge(ix,labels[target],"goto")
+        elif switch(op):
+            payload=matches[-1] if matches else None
+            if payload in labels and payload not in payload_labels:
+                for target in switch_payloads.get(payload,[]):
+                    if target in labels and target not in payload_labels: add_edge(ix,labels[target],"switch")
+            if ix+1<count: add_edge(ix,ix+1,"switch-default")
+        elif not terminal(op) and ix+1<count:
+            add_edge(ix,ix+1,"fallthrough")
+    for start,end,handler in catch_ranges:
+        for block in blocks:
+            if start <= block["start"] < end:
+                add_edge(block["end"],handler,"exception")
+    edge_list=[{"from":a,"to":b,"kind":kind} for a,b,kind in sorted(edges)]
+    return {"instruction_count":count,"block_count":len(blocks),"edge_count":len(edge_list),
+        "unresolved_target_count":len(unresolved),"unresolved_targets":sorted(set(unresolved))[:32],
+        "complete":not unresolved,"edges":edge_list[:256],"edges_truncated":len(edge_list)>256,
+        "blocks_truncated":False}
+
+
 def analyze_smali(root):
     classes=[]; methods=[]; call_edges=[]
     for file in sorted(root.rglob("*.smali")):
@@ -123,7 +254,7 @@ def analyze_smali(root):
                                  "access":m.group(1), "file":str(file.relative_to(root)),
                                  "line":line_no, "strings":[], "invokes":[], "opcodes":collections.Counter(),
                                  "field_reads":[], "field_writes":[], "branch_count":0, "label_count":0,
-                                 "return_count":0, "throw_count":0}
+                                 "return_count":0, "throw_count":0, "body_lines":[]}
                         in_method=True
                 continue
             if line.startswith(".end method"):
@@ -138,11 +269,13 @@ def analyze_smali(root):
                     current["opcode_histogram"]=dict(current["opcodes"].most_common(24))
                     current["field_reads"]=sorted(set(current["field_reads"]))[:120]
                     current["field_writes"]=sorted(set(current["field_writes"]))[:120]
+                    cfg=build_smali_cfg(current["body_lines"])
                     current["control_flow"]={"branch_count":current["branch_count"],"label_count":current["label_count"],
                         "return_count":current["return_count"],"throw_count":current["throw_count"],
-                        "basic_block_estimate":1+current["label_count"]+current["branch_count"]}
+                        "basic_block_estimate":cfg["block_count"],"cfg":cfg}
                     current["invokes"]=sorted(set(current["invokes"]))[:120]
                     current["strings"]=sorted(set(current["strings"]))[:100]
+                    current.pop("body_lines",None)
                     methods.append(current)
                     for target,name,sig in current.pop("_edges",[]):
                         call_edges.append({"from":current["class"]+"->"+current["name"]+current["descriptor"],
@@ -150,6 +283,7 @@ def analyze_smali(root):
                 current=None; in_method=False
                 continue
             if current is None: continue
+            current["body_lines"].append(line)
             sm=safe_strings(line)
             current["strings"].extend(sm)
             im=INVOKE_RE.search(line)
