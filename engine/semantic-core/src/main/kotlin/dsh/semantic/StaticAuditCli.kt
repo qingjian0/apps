@@ -25,7 +25,11 @@ fun main(args: Array<String>) {
         val valueEdgesPath = auditDirectory?.resolve("interprocedural-value-edges.jsonl.gz")
             ?.takeIf { it.isFile }?.path
         val summaryPath = auditDirectory?.resolve("summary.json")?.takeIf { it.isFile }?.path
-        val graph = StaticProgramGraph.load(methodsPath, edgesPath, classesPath, valueEdgesPath, summaryPath)
+        val pointsToPath = auditDirectory?.resolve("interprocedural-points-to.jsonl.gz")
+            ?.takeIf { it.isFile }?.path
+        val graph = StaticProgramGraph.load(
+            methodsPath, edgesPath, classesPath, valueEdgesPath, summaryPath, pointsToPath
+        )
         val byRole = mutableMapOf<RoleId, MutableList<SemanticCandidate>>()
         var methods = 0
         BufferedReader(InputStreamReader(GZIPInputStream(FileInputStream(methodsPath)), Charsets.UTF_8)).use { input ->
