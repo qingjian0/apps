@@ -188,5 +188,45 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertEqual(1, len(parsed["signing_sha256s"]))
 
 
+    def test_reaching_definitions_resolve_linear_register_flow(self):
+        body = [
+            "    const/4 v0, 0x1",
+            "    move v1, v0",
+            "    return v1",
+        ]
+        cfg = AUDIT.build_smali_cfg(body)
+        facts = AUDIT.analyze_register_dataflow(body, cfg)
+        self.assertTrue(facts["complete"])
+        use = next(x for x in facts["uses"] if x["register"] == "v0")
+        self.assertEqual("resolved", use["resolution"])
+        self.assertEqual(["d0:v0"], use["reaching_definitions"])
+
+    def test_reaching_definitions_preserve_branch_ambiguity(self):
+        body = [
+            "    if-eqz v1, :else",
+            "    const/4 v0, 0x1",
+            "    goto :join",
+            "    :else",
+            "    const/4 v0, 0x2",
+            "    :join",
+            "    move v2, v0",
+            "    return v2",
+        ]
+        cfg = AUDIT.build_smali_cfg(body)
+        facts = AUDIT.analyze_register_dataflow(body, cfg)
+        self.assertTrue(facts["complete"])
+        use = next(x for x in facts["uses"] if x["register"] == "v0")
+        self.assertEqual("ambiguous", use["resolution"])
+        self.assertEqual(2, len(use["reaching_definitions"]))
+        self.assertGreaterEqual(facts["ambiguous_use_count"], 1)
+
+    def test_reaching_definitions_fail_closed_for_incomplete_cfg(self):
+        body = ["    if-eqz v0, :missing", "    return-void"]
+        cfg = AUDIT.build_smali_cfg(body)
+        facts = AUDIT.analyze_register_dataflow(body, cfg)
+        self.assertFalse(facts["complete"])
+        self.assertEqual("incomplete-cfg-or-nonconvergence", facts["reason"])
+
+
 if __name__ == "__main__":
     unittest.main()
