@@ -710,7 +710,7 @@ def analyze_object_points_to(body_lines, cfg, owner, method_name, descriptor,
             instruction=executable[index]
             if instruction["opcode"].startswith("return-object"):
                 return_line=body_lines[instruction["line"]-1].strip()
-                return_regs=re.findall(r"\\b[vp]\\d+\\b",return_line)
+                return_regs=re.findall(r"\b[vp]\d+\b",return_line)
                 if return_regs:
                     return_reg=return_regs[0]
                     return_ids=sorted(points.get(return_reg,set()))
