@@ -941,5 +941,113 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertEqual([], AUDIT.extract_invoke_sites(body))
 
 
+    def test_nested_return_summary_does_not_survive_intervening_register_write(self):
+        def method(owner, name, descriptor, body):
+            cfg = AUDIT.build_smali_cfg(body)
+            invokes = AUDIT.extract_invoke_sites(body)
+            fields = AUDIT.extract_field_access_sites(body)
+            pts = AUDIT.analyze_object_points_to(
+                body, cfg, owner, name, descriptor, "static", fields, invokes)
+            return {
+                "class": owner, "name": name, "descriptor": descriptor,
+                "component": "base", "invoke_sites": invokes,
+                "invoke_sites_truncated": False, "invoke_sites_incomplete": False,
+                "object_points_to": pts,
+                "control_flow": {
+                    "branch_count": sum(
+                        1 for line in body if AUDIT.BRANCH_RE.match(line)
+                    ),
+                    "return_count": sum(
+                        1 for line in body
+                        if AUDIT.OP_RE.match(line)
+                        and AUDIT.OP_RE.match(line).group(1).startswith("return")
+                    ),
+                    "cfg": cfg,
+                },
+            }
+
+        caller = method("Lx/Caller;", "run", "()V", [
+            "    invoke-static {}, Lx/Wrapper;->make()Lx/Thing;",
+            "    move-result-object v0",
+            "    invoke-static {v0}, Lx/Sink;->consume(Lx/Thing;)V",
+            "    return-void",
+        ])
+        wrapper = method("Lx/Wrapper;", "make", "()Lx/Thing;", [
+            "    invoke-static {}, Lx/Factory;->make()Lx/Thing;",
+            "    move-result-object v0",
+            "    new-instance v0, Lx/Thing;",
+            "    return-object v0",
+        ])
+        factory = method("Lx/Factory;", "make", "()Lx/Thing;", [
+            "    new-instance v0, Lx/Thing;",
+            "    return-object v0",
+        ])
+        sink = method("Lx/Sink;", "consume", "(Lx/Thing;)V", [
+            "    iget-object v0, p0, Lx/Thing;->value:Ljava/lang/Object;",
+            "    return-void",
+        ])
+        graph = AUDIT.build_interprocedural_points_to_graph(
+            [caller, wrapper, factory, sink])
+        wrapper_call = next(
+            row for row in graph["call_contexts"]
+            if row["caller"] == "Lx/Caller;->run()V"
+            and row["callee"] == "Lx/Wrapper;->make()Lx/Thing;"
+        )
+        self.assertEqual("singleton", wrapper_call["return_value"]["identity_status"])
+        self.assertIn("Lx/Wrapper;->make()Lx/Thing;", wrapper_call["return_value"]["points_to"][0])
+        self.assertNotIn("Lx/Factory;->make()Lx/Thing;", wrapper_call["return_value"]["points_to"][0])
+
+    def test_branching_wrapper_does_not_use_nested_return_override(self):
+        def method(owner, name, descriptor, body):
+            cfg = AUDIT.build_smali_cfg(body)
+            invokes = AUDIT.extract_invoke_sites(body)
+            fields = AUDIT.extract_field_access_sites(body)
+            pts = AUDIT.analyze_object_points_to(
+                body, cfg, owner, name, descriptor, "static", fields, invokes)
+            return {
+                "class": owner, "name": name, "descriptor": descriptor,
+                "component": "base", "invoke_sites": invokes,
+                "invoke_sites_truncated": False, "invoke_sites_incomplete": False,
+                "object_points_to": pts,
+                "control_flow": {
+                    "branch_count": sum(
+                        1 for line in body if AUDIT.BRANCH_RE.match(line)
+                    ),
+                    "return_count": sum(
+                        1 for line in body
+                        if AUDIT.OP_RE.match(line)
+                        and AUDIT.OP_RE.match(line).group(1).startswith("return")
+                    ),
+                    "cfg": cfg,
+                },
+            }
+
+        caller = method("Lx/Caller;", "run", "()V", [
+            "    invoke-static {}, Lx/Wrapper;->make(Z)Lx/Thing;",
+            "    move-result-object v0",
+            "    return-void",
+        ])
+        wrapper = method("Lx/Wrapper;", "make", "(Z)Lx/Thing;", [
+            "    invoke-static {}, Lx/Factory;->make()Lx/Thing;",
+            "    move-result-object v0",
+            "    if-eqz p0, :alternate",
+            "    return-object v0",
+            "    :alternate",
+            "    return-object v0",
+        ])
+        factory = method("Lx/Factory;", "make", "()Lx/Thing;", [
+            "    new-instance v0, Lx/Thing;",
+            "    return-object v0",
+        ])
+        graph = AUDIT.build_interprocedural_points_to_graph(
+            [caller, wrapper, factory])
+        wrapper_call = next(
+            row for row in graph["call_contexts"]
+            if row["callee"] == "Lx/Wrapper;->make(Z)Lx/Thing;"
+        )
+        self.assertEqual("unknown", wrapper_call["return_value"]["identity_status"])
+        self.assertEqual([], wrapper_call["return_value"]["points_to"])
+
+
 if __name__ == "__main__":
     unittest.main()
