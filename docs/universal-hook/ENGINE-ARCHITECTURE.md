@@ -165,5 +165,5 @@ F. 使用未参与开发的新版本 APK 盲测。盲测报告记录自动定位
 
 - 已有：五版本 APK/APKM 输入清单、独立审计 workflow、Smali/DEX 方法与调用边扫描器、初版候选聚合器、2.7.3/2.7.5 SSE 链路证据、2.7.2 动态 Hook 日志线索。
 - 正在修复/验证：Unicode/Smali 字符处理、APK 组件身份、五版本 Actions 全量审计、候选排序和报告。
-- 已有核心原型：Kotlin/JVM SemanticResolver（独立证据族、候选歧义和 fail-closed）、角色级幂等 HookCoordinator、HookBackend 抽象、Prompt/Agent/Local API/Conversation/SSE 元数据 FeatureContract 与隐私字段白名单；独立 Actions CI 正在验证。
+- 已有核心原型：Kotlin/JVM SemanticResolver（独立证据族、候选歧义和 fail-closed）、角色级幂等 HookCoordinator、HookBackend 抽象、Prompt/Agent/Local API/Conversation/SSE 元数据 FeatureContract 与严格字段白名单，以及读取当前 APK 审计器 JSONL 输出的 StaticAuditJsonReader/StaticEvidenceMapper；独立 Actions CI 正在验证。
 - 尚未实现：完整 DEX/CFG/Dataflow 引擎、从 APK 自动生成运行时证据的语义发现器、LSPosed Android Backend、Prompt/Agent/Local API 全功能桥接、未知版本盲测、真机验证。
