@@ -1185,3 +1185,10 @@ nativeCalculateDeepSeekHashV1Pow(String base, String challenge, long difficulty)
 - 请求、SSE 事件、完成、取消和 auto-resume 的状态链闭合。
 - 无敏感数据进入日志。
 - 未完成设备测试前，不将任何候选标记为“生产可用”。
+
+
+## DeepSeek 国内版 2.7.2 / code289-cn Native API 静态调用链
+
+- 已补充 code289 专属 DEX/Smali 审计，确认 APK package/versionName/versionCode、SHA-256，并将 23 个动态候选类全部关联到静态 DEX。
+- 完整记录 Request Factory、Ktor Transport、Challenge/PoW、SSE parser、DeltaCommand patch reducer 和 Native Adapter 实现建议：[`docs/deepseek-272-native-callgraph.md`](docs/deepseek-272-native-callgraph.md)。
+- 审计工作流：`.github/workflows/deepseek-272-static-audit.yml`；成功 Run：`42342447740`。
