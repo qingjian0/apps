@@ -11,14 +11,17 @@
 
 ## 1. 仓库材料盘点
 
-本仓库当前保留两份 APK 和两份运行日志。2.7.3 与 2.7.5 两份 APK 均已完成静态证据采集，并完成网络 / SSE / PoW 跨版本语义映射。
+本仓库当前保留四个宿主版本输入（2.7.1 APK、2.7.3 APK、2.7.4 APKM、2.7.5 APK）、两份运行日志和一份 SSE/Hook 证据包。2.7.3 / 2.7.5 已有静态证据；2.7.1 / 2.7.4 纳入本轮统一重审。2.7.2 当前只有 code289-cn 动态日志，不把它误算成已上传 APK。
 
 | 文件 | 大小 | 本轮处理状态 |
 |---|---:|---|
-| DeepSeek_2.7.5.apk | 22,210,268 bytes | 已提取 3 个 DEX；JADX 1.5.6 输出 13,940 个 Java 源文件；第一方索引覆盖 12,596 个类 |
-| deepseek 273.apk | 14,211,169 bytes | 已提取 3 个 DEX；JADX 12,319 个 Java 源文件；APKTool 13,311 个 smali 文件；304 项 JADX 错误 |
-| deekseep_vision.log | 6,440,972 bytes / 19,747 行 | 已完成动态事件、线程、异常、Continuation 与 Callback 统计 |
-| dsprobe.log | 12,320 bytes / 50 行 | 已完成 Hook 安装失败和版本映射分析 |
+| deepseek271.apk | 22,006,745 bytes | 2.7.1 输入；本轮重新核对实际包身份和 DEX |
+| deepseek 273.apk | 14,211,169 bytes | 2.7.3；既有 JADX/Smali 结果，本轮重新统一扫描 |
+| com.deepseek.chat_2.7.4-294_...apkm | 19,476,565 bytes | 2.7.4 / code294 分包容器；按内嵌 APK 组件逐个扫描 |
+| DeepSeek_2.7.5.apk | 22,210,268 bytes | 2.7.5；既有 JADX/Smali 结果，本轮重新统一扫描 |
+| deekseep_vision.log | 6,440,972 bytes / 19,747 行 | 动态 observer 大日志；统一汇总调用角色和方法标记 |
+| dsprobe.log | 12,320 bytes / 50 行 | 2.7.2/code289-cn 版本误选 2.7.1/code257 映射及重复安装失败 |
+| deepseek-sse-hook-evidence.zip | 329,086 bytes | 已有 SSE/Hook 证据包；本轮重新盘点条目和哈希 |
 
 2.7.3 APK SHA-256：a6d025c14c98118a5a67849e04aaef6f3c9c13aaf0fa62caaee0e47091374ea3
 
@@ -1185,3 +1188,16 @@ nativeCalculateDeepSeekHashV1Pow(String base, String challenge, long difficulty)
 - 请求、SSE 事件、完成、取消和 auto-resume 的状态链闭合。
 - 无敏感数据进入日志。
 - 未完成设备测试前，不将任何候选标记为“生产可用”。
+
+
+## 29. 跨版本通用 Hook 重新审计
+
+本轮将分析范围扩展到仓库内全部 DeepSeek 宿主 APK/APKM：2.7.1、2.7.3、2.7.4/code294、2.7.5；并将 2.7.2/code289-cn 的动态日志作为独立证据集。2.7.4 是 APKM，必须按内嵌 APK 组件拆分分析；2.7.2 没有对应 APK 输入，不得伪造静态 Profile。
+
+- 通用 Hook 设计文档：[docs/universal-hook/README.md](docs/universal-hook/README.md)
+- 审计脚本：[scripts/audit_deepseek_apk.py](scripts/audit_deepseek_apk.py)
+- 跨版本聚合脚本：[scripts/aggregate_deepseek_hook_audit.py](scripts/aggregate_deepseek_hook_audit.py)
+- 独立工作流：[.github/workflows/deepseek-universal-hook-audit.yml](.github/workflows/deepseek-universal-hook-audit.yml)
+- 工作分支：`work/deepseek-universal-hook-audit`
+
+设计原则：以业务语义角色定位 Hook，通过调用图、完整方法描述符、类型结构、稳定框架调用、协议锚点和字节码形状交叉验证；未知版本、候选歧义和 ClassLoader 解析失败时 fail-closed。静态分析、动态观察和真机 Hook 验证分开标记。自动审计结果将直接写回本仓库 `audit/`，不以本地文件作为交付。
