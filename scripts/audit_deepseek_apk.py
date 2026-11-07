@@ -931,7 +931,7 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4):
     record_limit=200000
     seen_contexts=set()
 
-    def substitute(identity,method_key,bindings,context_id):
+    def substitute(identity,method_key,bindings,context_id,contextualize_allocations=True):
         formal_prefix="param:{}:".format(method_key)
         if identity.startswith(formal_prefix):
             formal=identity[len(formal_prefix):]
@@ -941,7 +941,9 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4):
             return list(actual.get("points_to",[])),False
         allocation_prefix="alloc:{}#".format(method_key)
         if identity.startswith(allocation_prefix):
-            return ["context:{}:{}".format(context_id,identity)],False
+            if contextualize_allocations:
+                return ["context:{}:{}".format(context_id,identity)],False
+            return [identity],False
         return [identity],False
 
     while queue:
@@ -987,7 +989,8 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4):
                 has_unknown=bool(item.get("unknown"))
                 for identity in item.get("points_to",[]):
                     projected,unknown=substitute(
-                        identity,caller_key,state["bindings"],state["context_id"])
+                        identity,caller_key,state["bindings"],state["context_id"],
+                        contextualize_allocations=state["depth"]>0)
                     identities.extend(projected)
                     has_unknown=has_unknown or unknown
                 resolved_bindings[item["formal_register"]]={
