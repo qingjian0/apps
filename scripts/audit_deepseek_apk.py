@@ -62,6 +62,26 @@ def run(cmd,log):
     pathlib.Path(log).write_text(p.stdout,errors="replace")
     return p.returncode
 
+def aapt_badging(aapt, apk, log_path):
+    if not aapt: return {}
+    p=subprocess.run([aapt,"dump","badging",str(apk)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,errors="replace")
+    pathlib.Path(log_path).write_text(p.stdout,errors="replace")
+    result={"aapt_exit":p.returncode}
+    line=next((x for x in p.stdout.splitlines() if x.startswith("package: ")), "")
+    if line:
+        for key in ("name","versionCode","versionName","split"):
+            m=re.search(r"(?:^|\s)"+re.escape(key)+r"='([^']*)'",line)
+            if m: result[{"name":"package","versionCode":"version_code","versionName":"version_name","split":"split"}[key]]=m.group(1) or None
+    return result
+
+def signing_certificate(apksigner, apk, log_path):
+    if not apksigner: return {}
+    p=subprocess.run([apksigner,"verify","--print-certs",str(apk)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,errors="replace")
+    pathlib.Path(log_path).write_text(p.stdout,errors="replace")
+    m=re.search(r"Signer #\d+ certificate SHA-256 digest:\s*([0-9a-fA-F]{64})",p.stdout)
+    return {"apksigner_exit":p.returncode,"signing_sha256":m.group(1).lower() if m else None}
+
+
 def safe_strings(line):
     m=STR_RE.search(line)
     if not m: return []
@@ -152,6 +172,7 @@ def main():
     ap.add_argument("--input",required=True); ap.add_argument("--version",required=True)
     ap.add_argument("--work",required=True); ap.add_argument("--out",required=True)
     ap.add_argument("--jadx",required=True); ap.add_argument("--apktool",required=True)
+    ap.add_argument("--aapt",required=True); ap.add_argument("--apksigner",required=True)
     a=ap.parse_args()
     src=pathlib.Path(a.input); work=pathlib.Path(a.work); out=pathlib.Path(a.out)
     if work.exists(): shutil.rmtree(work)
@@ -205,6 +226,13 @@ def main():
                           "root_attributes":{k:v for k,v in root.attrib.items()}}
             except (ET.ParseError,OSError) as exc:
                 manifest={"parse_error":type(exc).__name__,"parse_detail":str(exc)[:240]}
+        binary_manifest=aapt_badging(a.aapt,apk,comp_out/"aapt-badging.log")
+        for key in ("package","split","version_code","version_name"):
+            if binary_manifest.get(key): manifest[key]=binary_manifest[key]
+        signing=signing_certificate(a.apksigner,apk,comp_out/"apksigner.log")
+        manifest["binary_manifest"]=binary_manifest
+        manifest["signing_sha256"]=signing.get("signing_sha256")
+        manifest["apksigner_exit"]=signing.get("apksigner_exit")
         jadx_dir=work/f"jadx-{i}"
         jadx_rc=run([a.jadx,"--show-bad-code","--no-res","--threads-count","2","-d",str(jadx_dir),str(apk)],comp_out/"jadx.log")
         java_count=len(list((jadx_dir/"sources").rglob("*.java"))) if (jadx_dir/"sources").exists() else 0
