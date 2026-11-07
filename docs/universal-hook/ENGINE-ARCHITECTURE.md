@@ -328,3 +328,6 @@ The next implementation step is to add parameter/return edges between methods an
 - 字段槽读写关联不证明对象实例相同。
 
 下一阶段应先补齐 Python 单元与真实五版本索引回归，再实现基于参数边的 receiver alias propagation（带对象创建点/参数来源），最后将字段槽分组升级为带别名证据的字段值传播。只有被多条独立证据验证的传播关系才可进入生产 SemanticResolver；本轮新图不直接改变 Resolver 评分或 HookCoordinator 授权。
+
+
+补充 fail-closed 规则：Dalvik wide 指令（包含 wide / long / double 的寄存器操作）在 pair-aware transfer function 完成前会被标记为 unknown opcode，使该方法的数据流完整性失败；不能只追踪 wide value 的低位寄存器并假装整个值已解析。新增回归用例覆盖 move-wide 与 return-wide。
