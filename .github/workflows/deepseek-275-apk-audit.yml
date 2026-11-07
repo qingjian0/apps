@@ -99,7 +99,7 @@ jobs:
               "pow_prefetch",
           ]
           xrefs = {term: [] for term in xref_terms}
-          method_pattern = re.compile(r"(?m)^\\s*(?:public|protected|private)\\s+(?:(?:static|final|synchronized|native|abstract)\\s+)*[\\w.$<>?, \\[\\]]+\\s+([\\w$]+)\\s*\\(")
+          method_pattern = re.compile(r"(?m)^\s*(?:public|protected|private)\s+(?:(?:static|final|synchronized|native|abstract)\s+)*[\w.$<>?, \[\]]+\s+([\w$]+)\s*\(")
           for path in java_files:
               try: data = path.read_text(encoding="utf-8", errors="replace")
               except Exception: continue
