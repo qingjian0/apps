@@ -11,7 +11,7 @@
 
 ## 1. 仓库材料盘点
 
-本仓库当前保留两份 APK 和两份运行日志。2.7.5 已完成 2.7.5 与 2.7.3 双版本静态证据采集，并完成 SSE / 网络 / PoW 语义映射。
+本仓库当前保留两份 APK 和两份运行日志。2.7.3 与 2.7.5 两份 APK 均已完成静态证据采集，并完成网络 / SSE / PoW 跨版本语义映射。
 
 | 文件 | 大小 | 本轮处理状态 |
 |---|---:|---|
@@ -1094,8 +1094,9 @@ nativeCalculateDeepSeekHashV1Pow(String base, String challenge, long difficulty)
 
 ### 26.1 自动化工作流
 
-- 分支：work/deepseek-version-comparison-audit
-- 工作流：<https://github.com/qingjian0/apps/blob/work/deepseek-version-comparison-audit/.github/workflows/deepseek-version-comparison.yml>
+- 主分支：main（已纳入仓库，后续 APK 或工作流文件变更会触发）
+- 开发验证分支：work/deepseek-version-comparison-audit
+- 工作流：<https://github.com/qingjian0/apps/blob/main/.github/workflows/deepseek-version-comparison.yml>
 - 工作流采用 matrix 并行审计 2.7.3 / 2.7.5，再合并生成比较报告。
 - 每个版本分别生成 APK SHA-256、DEX inventory、JADX 源码、APKTool smali、symbol hits、native library hash。
 - 自动验证要求 smali 数量非零、JSON 可解析、报告和 smali archive 非空。
