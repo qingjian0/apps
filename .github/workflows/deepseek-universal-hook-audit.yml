@@ -116,6 +116,8 @@ jobs:
           gzip -t "audit/${{ matrix.version }}/methods.jsonl.gz"
           gzip -t "audit/${{ matrix.version }}/classes.jsonl.gz"
           gzip -t "audit/${{ matrix.version }}/call-edges.jsonl.gz"
+          gzip -t "audit/${{ matrix.version }}/interprocedural-value-edges.jsonl.gz"
+          gzip -t "audit/${{ matrix.version }}/interprocedural-points-to.jsonl.gz"
           test -s "audit/${{ matrix.version }}/candidate-methods.csv"
       - uses: actions/upload-artifact@v4
         with:
@@ -154,6 +156,7 @@ jobs:
           python3 -m unittest discover -s tests -p "test_aggregate_deepseek_hook_audit.py" -v
           python3 scripts/aggregate_deepseek_hook_audit.py
           python3 -m json.tool audit/universal-hook/semantic-method-matches.json >/dev/null
+          python3 -m json.tool audit/universal-hook/semantic-match-diagnostics.json >/dev/null
           python3 -m json.tool audit/universal-hook/probe-log-summary.json >/dev/null
           python3 -m json.tool audit/universal-hook/evidence-zip-inventory.json >/dev/null
       - uses: actions/setup-java@v4
