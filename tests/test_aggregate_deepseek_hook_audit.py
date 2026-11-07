@@ -5,6 +5,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from scripts.aggregate_deepseek_hook_audit import (
+    mutual_best_matches,
     prepared_method,
     prepared_similarity,
     project_candidate,
