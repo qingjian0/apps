@@ -1049,5 +1049,63 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertEqual([], wrapper_call["return_value"]["points_to"])
 
 
+    def test_factory_with_distinct_return_allocations_stays_multiple(self):
+        def method(owner, name, descriptor, body):
+            cfg = AUDIT.build_smali_cfg(body)
+            invokes = AUDIT.extract_invoke_sites(body)
+            fields = AUDIT.extract_field_access_sites(body)
+            pts = AUDIT.analyze_object_points_to(
+                body, cfg, owner, name, descriptor, "static", fields, invokes)
+            return {
+                "class": owner, "name": name, "descriptor": descriptor,
+                "component": "base", "invoke_sites": invokes,
+                "invoke_sites_truncated": False, "invoke_sites_incomplete": False,
+                "object_points_to": pts,
+                "control_flow": {
+                    "branch_count": sum(
+                        1 for line in body if AUDIT.BRANCH_RE.match(line)
+                    ),
+                    "return_count": sum(
+                        1 for line in body
+                        if AUDIT.OP_RE.match(line)
+                        and AUDIT.OP_RE.match(line).group(1).startswith("return")
+                    ),
+                    "cfg": cfg,
+                },
+            }
+
+        caller = method("Lx/Caller;", "run", "()V", [
+            "    invoke-static {v0}, Lx/Factory;->make(I)Lx/Thing;",
+            "    move-result-object v1",
+            "    invoke-static {v1}, Lx/Sink;->consume(Lx/Thing;)V",
+            "    return-void",
+        ])
+        factory = method("Lx/Factory;", "make", "(I)Lx/Thing;", [
+            "    if-eqz p0, :second",
+            "    new-instance v0, Lx/Thing;",
+            "    return-object v0",
+            "    :second",
+            "    new-instance v0, Lx/Thing;",
+            "    return-object v0",
+        ])
+        sink = method("Lx/Sink;", "consume", "(Lx/Thing;)V", [
+            "    iget-object v0, p0, Lx/Thing;->value:Ljava/lang/Object;",
+            "    return-void",
+        ])
+        graph = AUDIT.build_interprocedural_points_to_graph(
+            [caller, factory, sink])
+        factory_call = next(
+            row for row in graph["call_contexts"]
+            if row["callee"] == "Lx/Factory;->make(I)Lx/Thing;"
+        )
+        self.assertEqual("multiple", factory_call["return_value"]["identity_status"])
+        self.assertEqual(2, len(factory_call["return_value"]["points_to"]))
+        sink_receiver = next(
+            row for row in graph["contextual_receivers"]
+            if row["callee"] == "Lx/Sink;->consume(Lx/Thing;)V"
+        )
+        self.assertNotEqual("singleton", sink_receiver["identity_status"])
+
+
 if __name__ == "__main__":
     unittest.main()
