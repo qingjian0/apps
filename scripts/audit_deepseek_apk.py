@@ -516,6 +516,181 @@ def extract_field_access_sites(body_lines):
     return result
 
 
+def object_parameter_registers_for_method(access, descriptor):
+    """Return receiver and reference-typed formal registers (wide words excluded)."""
+    parsed=parse_method_descriptor(descriptor)
+    if not parsed:
+        return []
+    registers=[]
+    word=0
+    if "static" not in access.split():
+        registers.append("p0")
+        word=1
+    for param_type in parsed["parameters"]:
+        if param_type.startswith(("L","[")):
+            registers.append("p{}".format(word))
+        word += 2 if param_type in ("J","D") else 1
+    return registers
+
+
+def analyze_object_points_to(body_lines, cfg, owner, method_name, descriptor,
+                             access, field_access_sites):
+    """Conservative intraprocedural points-to for parameters, allocations and move-object.
+
+    Unsupported object-producing instructions become unknown. Only a singleton,
+    non-unknown abstract object identity is eligible for same-instance evidence.
+    """
+    executable=[]
+    for line_no,line in enumerate(body_lines,1):
+        match=OP_RE.match(line)
+        if not match or line.lstrip().startswith((".",":","#")):
+            continue
+        facts=analyze_register_use_def([line])
+        item=facts["instructions"][0] if facts["instructions"] else None
+        executable.append({"index":len(executable),"line":line_no,"opcode":match.group(1),
+                           "writes":item["writes"] if item else [],
+                           "known":not facts["unknown_opcode_count"]})
+    blocks=cfg.get("blocks",[])
+    if not cfg.get("complete") or not executable or not blocks:
+        return {"complete":False,"reason":"incomplete-cfg-or-empty-method",
+                "field_receivers":[],"same_instance_groups":[]}
+    block_by_instruction={}
+    for block in blocks:
+        for index in range(block["start"],block["end"]+1):
+            block_by_instruction[index]=block["id"]
+    if len(block_by_instruction)!=len(executable) or not all(x["known"] for x in executable):
+        return {"complete":False,"reason":"instruction-index-mismatch-or-unknown-opcode",
+                "field_receivers":[],"same_instance_groups":[]}
+    predecessors={b["id"]:set() for b in blocks}
+    for edge in cfg.get("edges",[]):
+        if edge["from"] in predecessors and edge["to"] in predecessors:
+            predecessors[edge["to"]].add(edge["from"])
+    method_key=owner+"->"+method_name+descriptor
+    entry_points={reg:{"param:{}:{}".format(method_key,reg)}
+                  for reg in object_parameter_registers_for_method(access,descriptor)}
+    in_points={b["id"]:{} for b in blocks}
+    out_points={b["id"]:{} for b in blocks}
+    in_unknown={b["id"]:set() for b in blocks}
+    out_unknown={b["id"]:set() for b in blocks}
+
+    def merge_maps(maps):
+        merged=collections.defaultdict(set)
+        for mapping in maps:
+            for reg,values in mapping.items():
+                merged[reg].update(values)
+        return {reg:set(values) for reg,values in merged.items()}
+
+    def transfer(index, points, unknown):
+        ins=executable[index]
+        line=body_lines[ins["line"]-1].strip()
+        op=ins["opcode"]
+        new_points={reg:set(values) for reg,values in points.items()}
+        new_unknown=set(unknown)
+        if op.startswith("new-instance"):
+            match=re.search(r"\bnew-instance\s+([vp]\d+)\s*,\s*(L[^;]+;)",line)
+            if match:
+                dest,allocated_type=match.groups()
+                new_points[dest]={"alloc:{}#{}:{}".format(method_key,index,allocated_type)}
+                new_unknown.discard(dest)
+            else:
+                for dest in ins["writes"]:
+                    new_points[dest]=set(); new_unknown.add(dest)
+        elif op.startswith("move-object"):
+            match=re.search(r"\bmove-object(?:/(?:from16|16))?\s+([vp]\d+)\s*,\s*([vp]\d+)",line)
+            if match:
+                dest,src=match.groups()
+                new_points[dest]=set(new_points.get(src,set()))
+                if src in new_unknown:
+                    new_unknown.add(dest)
+                else:
+                    new_unknown.discard(dest)
+            else:
+                for dest in ins["writes"]:
+                    new_points[dest]=set(); new_unknown.add(dest)
+        elif op.startswith("check-cast"):
+            pass
+        else:
+            object_result=(op.startswith(("move-result-object","iget-object","sget-object",
+                                          "aget-object","const-string","const-class")))
+            for dest in ins["writes"]:
+                new_points[dest]=set()
+                if object_result:
+                    new_unknown.add(dest)
+                else:
+                    new_unknown.discard(dest)
+        return new_points,new_unknown
+
+    changed=True
+    iterations=0
+    limit=max(8,len(blocks)*4)
+    while changed and iterations<limit:
+        changed=False
+        iterations+=1
+        for block in blocks:
+            bid=block["id"]
+            pred_points=[out_points[p] for p in predecessors[bid]]
+            pred_unknown=[out_unknown[p] for p in predecessors[bid]]
+            new_in=merge_maps(pred_points)
+            new_in_unknown=set().union(*pred_unknown) if pred_unknown else set()
+            if bid==min(b["id"] for b in blocks):
+                for reg,values in entry_points.items():
+                    new_in.setdefault(reg,set()).update(values)
+            current_points={reg:set(values) for reg,values in new_in.items()}
+            current_unknown=set(new_in_unknown)
+            for index in range(block["start"],block["end"]+1):
+                current_points,current_unknown=transfer(index,current_points,current_unknown)
+            if (new_in!=in_points[bid] or new_in_unknown!=in_unknown[bid]
+                    or current_points!=out_points[bid] or current_unknown!=out_unknown[bid]):
+                in_points[bid]=new_in
+                in_unknown[bid]=new_in_unknown
+                out_points[bid]=current_points
+                out_unknown[bid]=current_unknown
+                changed=True
+    if changed:
+        return {"complete":False,"reason":"points-to-nonconvergence",
+                "field_receivers":[],"same_instance_groups":[]}
+
+    field_by_instruction={site["instruction"]:site for site in field_access_sites
+                          if site.get("object_register")}
+    receiver_facts=[]
+    for block in blocks:
+        bid=block["id"]
+        points={reg:set(values) for reg,values in in_points[bid].items()}
+        unknown=set(in_unknown[bid])
+        for index in range(block["start"],block["end"]+1):
+            site=field_by_instruction.get(index)
+            if site:
+                reg=site["object_register"]
+                identities=sorted(points.get(reg,set()))
+                is_unknown=reg in unknown
+                status=("singleton" if len(identities)==1 and not is_unknown else
+                        "unknown" if is_unknown else
+                        "multiple" if len(identities)>1 else "unresolved")
+                receiver_facts.append({
+                    "instruction":index,"field":site["field"],"access":site["access"],
+                    "receiver_register":reg,"points_to":identities,
+                    "unknown":is_unknown,"identity_status":status,
+                    "identity":identities[0] if status=="singleton" else None
+                })
+            points,unknown=transfer(index,points,unknown)
+    groups=collections.defaultdict(list)
+    for fact in receiver_facts:
+        if fact["identity_status"]=="singleton":
+            groups[(fact["field"],fact["identity"])].append(fact["instruction"])
+    same_instance_groups=[
+        {"field":field,"identity":identity,"instructions":sorted(set(indices)),
+         "confirmed_same_instance":True}
+        for (field,identity),indices in groups.items() if len(set(indices))>1
+    ]
+    return {"complete":True,"reason":None,"iterations":iterations,
+            "field_receivers":receiver_facts,
+            "same_instance_groups":same_instance_groups,
+            "singleton_receiver_count":sum(x["identity_status"]=="singleton" for x in receiver_facts),
+            "unknown_receiver_count":sum(x["identity_status"]=="unknown" for x in receiver_facts),
+            "unresolved_receiver_count":sum(x["identity_status"]=="unresolved" for x in receiver_facts),
+            "multiple_receiver_count":sum(x["identity_status"]=="multiple" for x in receiver_facts)}
+
+
 def build_interprocedural_value_graph(methods):
     """Link caller definitions to callee parameters and callee returns to move-result defs.
 
@@ -713,6 +888,16 @@ def analyze_smali(root):
                     invoke_sites=extract_invoke_sites(current["body_lines"])
                     invoke_opcode_count=sum(1 for body_line in current["body_lines"]
                         if (OP_RE.match(body_line) and OP_RE.match(body_line).group(1).startswith("invoke-")))
+                    current["object_points_to"]=analyze_object_points_to(
+                        current["body_lines"],cfg,current["class"],current["name"],
+                        current["descriptor"],current["access"],current.get("field_access_sites",[]))
+                    receiver_by_instruction={x["instruction"]:x for x in
+                        current["object_points_to"].get("field_receivers",[])}
+                    for field_site in current.get("field_access_sites",[]):
+                        receiver=receiver_by_instruction.get(field_site["instruction"])
+                        if receiver:
+                            field_site["receiver_identity_status"]=receiver["identity_status"]
+                            field_site["receiver_identity"]=receiver["identity"]
                     current["invoke_sites"]=invoke_sites[:512]
                     current["invoke_sites_truncated"]=len(invoke_sites)>512
                     current["invoke_sites_incomplete"]=len(invoke_sites)!=invoke_opcode_count
