@@ -69,18 +69,32 @@ jobs:
                   found = [n for n in needles if n.lower() in data.lower()]
                   if found: hits[group] = found
               if not hits: continue
-              decl = re.search(r"(?m)^\s*(?:(?:public|protected|private|abstract|final|static|synchronized)\s+)*(?:class|interface|enum|record)\s+([\w$]+)", data)
-              package = re.search(r"(?m)^package\s+([\w.]+)\s*;", data)
+              decl = re.search(r"(?m)^\\s*(?:(?:public|protected|private|abstract|final|static|synchronized)\\s+)*(?:class|interface|enum|record)\\s+([\\w$]+)([^\\n{]*)", data)
+              package = re.search(r"(?m)^package\\s+([\\w.]+)\\s*;", data)
               methods = []
+              fields = []
               for line in data.splitlines():
-                  m = re.match(r"\s*(?:public|protected|private)\s+(?:static\s+)?(?:final\s+)?[\w.$<>?, \[\]]+\s+([\w$]+)\s*\(", line)
-                  if m and len(methods) < 20: methods.append(m.group(1))
+                  m = re.match(r"\\s*(?:public|protected|private)\\s+(?:(?:static|final|synchronized|native|abstract)\\s+)*([\\w.$<>?, \\[\\]]+)\\s+([\\w$]+)\\s*\\(([^)]*)\\)", line)
+                  if m and len(methods) < 40:
+                      methods.append(m.group(2) + "(" + re.sub(r"\\s+", " ", m.group(3)).strip() + "):" + m.group(1).strip())
+                  f = re.match(r"\\s*(?:public|protected|private)\\s+(?:(?:static|final|volatile|transient)\\s+)*([\\w.$<>?, \\[\\]]+)\\s+([\\w$]+)\\s*(?:=|;)", line)
+                  if f and len(fields) < 40:
+                      fields.append(f.group(2) + ":" + f.group(1).strip())
+              constants = []
+              for value in re.findall(r'"((?:\\\\.|[^"\\\\])*)"', data):
+                  if re.search(r"(https?://|deepseek|/api|/chat|stream|challenge|pow|captcha|tool)", value, re.I):
+                      value = value[:180]
+                      if value not in constants: constants.append(value)
+                  if len(constants) >= 20: break
               rows.append((sum(len(v) for v in hits.values()), str(path.relative_to(root)),
                            package.group(1) if package else "", decl.group(1) if decl else "",
-                           hits, methods))
+                           decl.group(2).strip() if decl else "", hits, methods, fields, constants))
           rows.sort(key=lambda x: (-x[0], x[1]))
           with zipfile.ZipFile(apk) as z:
-              dex = [(i.filename, i.file_size) for i in z.infolist() if re.fullmatch(r"classes[0-9]*\.dex", i.filename)]
+              dex = [(i.filename, i.file_size) for i in z.infolist() if re.fullmatch(r"classes[0-9]*\\.dex", i.filename)]
+          stdout = pathlib.Path("audit/jadx.stdout.log").read_text(errors="replace").splitlines()
+          stderr = pathlib.Path("audit/jadx.stderr.log").read_text(errors="replace").splitlines()
+          diagnostics = [x for x in stdout + stderr if re.search(r"ERROR|WARN|Exception|failed", x, re.I)]
           lines = [
               "# DeepSeek 2.7.5 APK static evidence index", "",
               f"- APK bytes: {apk.stat().st_size}",
@@ -92,17 +106,22 @@ jobs:
               "## DEX inventory", "",
           ]
           lines += [f"- {name}: {size:,} bytes" for name, size in dex]
+          lines += ["", "## JADX diagnostics", ""]
+          lines += [f"- {x[:300]}" for x in diagnostics[:40]] or ["- No warning/error lines captured in JADX stdout/stderr."]
           lines += ["", "## Candidate classes", "",
                     "Ranked by matches across network, endpoint, PoW/challenge, async/stream, and agent/tool terms.",
-                    "Names below are navigation candidates, not confirmed execution-chain roles.", ""]
-          for score, rel, pkg, cls, hits, methods in rows[:250]:
+                    "Class and method signatures are navigation evidence only, not proof of execution.", ""]
+          for score, rel, pkg, cls, inheritance, hits, methods, fields, constants in rows[:150]:
               groups = "; ".join(f"{k}=[{', '.join(v)}]" for k,v in hits.items())
-              lines.append(f"- **{pkg}.{cls}** ({rel}; score={score}) — {groups}")
-              if methods: lines.append(f"  - Methods: {', '.join(methods)}")
-          (out / "report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+              lines.append(f"- **{pkg}.{cls}** ({rel}; score={score}; {inheritance}) — {groups}")
+              if methods: lines.append(f"  - Methods: {', '.join(methods[:20])}")
+              if fields: lines.append(f"  - Fields: {', '.join(fields[:20])}")
+              if constants: lines.append(f"  - Relevant string constants: {', '.join(constants[:12])}")
+          (out / "report.md").write_text("\\n".join(lines) + "\\n", encoding="utf-8")
           (out / "candidate-index.json").write_text(json.dumps([
-              {"score":s,"path":p,"package":pkg,"class":cls,"matches":h,"methods":m}
-              for s,p,pkg,cls,h,m in rows[:500]
+              {"score":s,"path":p,"package":pkg,"class":cls,"inheritance":inh,
+               "matches":h,"methods":m,"fields":f,"strings":k}
+              for s,p,pkg,cls,inh,h,m,f,k in rows[:500]
           ], ensure_ascii=False, indent=2), encoding="utf-8")
           print(f"Indexed {len(rows)} candidate classes")
           PY
