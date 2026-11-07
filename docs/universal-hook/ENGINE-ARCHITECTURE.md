@@ -334,3 +334,10 @@ The next implementation step is to add parameter/return edges between methods an
 
 
 补充调用点完整性门槛：方法内 invoke opcode 总数必须与成功解析的标准 invoke-site 数一致；invoke-custom、invoke-polymorphic、quickened 或无法识别的调用形式不会被猜成普通直接调用。只要调用点清单存在未解析或截断，调用方方法的跨方法值边整体跳过并计入不完整统计。字段访问 opcode 数与字段访问点数也单独核对，避免字段槽索引被误读为完整字段清单。
+
+
+### 16.7 Kotlin Semantic Core 接入与证据门槛收紧
+
+StaticProgramGraph / StaticAuditCli 已接入同目录的 interprocedural-value-edges.jsonl.gz，并读取 summary.json 的 edges_truncated 状态。只有 summary 明确确认值边文件未截断时才加载；旧审计目录缺少该索引或摘要时不会补造 DATA_FLOW 证据。
+
+**重要修正：** 同一字段描述符的跨方法读写共现不再单独生成 DATA_FLOW 证据。由于尚无 receiver points-to/alias 证明，它只保留为诊断统计。DATA_FLOW 现在必须来自已解析的参数边或返回值边；字段槽共现不能满足 RolePolicy 的 DATA_FLOW 要求。新增 Kotlin 回归覆盖未截断值边可产生证据、截断值边不产生证据，以及字段槽共现单独不足以产生 DATA_FLOW。
