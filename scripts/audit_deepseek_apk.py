@@ -593,12 +593,40 @@ def build_interprocedural_value_graph(methods):
                         return_edges+=1
     for method in methods:
         method.pop("_semantic_key",None)
-    return {"edges":edges,"summary":{"resolved_call_sites":resolved_calls,
+    total_edges=len(edges)
+    return {"edges":edges[:200000],"summary":{"resolved_call_sites":resolved_calls,
             "unresolved_call_sites":unresolved_calls,"ambiguous_call_sites":ambiguous_calls,
             "argument_edges":argument_edges,"return_edges":return_edges,
             "unresolved_argument_mappings":unresolved_arguments,
             "unresolved_return_mappings":unresolved_returns,
-            "edge_count":len(edges),"edges_truncated":len(edges)>200000}}
+            "edge_count":total_edges,"stored_edge_count":min(total_edges,200000),
+            "edges_truncated":total_edges>200000}}
+
+
+def build_field_slot_index(methods):
+    """Group field reads/writes by exact DEX field descriptor, without claiming object identity."""
+    groups=collections.defaultdict(lambda:{"field":"","writers":[],"readers":[]})
+    for method in methods:
+        key=method["class"]+"->"+method["name"]+method["descriptor"]
+        for access in method.get("field_access_sites",[]):
+            group=groups[access["field"]]
+            group["field"]=access["field"]
+            event={"method":key,"component":method.get("component"),
+                   "instruction":access["instruction"],"line":access["line"],
+                   "opcode":access["opcode"],"value_register":access["value_register"],
+                   "object_register":access.get("object_register"),
+                   "static":access["static"]}
+            group["readers" if access["access"]=="read" else "writers"].append(event)
+    records=[]
+    for field in sorted(groups):
+        group=groups[field]
+        if group["writers"] and group["readers"]:
+            group["cross_method_pair_count"]=sum(
+                1 for writer in group["writers"] for reader in group["readers"]
+                if writer["method"]!=reader["method"])
+            group["instance_identity_confirmed"]=False
+            records.append(group)
+    return records
 
 
 def analyze_smali(root):
@@ -760,6 +788,8 @@ def main():
              "java_files":java_count,"dex_count":len(dex_entries)},indent=2,ensure_ascii=True))
     if not all_classes or not all_methods:
         raise SystemExit(f"No DEX methods recovered from {src.name}; apktool exit status and input package layout require investigation")
+    interprocedural=build_interprocedural_value_graph(all_methods)
+    field_slot_index=build_field_slot_index(all_methods)
     # Keep the complete method inventory compressed in the repository; no source dump or raw logs are copied.
     with gzip.open(out/"methods.jsonl.gz","wt",encoding="utf-8") as f:
         for m in all_methods: f.write(json.dumps(m,separators=(",",":"),ensure_ascii=True)+"\n")
@@ -767,6 +797,10 @@ def main():
         for c in all_classes: f.write(json.dumps(c,separators=(",",":"),ensure_ascii=True)+"\n")
     with gzip.open(out/"call-edges.jsonl.gz","wt",encoding="utf-8") as f:
         for e in all_edges: f.write(json.dumps(e,separators=(",",":"),ensure_ascii=True)+"\n")
+    with gzip.open(out/"interprocedural-value-edges.jsonl.gz","wt",encoding="utf-8") as f:
+        for e in interprocedural["edges"]: f.write(json.dumps(e,separators=(",",":"),ensure_ascii=True)+"\n")
+    with gzip.open(out/"field-slot-index.jsonl.gz","wt",encoding="utf-8") as f:
+        for e in field_slot_index: f.write(json.dumps(e,separators=(",",":"),ensure_ascii=True)+"\n")
     candidates=[]
     for m in all_methods:
         roles=m.get("roles",[])
@@ -789,6 +823,13 @@ def main():
       "register_dataflow_use_count":sum(m.get("register_dataflow",{}).get("use_count",0) for m in all_methods),
       "register_dataflow_ambiguous_use_count":sum(m.get("register_dataflow",{}).get("ambiguous_use_count",0) for m in all_methods),
       "register_dataflow_unresolved_use_count":sum(m.get("register_dataflow",{}).get("unresolved_use_count",0) for m in all_methods),
+      "parameter_definition_count":sum(m.get("register_dataflow",{}).get("parameter_definition_count",0) for m in all_methods),
+      "invoke_site_count":sum(len(m.get("invoke_sites",[])) for m in all_methods),
+      "field_access_site_count":sum(len(m.get("field_access_sites",[])) for m in all_methods),
+      "field_slot_group_count":len(field_slot_index),
+      "field_slot_cross_method_pair_count":sum(x["cross_method_pair_count"] for x in field_slot_index),
+      "field_instance_identity_confirmed":False,
+      "interprocedural_value_flow":interprocedural["summary"],
       "candidate_method_count":len(candidates),
       "native_libraries":native,"tool_limits":{"JADX":"best-effort; inspect exit status and APKTool smali evidence",
       "Hook":"static candidate discovery only; no device Hook is claimed"}}
