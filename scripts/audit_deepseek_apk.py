@@ -1,0 +1,192 @@
+#!/usr/bin/env python3
+"""Repository-only DeepSeek APK audit. Emits compact, privacy-safe evidence indexes."""
+from __future__ import annotations
+import argparse, collections, gzip, hashlib, json, pathlib, re, shutil, struct, subprocess, zipfile
+
+ROUTES = (
+    "/api/v0/chat/completion", "/api/v0/chat/regenerate", "/api/v0/chat/continue",
+    "/api/v0/chat/edit_message", "/api/v0/chat/resume_stream",
+    "/api/v0/chat/create_pow_challenge", "/api/v0/chat/stop_stream",
+    "/api/v0/chat/history_messages", "/api/v0/chat/message_feedback",
+)
+ANCHORS = {
+    "request_route": ROUTES,
+    "pow": ("PowCalculator", "DeepSeekHashV1", "X-DS-PoW-Response", "X-DS-Challenge-Response", "create_pow_challenge"),
+    "sse_transport": ("text/event-stream", "ByteReadChannel", "readUTF8Line", "x-ds-sse-heartbeat-timeout-secs"),
+    "sse_dispatch": ("DeltaCommand", "update_session", "update_parent_message", "auto_tts_capability", "check_client_update"),
+    "flow_coroutine": ("kotlinx.coroutines.flow.Flow", "Continuation", "emit", "collect"),
+    "serialization": ("kotlinx.serialization", "SerialDescriptor", "serializer", "SerializersModule"),
+    "agent_tool": ("ToolOpenFragment", "ToolFindFragment", "SearchFragment", "tool_calls", "tool_use", "MCP"),
+    "session": ("conversation_id", "session_id", "message_id", "history_messages", "resume_stream"),
+}
+SENSITIVE = re.compile(r"(?i)(authorization|bearer\\s+|cookie|api[_-]?key|access[_-]?token|refresh[_-]?token|password|prompt|message[_-]?content)")
+METHOD_RE = re.compile(r"^\\.method\\s+(.+?)\\s+([^\\s(]+)(\\([^)]*\\).+)$")
+CLASS_RE = re.compile(r"^\\.class\\s+.*?\\s+(L[^;]+;)")
+SUPER_RE = re.compile(r"^\\.super\\s+(L[^;]+;)")
+IMPL_RE = re.compile(r"^\\.implements\\s+(L[^;]+;)")
+INVOKE_RE = re.compile(r"\\binvoke-[\\w/-]+\\s+\\{[^}]*\\},?\\s*(L[^;]+;)->([^ (]+)(\\([^)]*\\).+)")
+OP_RE = re.compile(r"^\\s*([a-z][a-z0-9_/-]+)(?:\\s|$)")
+STR_RE = re.compile(r'const-string(?:/jumbo)?\\s+[^,]+,\\s+"((?:\\\\.|[^"])*)"')
+
+def sha256(path):
+    h=hashlib.sha256()
+    with open(path,"rb") as f:
+        for b in iter(lambda:f.read(1024*1024),b""): h.update(b)
+    return h.hexdigest()
+
+def dex_header(data):
+    if len(data)<112 or not data.startswith(b"dex\\n"): return None
+    u=lambda off: struct.unpack_from("<I",data,off)[0]
+    return {"magic":data[:8].decode("latin1").replace("\\0",""),"bytes":len(data),
+            "header_file_size":u(32),"string_ids":u(56),"type_ids":u(64),"proto_ids":u(72),
+            "field_ids":u(80),"method_ids":u(88),"class_defs":u(96),
+            "file_size_matches":u(32)==len(data),"adler32_header":u(8)}
+
+def run(cmd,log):
+    p=subprocess.run(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,errors="replace")
+    pathlib.Path(log).write_text(p.stdout,errors="replace")
+    return p.returncode
+
+def safe_strings(line):
+    m=STR_RE.search(line)
+    if not m: return []
+    value=m.group(1)
+    value=bytes(value,"utf-8").decode("unicode_escape",errors="replace")
+    if SENSITIVE.search(value): return ["<redacted-sensitive-marker>"]
+    return [value[:240]]
+
+def analyze_smali(root):
+    classes=[]; methods=[]; call_edges=[]
+    for file in sorted(root.rglob("*.smali")):
+        try: lines=file.read_text(errors="replace").splitlines()
+        except OSError: continue
+        desc=super_desc=None; interfaces=[]; current=None; in_method=False
+        for line_no,line in enumerate(lines,1):
+            if not in_method:
+                m=CLASS_RE.match(line)
+                if m: desc=m.group(1)
+                m=SUPER_RE.match(line)
+                if m: super_desc=m.group(1)
+                m=IMPL_RE.match(line)
+                if m: interfaces.append(m.group(1))
+                if line.startswith(".method "):
+                    m=METHOD_RE.match(line)
+                    if m:
+                        current={"class":desc or "", "name":m.group(2), "descriptor":m.group(3),
+                                 "access":m.group(1), "file":str(file.relative_to(root)),
+                                 "line":line_no, "strings":[], "invokes":[], "opcodes":collections.Counter()}
+                        in_method=True
+                continue
+            if line.startswith(".end method"):
+                if current:
+                    blob=" ".join(current["strings"])+" "+" ".join(current["invokes"])
+                    roles=[]
+                    for role,terms in ANCHORS.items():
+                        hits=[t for t in terms if t in blob]
+                        if hits: roles.append({"role":role,"anchors":hits[:20]})
+                    current["roles"]=roles
+                    current["opcode_count"]=sum(current["opcodes"].values())
+                    current["opcode_histogram"]=dict(current["opcodes"].most_common(24))
+                    current["invokes"]=sorted(set(current["invokes"]))[:120]
+                    current["strings"]=sorted(set(current["strings"]))[:100]
+                    methods.append(current)
+                    for target,name,sig in current.pop("_edges",[]):
+                        call_edges.append({"from":current["class"]+"->"+current["name"]+current["descriptor"],
+                                           "to":target+"->"+name+sig})
+                current=None; in_method=False
+                continue
+            if current is None: continue
+            sm=safe_strings(line)
+            current["strings"].extend(sm)
+            im=INVOKE_RE.search(line)
+            if im:
+                target,name,sig=im.groups()
+                current["invokes"].append(target+"->"+name+sig)
+                current.setdefault("_edges",[]).append((target,name,sig))
+            op=OP_RE.match(line)
+            if op and not line.lstrip().startswith((".",":","#)):
+                current["opcodes"][op.group(1)] += 1
+        if desc:
+            classes.append({"descriptor":desc,"super":super_desc,"interfaces":interfaces,
+                            "file":str(file.relative_to(root))})
+    return classes,methods,call_edges
+
+def main():
+    ap=argparse.ArgumentParser()
+    ap.add_argument("--input",required=True); ap.add_argument("--version",required=True)
+    ap.add_argument("--work",required=True); ap.add_argument("--out",required=True)
+    ap.add_argument("--jadx",required=True); ap.add_argument("--apktool",required=True)
+    a=ap.parse_args()
+    src=pathlib.Path(a.input); work=pathlib.Path(a.work); out=pathlib.Path(a.out)
+    if work.exists(): shutil.rmtree(work)
+    if out.exists(): shutil.rmtree(out)
+    work.mkdir(parents=True); out.mkdir(parents=True)
+    components=[]
+    if zipfile.is_zipfile(src):
+        with zipfile.ZipFile(src) as z:
+            names=[n for n in z.namelist() if n.lower().endswith(".apk")]
+            if names:
+                for i,n in enumerate(names):
+                    target=work/f"component-{i}-{pathlib.Path(n).name}"
+                    target.parent.mkdir(parents=True,exist_ok=True)
+                    target.write_bytes(z.read(n)); components.append(target)
+            elif src.suffix.lower()==".apk": components=[src]
+            else: raise SystemExit("ZIP container has no embedded APK components")
+    else: components=[src]
+    if not components: raise SystemExit("No APK components discovered")
+    inventory=[]; all_classes=[]; all_methods=[]; all_edges=[]; native=[]
+    for i,apk in enumerate(components):
+        comp=apk.stem
+        comp_out=out/comp; comp_out.mkdir(parents=True,exist_ok=True)
+        with zipfile.ZipFile(apk) as z:
+            dex_entries=[x for x in z.infolist() if re.fullmatch(r"classes[0-9]*\\.dex",pathlib.PurePosixPath(x.filename).name)]
+            for item in dex_entries:
+                raw=z.read(item)
+                dh=dex_header(raw) or {"invalid_dex":True}
+                inventory.append({"component":apk.name,"entry":item.filename,"sha256":hashlib.sha256(raw).hexdigest(),**dh})
+            for item in z.infolist():
+                if item.filename.startswith("lib/") and item.filename.endswith(".so"):
+                    raw=z.read(item.filename)
+                    native.append({"component":apk.name,"path":item.filename,"bytes":len(raw),"sha256":hashlib.sha256(raw).hexdigest()})
+        smali=work/f"smali-{i}"
+        apktool_rc=run(["java","-jar",a.apktool,"d","-f","-r","-o",str(smali),str(apk)],comp_out/"apktool.log")
+        if smali.exists():
+            cls,meth,edges=analyze_smali(smali)
+            for x in cls: x["component"]=apk.name
+            for x in meth: x["component"]=apk.name
+            for x in edges: x["component"]=apk.name
+            all_classes.extend(cls); all_methods.extend(meth); all_edges.extend(edges)
+        jadx_dir=work/f"jadx-{i}"
+        jadx_rc=run([a.jadx,"--show-bad-code","--no-res","--threads-count","2","-d",str(jadx_dir),str(apk)],comp_out/"jadx.log")
+        java_count=len(list((jadx_dir/"sources").rglob("*.java"))) if (jadx_dir/"sources").exists() else 0
+        (comp_out/"component.json").write_text(json.dumps({"apk":apk.name,"bytes":apk.stat().st_size,
+             "sha256":sha256(apk),"apktool_exit":apktool_rc,"jadx_exit":jadx_rc,
+             "java_files":java_count,"dex_count":len(dex_entries)},indent=2))
+    # Keep the complete method inventory compressed in the repository; no source dump or raw logs are copied.
+    with gzip.open(out/"methods.jsonl.gz","wt",encoding="utf-8") as f:
+        for m in all_methods: f.write(json.dumps(m,separators=(",",":"),ensure_ascii=False)+"\\n")
+    with gzip.open(out/"classes.jsonl.gz","wt",encoding="utf-8") as f:
+        for c in all_classes: f.write(json.dumps(c,separators=(",",":"),ensure_ascii=False)+"\\n")
+    with gzip.open(out/"call-edges.jsonl.gz","wt",encoding="utf-8") as f:
+        for e in all_edges: f.write(json.dumps(e,separators=(",",":"),ensure_ascii=False)+"\\n")
+    candidates=[]
+    for m in all_methods:
+        roles=m.get("roles",[])
+        if roles:
+            score=sum(len(x["anchors"]) for x in roles)
+            candidates.append({"class":m["class"],"name":m["name"],"descriptor":m["descriptor"],
+                "component":m["component"],"file":m["file"],"line":m["line"],"score":score,"roles":roles,
+                "invokes":m["invokes"][:40],"opcode_count":m["opcode_count"]})
+    candidates.sort(key=lambda x:(-x["score"],x["class"],x["name"]))
+    summary={"version_label":a.version,"source_file":src.name,"source_bytes":src.stat().st_size,
+      "source_sha256":sha256(src),"components":[x.name for x in components],"dex":inventory,
+      "dex_count":len(inventory),"class_count":len(all_classes),"method_count":len(all_methods),
+      "call_edge_count":len(all_edges),"candidate_method_count":len(candidates),
+      "native_libraries":native,"tool_limits":{"JADX":"best-effort; inspect exit status and APKTool smali evidence",
+      "Hook":"static candidate discovery only; no device Hook is claimed"}}
+    (out/"summary.json").write_text(json.dumps(summary,indent=2,ensure_ascii=False))
+    (out/"hook-candidates.json").write_text(json.dumps(candidates,indent=2,ensure_ascii=False))
+    (out/"candidate-methods.csv").write_text("version,component,class,method,descriptor,score,roles,file,line\\n"+"".join(
+      ",".join(json.dumps(v,ensure_ascii=False) for v in [a.version,c["component"],c["class"],c["name"],c["descriptor"],c["score"],"|".join(x["role"] for x in c["roles"]),c["file"],c["line"]])+"\\n" for c in candidates))
+    print(json.dumps({k:summary[k] for k in ("version_label","source_sha256","dex_count","class_count","method_count","call_edge_count","candidate_method_count")},ensure_ascii=False))
+if __name__=="__main__": main()
