@@ -22,7 +22,7 @@ class FeatureContractTest {
 
     @Test fun oversizedOrMultilineFieldIsDroppedAndRequiredFieldFailsClosed() {
         val contract = DeepSeekFeatureContracts.all.single { it.role.value == "prompt.compose" }
-        assertNull(FeatureEventSanitizer().sanitize(contract, mapOf(SafeEventField.SOURCE_LABEL to "raw\\ncontent")))
+        assertNull(FeatureEventSanitizer().sanitize(contract, mapOf(SafeEventField.SOURCE_LABEL to "raw\ncontent")))
         assertNull(FeatureEventSanitizer().sanitize(contract, mapOf(SafeEventField.SOURCE_LABEL to "x".repeat(161))))
     }
 }
