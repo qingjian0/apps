@@ -71,7 +71,8 @@ class StaticProgramGraphTest {
         val enriched = graph.enrich(candidate)
         val families = enriched.evidence.map { it.family }.toSet()
         assertTrue(EvidenceFamily.CALL_GRAPH in families)
-        assertTrue(EvidenceFamily.DATA_FLOW in families)
+        // Matching field descriptors alone do not prove the same object instance.
+        assertFalse(EvidenceFamily.DATA_FLOW in families)
         assertTrue(EvidenceFamily.CONTROL_FLOW in families)
         assertTrue(EvidenceFamily.TYPE_SHAPE in families)
         assertTrue(enriched.evidence.any { it.family == EvidenceFamily.TYPE_SHAPE && it.key.contains("interface-implementors=2") })
