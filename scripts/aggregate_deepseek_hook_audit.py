@@ -10,6 +10,50 @@ def read_jsonl_gz(path):
     with gzip.open(path,"rt",encoding="utf-8") as f:
         for line in f:
             if line.strip(): yield json.loads(line)
+
+def version_identity(label, summary):
+    """Use the base APK manifest as the version authority; split manifests often omit versionName."""
+    components=summary.get("component_metadata",[])
+    base=[x for x in components if not x.get("manifest",{}).get("split")]
+    if len(base)!=1:
+        return {"label":label,"status":"base-component-ambiguous","trusted_for_cross_version":False,
+                "base_component_count":len(base)}
+    component=base[0]
+    manifest=component.get("manifest",{})
+    package=manifest.get("package")
+    actual=manifest.get("version_name")
+    if package!="com.deepseek.chat":
+        status="package-mismatch"
+    elif not actual:
+        status="version-name-missing"
+    elif actual!=label:
+        status="label-mismatch"
+    else:
+        status="verified"
+    return {"label":label,"status":status,"trusted_for_cross_version":status=="verified",
+            "base_component":component.get("apk"),"package":package,
+            "manifest_version_name":actual,"version_code":manifest.get("version_code"),
+            "apk_sha256":component.get("sha256")}
+
+def project_candidate(method):
+    """Keep only fields used by semantic matching; full method records contain large CFG/dataflow payloads."""
+    return {key:method.get(key,[]) for key in
+            ("class","name","descriptor","roles","invokes","strings","opcode_histogram","opcode_count")}
+
+def prepared_method(method):
+    return (method,feature_set(method),method.get("opcode_histogram",{}))
+
+def prepared_similarity(left,right):
+    A=left[1]; B=right[1]
+    if not A or not B: return 0.0
+    j=len(A&B)/len(A|B)
+    ah=left[2]; bh=right[2]
+    keys=set(ah)|set(bh)
+    if keys:
+        den=sum(max(ah.get(k,0),bh.get(k,0)) for k in keys) or 1
+        op=sum(min(ah.get(k,0),bh.get(k,0)) for k in keys)/den
+    else: op=0.0
+    return round(0.78*j+0.22*op,4)
 def feature_set(m):
     out=set()
     for role in m.get("roles",[]):
@@ -82,25 +126,40 @@ def main():
     for v in VERSIONS:
         p=root/v/"summary.json"
         if p.exists(): summaries[v]=read_json(p)
-    candidates={v:[] for v in summaries}
+    identities={v:version_identity(v,s) for v,s in summaries.items()}
+    role_names=("request_route","pow","sse_transport","sse_dispatch","flow_coroutine","serialization",
+        "agent_tool","session","prompt_pipeline","agent_planning","tool_registry_execution","local_api_gateway",
+        "multimodal_image","multimodal_audio","attachment_file","search_web","storage_sync","account_capability","ui_settings")
+    # Stream the large method inventories and retain only compact role candidates.
+    # The previous implementation kept every full CFG/reaching-definitions record in RAM.
+    candidates={v:collections.defaultdict(list) for v in summaries}
     for v in summaries:
-        candidates[v]=list(read_jsonl_gz(root/v/"methods.jsonl.gz"))
+        for method in read_jsonl_gz(root/v/"methods.jsonl.gz"):
+            roles=method.get("roles",[])
+            if not roles: continue
+            compact=project_candidate(method)
+            for role_data in roles:
+                role=role_data.get("role")
+                if role in role_names:
+                    candidates[v][role].append(compact)
     pairs=[]
     # Match methods by semantic role, API-family calls, stable protocol anchors and normalized opcode shape.
     for role in ("request_route","pow","sse_transport","sse_dispatch","flow_coroutine","serialization","agent_tool","session","prompt_pipeline","agent_planning","tool_registry_execution","local_api_gateway","multimodal_image","multimodal_audio","attachment_file","search_web","storage_sync","account_capability","ui_settings"):
         by_version={}
-        for v,methods in candidates.items():
-            selected=[m for m in methods if any(x["role"]==role for x in m.get("roles",[]))]
+        for v in candidates:
+            selected=list(candidates[v].get(role,[]))
             selected.sort(key=lambda m: (
                 -max((len(x.get("anchors",[])) for x in m.get("roles",[]) if x["role"]==role), default=0),
                 -sum(call.startswith(("Lkotlin/","Lkotlinx/","Ljava/","Landroid/","Lio/ktor/","Lokhttp3/","Lretrofit2/")) for call in m.get("invokes",[])),
                 -m.get("opcode_count",0),m.get("class",""),m.get("name","")))
-            by_version[v]=selected[:160]
-        present=[v for v in by_version if by_version[v]]
+            by_version[v]=[prepared_method(m) for m in selected[:160]]
+        # A mismatched or absent Manifest version is quarantined from version-to-version matching.
+        present=[v for v in by_version if identities[v]["trusted_for_cross_version"] and by_version[v]]
         for i,va in enumerate(present):
             for vb in present[i+1:]:
-                for a in by_version[va]:
-                    ranked=sorted(((similarity(a,b),b) for b in by_version[vb]),key=lambda x:-x[0])[:3]
+                for prepared_a in by_version[va]:
+                    a=prepared_a[0]
+                    ranked=sorted(((prepared_similarity(prepared_a,b),b[0]) for b in by_version[vb]),key=lambda x:-x[0])[:3]
                     for score,b in ranked:
                         if score>=0.48:
                             pairs.append({"role":role,"from_version":va,"from":a["class"]+"->"+a["name"]+a["descriptor"],
@@ -113,8 +172,13 @@ def main():
       "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|"]
     for v,s in summaries.items():
         report.append(f"| {v} | {s['source_file']} | {len(s['components'])} | {s['dex_count']} | {s['class_count']} | {s['method_count']} | {s.get('call_edge_count',0)} | {s.get('field_read_count',0)}/{s.get('field_write_count',0)} | {s.get('methods_with_control_flow',0)}/{s.get('control_flow_branch_count',0)} | {s['candidate_method_count']} |")
-    report += ["","## 组件身份核对","","| 版本 | 组件 | 包名 | versionCode | versionName | split | 签名证书 SHA-256 | 身份完整度 | APK SHA-256 |",
-      "|---|---|---|---|---|---|---|"]
+    report += ["","## 版本标签核验","","| 矩阵标签 | Manifest versionName | versionCode | 身份状态 | 是否参与跨版本匹配 |",
+      "|---|---|---:|---|---|"]
+    for v,identity in identities.items():
+        report.append(f"| {v} | {identity.get('manifest_version_name','')} | {identity.get('version_code','')} | {identity['status']} | {'yes' if identity['trusted_for_cross_version'] else 'no'} |")
+    report += ["","2.7.3 当前输入的 Manifest versionName=2.5.2，与矩阵标签 2.7.3 冲突；该输入仍保留独立静态索引，但不会参与可信跨版本候选匹配。需要替换正确 APK 或确认该构建的版本标识后再纳入。","",
+      "## 组件身份核对","","| 版本 | 组件 | 包名 | versionCode | versionName | split | 签名证书 SHA-256 | 身份完整度 | APK SHA-256 |",
+      "|---|---|---|---|---|---|---|---|---|"]
     for v,s in summaries.items():
         for comp in s.get("component_metadata",[]):
             ident=comp.get("manifest",{})
@@ -140,6 +204,7 @@ def main():
       "- 2.7.3 / 2.7.5 既有 SSE 链是静态证据；尚未证明真实设备 Hook 成功。",
       "- 服务端 ToolOpen/ToolFind/Search 片段不等于本地工具执行器；需找到本地执行和结果回注闭环。",""]
     outdir=root/"universal-hook"; outdir.mkdir(parents=True,exist_ok=True)
+    (outdir/"version-identity.json").write_text(json.dumps(identities,indent=2,ensure_ascii=True))
     (outdir/"universal-hook-report.md").write_text("\n".join(report))
     (outdir/"semantic-method-matches.json").write_text(json.dumps(pairs,indent=2,ensure_ascii=True))
     (outdir/"probe-log-summary.json").write_text(json.dumps(probe_summary(pathlib.Path(".")),indent=2,ensure_ascii=True))
