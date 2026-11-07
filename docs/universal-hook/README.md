@@ -2,7 +2,7 @@
 
 ## 目标与范围
 
-目标宿主仅为官方 Android 应用 `com.deepseek.chat`。本目录把 2.7.1、2.7.3、2.7.4、2.7.5 的静态 APK/APKM 证据，与 2.7.2/code289-cn 的设备日志分开建模，形成跨混淆版本的 Hook 定位、验证和降级规范。
+目标宿主仅为官方 Android 应用 `com.deepseek.chat`。本目录把 2.7.1、2.7.2、2.7.3、2.7.4、2.7.5 的静态 APK/APKM 证据，与 2.7.2/code289-cn 的设备日志交叉验证，形成跨混淆版本的 Hook 定位、验证和降级规范。
 
 “通用通杀”在工程上定义为：**同一套语义解析器和 Hook 生命周期管理器，能够在不同宿主版本中自动定位同一业务角色；每个版本可以有独立的候选描述符，但不需要人工维护一套完全独立的 Hook 代码。** 不承诺一个固定类名/方法名适配所有版本。
 
@@ -10,7 +10,8 @@
 
 | 输入 | 身份/证据 | 处理方式 |
 |---|---|---|
-| `deepseek271.apk` | 2.7.1 候选宿主 APK | 本轮重新核对 Manifest、DEX、类/方法索引 |
+| `deepseek271.apk` | DeepSeek 2.7.1 | 本轮重新核对 Manifest、DEX、类/方法索引 |
+| `deepseek-2-7-2.apk` | DeepSeek 2.7.2 / code289-cn 候选 APK | 与 `dsprobe.log`、`deekseep_vision.log` 动态证据逐项交叉验证 |
 | `deepseek 273.apk` | DeepSeek 2.7.3 | DEX、Smali、JADX、Native 全量扫描 |
 | `com.deepseek.chat_2.7.4-294_...apkm` | DeepSeek 2.7.4 / code294 分包容器 | 解包每个内嵌 APK，按组件分别扫描 |
 | `DeepSeek_2.7.5.apk` | DeepSeek 2.7.5 | DEX、Smali、JADX、Native 全量扫描 |
@@ -152,4 +153,4 @@ JADX 反编译失败必须保留退出码和错误日志；Smali 是控制流复
 
 ## 当前状态
 
-本方案与自动审计流水线已建立在独立工作分支。完成 Actions 全量扫描并核对输出后，才更新各版本的具体 Profile 和可安装 Hook 代码。静态候选报告不会被标记为真机 Hook 成功。
+本方案与自动审计流水线已扩展为五版本矩阵（2.7.1–2.7.5，含 2.7.4 APKM）。完成 Actions 全量扫描并核对输出后，才更新各版本的具体 Profile 和可安装 Hook 代码。静态候选报告不会被标记为真机 Hook 成功。
