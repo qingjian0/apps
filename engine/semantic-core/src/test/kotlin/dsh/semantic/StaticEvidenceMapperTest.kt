@@ -41,5 +41,16 @@ class StaticEvidenceMapperTest {
         assertTrue(StaticEvidenceMapper().map(host, record).isEmpty())
     }
 
+    @Test fun frameworkAndThirdPartySdkOwnersCarryNegativeEvidence() {
+        val host = HostFingerprint("com.deepseek.chat", 289, "2.7.2", "cert", "dex", "loader")
+        val record = StaticMethodRecord(
+            "Lcn/fly/verify/bq;", "o", "(Z)Ljava/lang/String;", listOf("Z"), "Ljava/lang/String;",
+            listOf("Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;"), 18,
+            listOf(StaticRoleEvidence("request_route", listOf("/api/v0/chat/completion")))
+        )
+        val candidate = StaticEvidenceMapper().map(host, record).single()
+        assertTrue("third-party-sdk-owner" in candidate.negativeEvidence)
+    }
+
 
 }
