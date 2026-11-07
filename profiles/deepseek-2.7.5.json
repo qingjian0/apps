@@ -40,8 +40,8 @@
       "profile_descriptor_validation": {
         "status": "manually_verified_against_all_smali_archive",
         "artifact_run_id": 42338674344,
-        "classes_verified": 14,
-        "methods_verified": 20,
+        "classes_verified": 17,
+        "methods_verified": 26,
         "note": "Exact method descriptors and class files were checked against the 2.7.5 all-smali.zip artifact."
       }
     },
