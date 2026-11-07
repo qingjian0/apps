@@ -10,6 +10,17 @@ SPEC.loader.exec_module(AUDIT)
 
 
 class SmaliGraphExtractionTest(unittest.TestCase):
+    def test_jsonl_gzip_writer_emits_real_line_breaks(self):
+        records = [{"index": 1, "identity": "first"}, {"index": 2, "identity": "second"}]
+        with tempfile.TemporaryDirectory() as directory:
+            path = pathlib.Path(directory) / "records.jsonl.gz"
+            AUDIT.write_jsonl_gzip(path, records)
+            import gzip
+            with gzip.open(path, "rt", encoding="utf-8") as stream:
+                lines = stream.read().splitlines()
+        self.assertEqual(2, len(lines))
+        self.assertEqual(records, [__import__("json").loads(line) for line in lines])
+
     def test_extracts_field_reads_writes_and_control_flow(self):
         source = """.class public Lx/Test;
 .super Ljava/lang/Object;
