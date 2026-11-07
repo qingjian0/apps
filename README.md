@@ -1104,7 +1104,7 @@ nativeCalculateDeepSeekHashV1Pow(String base, String challenge, long difficulty)
 
 ### 26.2 本轮证据包
 
-- 双版本比较工作流运行和产物：<https://github.com/qingjian0/apps/actions/runs/42338674344>
+- 主分支自动审计运行和产物：<https://github.com/qingjian0/apps/actions/runs/42339059934>
 - 目标 APK 与摘要见第 24 节。
 - 精简的 SSE/Hook/PoW 关键类证据包：deepseek-sse-hook-evidence.zip（本轮交付附件）。
 - 完整 smali archive 包含 2.7.3 的 13,311 个和 2.7.5 的 15,364 个 smali 文件。
