@@ -104,9 +104,6 @@
     },
     "byte_read_channel": {
       "class": "Lzq0;",
-      "interfaces": [
-        "Ljava/lang/Object;"
-      ],
       "methods": [
         "g(ILif2;)Ljava/lang/Object;",
         "h()Lao0;",
@@ -117,7 +114,8 @@
         "README section 23.2",
         "DEX interface"
       ],
-      "confidence": "high"
+      "confidence": "high",
+      "super": "Ljava/lang/Object;"
     },
     "line_reader": {
       "class": "Lfl0;",
