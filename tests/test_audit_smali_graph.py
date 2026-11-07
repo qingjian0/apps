@@ -228,5 +228,111 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertEqual("incomplete-cfg-or-nonconvergence", facts["reason"])
 
 
+    def test_method_descriptor_and_parameter_word_layout(self):
+        parsed = AUDIT.parse_method_descriptor("(Ljava/lang/String;J[D)Ljava/lang/Object;")
+        self.assertEqual(["Ljava/lang/String;", "J", "[D"], parsed["parameters"])
+        self.assertEqual("Ljava/lang/Object;", parsed["return_type"])
+        self.assertEqual(
+            ["p0", "p1", "p2", "p3", "p4"],
+            AUDIT.parameter_registers_for_method("public", "(Ljava/lang/String;J[D)V"),
+        )
+        self.assertEqual(
+            ["p0", "p1", "p2", "p3"],
+            AUDIT.parameter_registers_for_method("public static", "(Ljava/lang/String;J)V"),
+        )
+
+    def test_method_entry_parameters_seed_reaching_definitions(self):
+        body = ["    move-object v0, p1", "    return-object v0"]
+        cfg = AUDIT.build_smali_cfg(body)
+        facts = AUDIT.analyze_register_dataflow(body, cfg, ["p0", "p1"])
+        use = next(x for x in facts["uses"] if x["register"] == "p1")
+        self.assertEqual("resolved", use["resolution"])
+        self.assertEqual(["entry:p1"], use["reaching_definitions"])
+        self.assertEqual(2, facts["parameter_definition_count"])
+
+    def test_invoke_site_captures_argument_words_and_move_result(self):
+        body = [
+            "    invoke-virtual {p0, v1, v2, v3}, Lx/Worker;->send(Ljava/lang/String;J)Ljava/lang/String;",
+            "    move-result-object v4",
+            "    return-object v4",
+        ]
+        sites = AUDIT.extract_invoke_sites(body)
+        self.assertEqual(1, len(sites))
+        self.assertEqual(["p0", "v1", "v2", "v3"], sites[0]["registers"])
+        self.assertEqual(0, sites[0]["instruction"])
+        self.assertEqual(1, sites[0]["result_instruction"])
+        self.assertEqual("v4", sites[0]["result_register"])
+
+    def test_field_access_site_preserves_slot_and_instance_register(self):
+        body = [
+            "    iget-object v0, p1, Lx/State;->value:Ljava/lang/String;",
+            "    iput-object v0, p1, Lx/State;->value:Ljava/lang/String;",
+            "    sget-object v2, Lx/State;->STATIC:Ljava/lang/String;",
+        ]
+        sites = AUDIT.extract_field_access_sites(body)
+        self.assertEqual(3, len(sites))
+        self.assertEqual("read", sites[0]["access"])
+        self.assertEqual("p1", sites[0]["object_register"])
+        self.assertEqual("write", sites[1]["access"])
+        self.assertEqual("v0", sites[1]["value_register"])
+        self.assertTrue(sites[2]["static"])
+        self.assertIsNone(sites[2]["object_register"])
+
+    def test_interprocedural_argument_and_return_edges(self):
+        caller = {
+            "class": "Lx/Caller;", "name": "call", "descriptor": "()V", "component": "base",
+            "register_dataflow": {
+                "complete": True,
+                "uses": [{"instruction": 0, "register": "v1",
+                          "reaching_definitions": ["d0:v1"]}],
+                "definitions": [],
+            },
+            "invoke_sites": [{
+                "instruction": 0, "line": 10, "opcode": "invoke-static",
+                "owner": "Lx/Worker;", "name": "echo",
+                "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+                "registers": ["v1"], "result_instruction": 1, "result_register": "v2",
+            }],
+        }
+        callee = {
+            "class": "Lx/Worker;", "name": "echo",
+            "descriptor": "(Ljava/lang/String;)Ljava/lang/String;", "component": "base",
+            "register_dataflow": {
+                "complete": True,
+                "definitions": [{"id": "entry:p0", "register": "p0", "kind": "parameter"}],
+                "uses": [{"instruction": 2, "register": "p0", "opcode": "return-object",
+                          "reaching_definitions": ["entry:p0"]}],
+            },
+            "invoke_sites": [],
+        }
+        graph = AUDIT.build_interprocedural_value_graph([caller, callee])
+        self.assertEqual(1, graph["summary"]["argument_edges"])
+        self.assertEqual(1, graph["summary"]["return_edges"])
+        self.assertEqual({"argument", "return"}, {x["kind"] for x in graph["edges"]})
+        argument = next(x for x in graph["edges"] if x["kind"] == "argument")
+        self.assertEqual("entry:p0", argument["to_parameter"])
+        returned = next(x for x in graph["edges"] if x["kind"] == "return")
+        self.assertEqual("d1:v2", returned["to_definition"])
+
+    def test_interprocedural_graph_rejects_incomplete_method_dataflow(self):
+        caller = {
+            "class": "Lx/Caller;", "name": "call", "descriptor": "()V",
+            "register_dataflow": {"complete": False, "uses": []},
+            "invoke_sites": [{
+                "instruction": 0, "line": 1, "opcode": "invoke-static",
+                "owner": "Lx/Worker;", "name": "run", "descriptor": "()V",
+                "registers": [], "result_instruction": None, "result_register": None,
+            }],
+        }
+        callee = {
+            "class": "Lx/Worker;", "name": "run", "descriptor": "()V",
+            "register_dataflow": {"complete": True, "uses": [], "definitions": []},
+            "invoke_sites": [],
+        }
+        graph = AUDIT.build_interprocedural_value_graph([caller, callee])
+        self.assertEqual(1, graph["summary"]["incomplete_dataflow_call_sites"])
+        self.assertEqual([], graph["edges"])
+
+
 if __name__ == "__main__":
     unittest.main()
