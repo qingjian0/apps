@@ -176,7 +176,7 @@ def build_smali_cfg(body_lines):
         elif switch(op):
             matches=branch_target_re.findall(text)
             payload=matches[-1] if matches else None
-            if payload not in labels or payload in payload_labels:
+            if payload not in labels or payload not in payload_labels:
                 unresolved.append(payload or "<missing-switch-payload>")
             else:
                 if index+1<count: leaders.add(index+1)
@@ -221,7 +221,7 @@ def build_smali_cfg(body_lines):
             if target in labels and target not in payload_labels: add_edge(ix,labels[target],"goto")
         elif switch(op):
             payload=matches[-1] if matches else None
-            if payload in labels and payload not in payload_labels:
+            if payload in labels and payload in payload_labels:
                 for target in switch_payloads.get(payload,[]):
                     if target in labels and target not in payload_labels: add_edge(ix,labels[target],"switch")
             if ix+1<count: add_edge(ix,ix+1,"switch-default")
