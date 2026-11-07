@@ -45,6 +45,13 @@ class SemanticResolverTest {
         assertEquals("no-host-matched-candidates", result.rejection)
     }
 
+    @Test fun malformedMethodDescriptorIsRejected() {
+        val malformed = candidate("a", goodEvidence).copy(method = MethodShape("not-a-descriptor", "a", "broken", emptyList(), "V"))
+        val result = SemanticResolver().resolve(host, policy, listOf(malformed))
+        assertFalse(result.accepted)
+        assertEquals("no-well-formed-host-matched-candidates", result.rejection)
+    }
+
     @Test fun nonDeepSeekHostIsRejected() {
         val untrusted = host.copy(packageName = "example.other")
         val result = SemanticResolver().resolve(untrusted, policy, listOf(candidate("a", goodEvidence)))
