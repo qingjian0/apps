@@ -389,15 +389,20 @@ def analyze_register_dataflow(body_lines, cfg, parameter_registers=()):
                          "opcode":ins["opcode"],"reaching_definitions":matches[:16],
                          "resolution":state})
     known=all(x["known"] for x in executable)
-    complete=bool(cfg.get("complete")) and known and not changed
-    return {"complete":complete,"reason":None if complete else
-            ("unknown-opcodes" if not known else "incomplete-cfg-or-nonconvergence"),
+    definitions_truncated=len(definitions)>256
+    uses_truncated=len(uses)>512
+    complete=bool(cfg.get("complete")) and known and not changed and not definitions_truncated and not uses_truncated
+    reason=(None if complete else
+            ("unknown-opcodes" if not known else
+             "evidence-truncated" if definitions_truncated or uses_truncated else
+             "incomplete-cfg-or-nonconvergence"))
+    return {"complete":complete,"reason":reason,
             "instruction_count":len(executable),"definition_count":len(definitions),
             "parameter_definition_count":len(entry_definitions),
             "use_count":len(uses),"ambiguous_use_count":ambiguous,
             "unresolved_use_count":unresolved,"iterations":iterations,
-            "definitions":definitions[:256],"definitions_truncated":len(definitions)>256,
-            "uses":uses[:512],"uses_truncated":len(uses)>512}
+            "definitions":definitions[:256],"definitions_truncated":definitions_truncated,
+            "uses":uses[:512],"uses_truncated":uses_truncated}
 
 def parse_method_descriptor(descriptor):
     """Return JVM/Dalvik parameter and return types without losing array/object widths."""
@@ -516,11 +521,15 @@ def build_interprocedural_value_graph(methods):
         by_signature[key].append(method)
     edges=[]; unresolved_calls=0; ambiguous_calls=0; resolved_calls=0
     argument_edges=0; return_edges=0; unresolved_arguments=0; unresolved_returns=0
+    incomplete_dataflow_calls=0; truncated_callsite_methods=0
     for caller in methods:
         caller_key=caller["_semantic_key"]
         caller_flow=caller.get("register_dataflow",{})
         uses={(item["instruction"],item["register"]):item
               for item in caller_flow.get("uses",[])}
+        if caller.get("invoke_sites_truncated"):
+            truncated_callsite_methods+=1
+            continue
         for site in caller.get("invoke_sites",[]):
             target=site["owner"]+"->"+site["name"]+site["descriptor"]
             choices=by_signature.get(target,[])
@@ -534,6 +543,12 @@ def build_interprocedural_value_graph(methods):
                 unresolved_calls+=1
                 continue
             resolved_calls+=1
+            callee_flow=callee.get("register_dataflow",{})
+            if not caller_flow.get("complete") or not callee_flow.get("complete"):
+                incomplete_dataflow_calls+=1
+                unresolved_arguments+=len(site.get("registers",[]))
+                if site.get("result_register"): unresolved_returns+=1
+                continue
             parsed=parse_method_descriptor(site["descriptor"])
             if not parsed:
                 unresolved_arguments+=1
@@ -599,6 +614,8 @@ def build_interprocedural_value_graph(methods):
             "argument_edges":argument_edges,"return_edges":return_edges,
             "unresolved_argument_mappings":unresolved_arguments,
             "unresolved_return_mappings":unresolved_returns,
+            "incomplete_dataflow_call_sites":incomplete_dataflow_calls,
+            "truncated_callsite_methods":truncated_callsite_methods,
             "edge_count":total_edges,"stored_edge_count":min(total_edges,200000),
             "edges_truncated":total_edges>200000}}
 
@@ -674,8 +691,12 @@ def analyze_smali(root):
                         "basic_block_estimate":cfg["block_count"],"cfg":cfg}
                     current["register_dataflow"]=analyze_register_dataflow(
                         current["body_lines"],cfg,current["parameter_registers"])
-                    current["invoke_sites"]=extract_invoke_sites(current["body_lines"])[:512]
-                    current["field_access_sites"]=extract_field_access_sites(current["body_lines"])[:512]
+                    invoke_sites=extract_invoke_sites(current["body_lines"])
+                    current["invoke_sites"]=invoke_sites[:512]
+                    current["invoke_sites_truncated"]=len(invoke_sites)>512
+                    field_sites=extract_field_access_sites(current["body_lines"])
+                    current["field_access_sites"]=field_sites[:512]
+                    current["field_access_sites_truncated"]=len(field_sites)>512
                     current["invokes"]=sorted(set(current["invokes"]))[:120]
                     current["strings"]=sorted(set(current["strings"]))[:100]
                     current.pop("body_lines",None)
