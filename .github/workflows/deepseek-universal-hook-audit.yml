@@ -24,7 +24,8 @@ permissions:
 
 concurrency:
   group: deepseek-universal-hook-audit-${{ github.ref }}
-  cancel-in-progress: true
+  # Keep an in-flight audit alive when another commit is pushed to this branch.
+  cancel-in-progress: false
 
 jobs:
   audit:
@@ -126,7 +127,8 @@ jobs:
   aggregate:
     needs: audit
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # APK artifact assembly and semantic ingestion can be CPU/memory intensive.
+    timeout-minutes: 90
     permissions:
       contents: write
       actions: read
