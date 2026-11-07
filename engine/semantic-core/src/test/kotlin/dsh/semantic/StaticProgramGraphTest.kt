@@ -81,6 +81,52 @@ class StaticProgramGraphTest {
         assertTrue(graph.graphStats()["classes"] == 3)
     }
 
+    @Test fun interproceduralPointsToIsLoadedOnlyAsDiagnosticAndOnlyWhenComplete() {
+        val target = "Lx/Target;->consume(Ljava/lang/Object;)V"
+        val caller = "Lx/Caller;->send()V"
+        val methods = gzipLines(listOf(
+            """{"class":"Lx/Target;","name":"consume","descriptor":"(Ljava/lang/Object;)V","field_reads":[],"field_writes":[],"roles":[{"role":"prompt_pipeline","anchors":["custom_instructions"]}]}""",
+            """{"class":"Lx/Caller;","name":"send","descriptor":"()V","field_reads":[],"field_writes":[]}"""
+        ))
+        val edges = gzipLines(emptyList())
+        val classes = gzipLines(listOf(
+            """{"descriptor":"Lx/Target;","super":"Ljava/lang/Object;","interfaces":[]}""",
+            """{"descriptor":"Lx/Caller;","super":"Ljava/lang/Object;","interfaces":[]}"""
+        ))
+        val pointsTo = gzipLines(listOf(
+            """{"caller":"$caller","callee":"$target","identity_scope":"one-callsite-context","identity_status":"singleton","identity":"alloc:caller#0:Lx/Thing;","runtime_identity_proven":false}"""
+        ))
+        val completeSummary = textFile(
+            """{"interprocedural_points_to":{"records_truncated":false,"recursive_fixed_point":false,"runtime_identity_proven":false}}"""
+        )
+        val host = HostFingerprint("com.deepseek.chat", 300, "future", "cert", "dex-300", "loader")
+        val candidate = SemanticCandidate(
+            RoleId("prompt.compose"),
+            MethodShape("Lx/Target;", "consume", "(Ljava/lang/Object;)V",
+                listOf("Ljava/lang/Object;"), "V"),
+            host,
+            listOf(Evidence(EvidenceFamily.PROTOCOL_ANCHOR, "custom_instructions", 0.9))
+        )
+        val graph = StaticProgramGraph.load(
+            methods, edges, classes, summaryPath = completeSummary, pointsToPath = pointsTo
+        )
+        val enriched = graph.enrich(candidate)
+        assertTrue(graph.graphStats()["interproceduralPointsToLoaded"] == 1)
+        assertTrue(graph.graphStats()["interproceduralContextualReceivers"] == 1)
+        assertTrue(graph.graphStats()["interproceduralSingletonContextReceivers"] == 1)
+        // A static contextual points-to projection is diagnostic only, never DATA_FLOW evidence.
+        assertFalse(enriched.evidence.any { it.family == EvidenceFamily.DATA_FLOW })
+
+        val truncatedSummary = textFile(
+            """{"interprocedural_points_to":{"records_truncated":true,"recursive_fixed_point":false,"runtime_identity_proven":false}}"""
+        )
+        val truncatedGraph = StaticProgramGraph.load(
+            methods, edges, classes, summaryPath = truncatedSummary, pointsToPath = pointsTo
+        )
+        assertTrue(truncatedGraph.graphStats()["interproceduralPointsToLoaded"] == 0)
+        assertTrue(truncatedGraph.graphStats()["interproceduralContextualReceivers"] == 0)
+    }
+
     @Test fun interproceduralValueEdgesBecomeDataFlowEvidenceOnlyWhenNotTruncated() {
         val target = "Lx/Target;->compose(Ljava/lang/String;)Ljava/lang/String;"
         val caller = "Lx/Caller;->send()V"
