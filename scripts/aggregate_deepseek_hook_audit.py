@@ -113,12 +113,13 @@ def main():
       "|---|---|---:|---:|---:|---:|---:|"]
     for v,s in summaries.items():
         report.append(f"| {v} | {s['source_file']} | {len(s['components'])} | {s['dex_count']} | {s['class_count']} | {s['method_count']} | {s['candidate_method_count']} |")
-    report += ["","## 组件身份核对","","| 版本 | 组件 | 包名 | versionCode | versionName | split | APK SHA-256 |",
+    report += ["","## 组件身份核对","","| 版本 | 组件 | 包名 | versionCode | versionName | split | 身份完整度 | APK SHA-256 |",
       "|---|---|---|---|---|---|---|"]
     for v,s in summaries.items():
         for comp in s.get("component_metadata",[]):
             ident=comp.get("manifest",{})
-            report.append(f"| {v} | {comp.get('apk','')} | {ident.get('package','')} | {ident.get('version_code','')} | {ident.get('version_name','')} | {ident.get('split','')} | `{comp.get('sha256','')}` |")
+            identity_status = "package+version+hash" if ident.get("version_code") and ident.get("version_name") else "package+hash (version attrs absent)"
+            report.append(f"| {v} | {comp.get('apk','')} | {ident.get('package','')} | {ident.get('version_code','')} | {ident.get('version_name','')} | {ident.get('split','')} | {identity_status} | `{comp.get('sha256','')}` |")
     report += ["","## 语义候选匹配","","匹配分数由语义锚点、稳定框架/API 调用族和规范化 opcode 分布组成；候选截取前先按锚点数量、稳定 API 调用量和方法体规模排序。分数仅用于排序，必须回看源码/Smali 和调用者/被调用者证据。","",
       "| 角色 | 来源版本 | 来源方法 | 目标版本 | 候选方法 | 相似度 |","|---|---|---|---|---|---:|"]
     for x in pairs[:1000]:
@@ -133,7 +134,7 @@ def main():
       "6. 安装按角色幂等；单个可选 Hook 失败不能阻断其他角色，失败记录版本、角色、候选 ID 和异常类型。",
       "7. 先只读观察，再启用请求桥接；不记录 prompt、消息正文、认证头、Cookie、API Key 或 PoW 原始材料。",
       "8. 真机验证覆盖首个 Delta、finish、错误、心跳超时、取消、自动恢复、并发流和重复安装。","",
-      "## 已知证据边界","","- 2.7.2 APK 已纳入扫描；必须以组件 Manifest 的包名/versionCode/versionName、DEX 指纹和 SHA-256 与 code289-cn 日志核对，不能只按文件名确认。",
+      "## 已知证据边界","","- 2.7.2 APK 已纳入扫描；先核对 Manifest 包名、versionCode/versionName（若 APK 提供）、DEX 指纹和 APK SHA-256，再与 code289-cn 运行日志交叉验证。若版本属性缺失，只能标记为 package+hash 身份，不能宣称已确认同一构建。",
       "- 2.7.4 输入为 APKM，组件级身份必须以本次解包结果为准。",
       "- 2.7.1 的 APKS/split 历史分析文件属于先前材料，需与当前单文件 deepseek271.apk 的身份核对。",
       "- 2.7.3 / 2.7.5 既有 SSE 链是静态证据；尚未证明真实设备 Hook 成功。",
