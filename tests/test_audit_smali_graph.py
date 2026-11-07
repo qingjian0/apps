@@ -405,5 +405,13 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertEqual([], graph["edges"])
 
 
+    def test_custom_and_polymorphic_invokes_are_not_guessed_as_direct_calls(self):
+        body = [
+            "    invoke-custom {v0}, call_site_0",
+            "    invoke-polymorphic {v0, v1}, Ljava/lang/invoke/MethodHandle;->invokeExact([Ljava/lang/Object;)Ljava/lang/Object;, (Ljava/lang/String;)V",
+        ]
+        self.assertEqual([], AUDIT.extract_invoke_sites(body))
+
+
 if __name__ == "__main__":
     unittest.main()
