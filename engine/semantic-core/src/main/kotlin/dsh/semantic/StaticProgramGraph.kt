@@ -103,7 +103,7 @@ class StaticProgramGraph private constructor(
         val interproceduralEdges = argumentEdges + returnEdges
         // A shared field descriptor is only a field-slot association. Without receiver
         // points-to/alias proof it must never satisfy the DATA_FLOW evidence contract.
-        if (interproceduralEdges > 0) {
+        if (interproceduralEdges > 0 && valueFlowComplete) {
             val weight = (0.62 +
                 minOf(0.22, interproceduralEdges.coerceAtMost(8) * 0.025) +
                 minOf(0.11, valueFlowAnchorHits.size * 0.055)).coerceAtMost(0.95)
