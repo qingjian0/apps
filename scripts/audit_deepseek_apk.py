@@ -389,6 +389,208 @@ def analyze_register_dataflow(body_lines, cfg):
             "definitions":definitions[:256],"definitions_truncated":len(definitions)>256,
             "uses":uses[:512],"uses_truncated":len(uses)>512}
 
+def parse_method_descriptor(descriptor):
+    """Return JVM/Dalvik parameter and return types without losing array/object widths."""
+    if not descriptor.startswith("(") or ")" not in descriptor:
+        return None
+    def parse_one(text, offset):
+        start=offset
+        while offset<len(text) and text[offset]=="[":
+            offset+=1
+        if offset>=len(text): return None
+        if text[offset]=="L":
+            end=text.find(";",offset)
+            if end<0: return None
+            return text[start:end+1],end+1
+        if text[offset] in "VZBSCIJFD":
+            return text[start:offset+1],offset+1
+        return None
+    close=descriptor.find(")")
+    params=[]; offset=1
+    while offset<close:
+        parsed=parse_one(descriptor,offset)
+        if not parsed: return None
+        value,offset=parsed
+        params.append(value)
+    result=parse_one(descriptor,close+1)
+    if not result or result[1]!=len(descriptor): return None
+    return {"parameters":params,"return_type":result[0]}
+
+
+def parameter_registers_for_method(access, descriptor):
+    parsed=parse_method_descriptor(descriptor)
+    if not parsed: return []
+    word=0 if "static" in access.split() else 1
+    registers=[]
+    if word: registers.append("p0")
+    for value in parsed["parameters"]:
+        width=2 if value in ("J","D") else 1
+        registers.extend("p{}".format(word+i) for i in range(width))
+        word+=width
+    return registers
+
+
+def parse_invoke_registers(register_text):
+    text=register_text.strip()
+    range_match=re.fullmatch(r"([vp])(\d+)\s*\.\.\s*([vp])(\d+)",text)
+    if range_match and range_match.group(1)==range_match.group(3):
+        prefix=range_match.group(1); start=int(range_match.group(2)); end=int(range_match.group(4))
+        if end>=start and end-start<=255:
+            return [prefix+str(i) for i in range(start,end+1)]
+        return []
+    return re.findall(r"\b[vp]\d+\b",text)
+
+
+def extract_invoke_sites(body_lines):
+    """Capture invoke argument registers and the immediately following move-result."""
+    detail_re=re.compile(r"\b(invoke-[\w/-]+)\s+\{([^}]*)\},?\s*(L[^;]+;)->([^ (]+)(\([^)]*\).+)")
+    sites=[]; pending=None; instruction_index=0
+    for line_no,line in enumerate(body_lines,1):
+        op_match=OP_RE.match(line)
+        if not op_match or line.lstrip().startswith((".",":","#")):
+            continue
+        op=op_match.group(1)
+        match=detail_re.search(line)
+        if match:
+            opcode,register_text,owner,name,descriptor=match.groups()
+            site={"instruction":instruction_index,"line":line_no,"opcode":opcode,
+                  "owner":owner,"name":name,"descriptor":descriptor,
+                  "registers":parse_invoke_registers(register_text),
+                  "result_instruction":None,"result_register":None}
+            sites.append(site); pending=len(sites)-1
+        elif op.startswith("move-result") and pending is not None:
+            registers=re.findall(r"\b[vp]\d+\b",line)
+            if registers:
+                sites[pending]["result_instruction"]=instruction_index
+                sites[pending]["result_register"]=registers[0]
+            pending=None
+        else:
+            pending=None
+        instruction_index+=1
+    return sites
+
+
+def extract_field_access_sites(body_lines):
+    """Record field slot plus receiver/value registers; instance identity is not inferred here."""
+    field_re=re.compile(r"\b([is](?:get|put)(?:-[a-z]+)*)\s+([^,]+)(?:,\s*([^,]+))?,\s*(L[^;]+;)->([^:]+):(\S+)")
+    result=[]; instruction_index=0
+    for line_no,line in enumerate(body_lines,1):
+        op_match=OP_RE.match(line)
+        if not op_match or line.lstrip().startswith((".",":","#")):
+            continue
+        match=field_re.search(line)
+        if match:
+            opcode,value_reg,object_reg,owner,name,field_type=match.groups()
+            is_static=opcode.startswith(("sget","sput"))
+            is_read=opcode.startswith(("iget","sget"))
+            result.append({"instruction":instruction_index,"line":line_no,"opcode":opcode,
+                           "field":owner+"->"+name+":"+field_type,
+                           "access":"read" if is_read else "write",
+                           "value_register":value_reg.strip(),
+                           "object_register":None if is_static or not object_reg else object_reg.strip(),
+                           "static":is_static})
+        instruction_index+=1
+    return result
+
+
+def build_interprocedural_value_graph(methods):
+    """Link caller definitions to callee parameters and callee returns to move-result defs.
+
+    Exact owner/name/descriptor matching is required. This emits evidence edges only;
+    it does not grant Hook authorization or infer object identity for field accesses.
+    """
+    by_signature=collections.defaultdict(list)
+    for method in methods:
+        key=method["class"]+"->"+method["name"]+method["descriptor"]
+        method["_semantic_key"]=key
+        by_signature[key].append(method)
+    edges=[]; unresolved_calls=0; ambiguous_calls=0; resolved_calls=0
+    argument_edges=0; return_edges=0; unresolved_arguments=0; unresolved_returns=0
+    for caller in methods:
+        caller_key=caller["_semantic_key"]
+        caller_flow=caller.get("register_dataflow",{})
+        uses={(item["instruction"],item["register"]):item
+              for item in caller_flow.get("uses",[])}
+        for site in caller.get("invoke_sites",[]):
+            target=site["owner"]+"->"+site["name"]+site["descriptor"]
+            choices=by_signature.get(target,[])
+            same_component=[m for m in choices if m.get("component")==caller.get("component")]
+            if len(same_component)==1: callee=same_component[0]
+            elif len(choices)==1: callee=choices[0]
+            elif len(choices)>1:
+                ambiguous_calls+=1
+                continue
+            else:
+                unresolved_calls+=1
+                continue
+            resolved_calls+=1
+            parsed=parse_method_descriptor(site["descriptor"])
+            if not parsed:
+                unresolved_arguments+=1
+                continue
+            actual=list(site["registers"])
+            is_static=site["opcode"].startswith("invoke-static")
+            formal_word=0; actual_word=0; mapping=[]
+            if not is_static:
+                mapping.append((actual[actual_word] if actual_word<len(actual) else None,
+                                "p0","receiver"))
+                actual_word+=1; formal_word=1
+            for parameter_index,param_type in enumerate(parsed["parameters"]):
+                width=2 if param_type in ("J","D") else 1
+                for word_index in range(width):
+                    actual_reg=actual[actual_word] if actual_word<len(actual) else None
+                    formal_reg="p{}".format(formal_word+word_index)
+                    mapping.append((actual_reg,formal_reg,"argument"))
+                    actual_word+=1
+                formal_word+=width
+            if actual_word!=len(actual):
+                unresolved_arguments+=1
+            callee_defs={d["register"]:d["id"] for d in callee.get("register_dataflow",{}).get("definitions",[])
+                         if d.get("kind")=="parameter"}
+            for actual_reg,formal_reg,kind in mapping:
+                if not actual_reg:
+                    unresolved_arguments+=1
+                    continue
+                formal_id=callee_defs.get(formal_reg)
+                use=uses.get((site["instruction"],actual_reg))
+                reaching=use.get("reaching_definitions",[]) if use else []
+                if not formal_id or not reaching:
+                    unresolved_arguments+=1
+                    continue
+                for source_id in reaching:
+                    edges.append({"kind":"argument","from_method":caller_key,
+                                  "from_definition":source_id,"to_method":callee["_semantic_key"],
+                                  "to_parameter":formal_id,"actual_register":actual_reg,
+                                  "formal_register":formal_reg,"call_instruction":site["instruction"],
+                                  "call_line":site["line"],"argument_kind":kind,
+                                  "component":caller.get("component")})
+                    argument_edges+=1
+            if site.get("result_instruction") is not None and site.get("result_register"):
+                caller_result_id="d{}:{}".format(site["result_instruction"],site["result_register"])
+                return_uses=[u for u in callee.get("register_dataflow",{}).get("uses",[])
+                             if u.get("opcode","").startswith("return") and u.get("reaching_definitions")]
+                if not return_uses:
+                    unresolved_returns+=1
+                for return_use in return_uses:
+                    for source_id in return_use["reaching_definitions"]:
+                        edges.append({"kind":"return","from_method":callee["_semantic_key"],
+                                      "from_definition":source_id,"to_method":caller_key,
+                                      "to_definition":caller_result_id,
+                                      "call_instruction":site["instruction"],
+                                      "result_instruction":site["result_instruction"],
+                                      "result_register":site["result_register"],
+                                      "component":caller.get("component")})
+                        return_edges+=1
+    for method in methods:
+        method.pop("_semantic_key",None)
+    return {"edges":edges,"summary":{"resolved_call_sites":resolved_calls,
+            "unresolved_call_sites":unresolved_calls,"ambiguous_call_sites":ambiguous_calls,
+            "argument_edges":argument_edges,"return_edges":return_edges,
+            "unresolved_argument_mappings":unresolved_arguments,
+            "unresolved_return_mappings":unresolved_returns,
+            "edge_count":len(edges),"edges_truncated":len(edges)>200000}}
+
+
 def analyze_smali(root):
     classes=[]; methods=[]; call_edges=[]
     for file in sorted(root.rglob("*.smali")):
