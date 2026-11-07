@@ -250,3 +250,21 @@ Kotlin `StaticProgramGraph` 已读取 CFG 完整性和结构计数；只有 `com
 **边界：** 当前只是单方法、单指令级操作数读写提取，不是 reaching-definitions、SSA、跨基本块/跨方法数据流，也未完整建模 wide/long/double 寄存器对、对象别名、异常路径上的寄存器状态或参数/返回值传播。不得将 `register_flow.complete` 解读为完整程序数据流证明；它只表示本方法中已识别的寄存器指令族没有发现未知 opcode。该数据目前只写入脱敏静态索引，不参与 Resolver 加分或 Hook 授权。
 
 本轮新增测试覆盖普通寄存器读写、字段访问、invoke 参数、invoke/range 展开、二地址算术和未知 opcode fail-closed。待对应 GitHub Actions run 完成后，再记录最终测试与五版本复验结论。
+
+
+## 15. 2026-11-07 CFG-based register reaching-definitions first implementation
+
+The Smali audit pipeline now adds a conservative intraprocedural reaching-definitions pass on top of the explicit CFG:
+
+- Every executable Smali instruction receives a stable method-local instruction index for this analysis pass.
+- The CFG exports its basic-block ranges, and the analyzer verifies that the block index covers the complete executable instruction sequence.
+- Per-instruction register reads/writes are converted into definition identities (d<instruction-index>:<register>).
+- Block GEN/KILL sets are computed with the last definition of each register in that block; a forward fixed-point pass propagates definitions across CFG predecessor edges.
+- Each register use is classified as resolved (one reaching definition), ambiguous (multiple reaching definitions), or unresolved (no reaching definition in the recovered graph).
+- The method record stores bounded definition/use evidence and completeness state. APK summary aggregates complete-method, definition, use, ambiguous-use and unresolved-use counts.
+
+The first regression cases cover a linear assignment chain, a branch join where two definitions must remain ambiguous, and an unresolved branch target that must fail closed.
+
+**Strict limitations:** this is not SSA construction, a verifier-grade Dalvik interpreter, interprocedural parameter/return propagation, object/field alias analysis, wide-register pair modeling, exception-sensitive register-state analysis, or coroutine state-machine reconstruction. The analysis keeps vN and pN register aliases distinct and does not infer semantic values from them. An unresolved use is not automatically a defect: it may be a method parameter, incoming value, or a value whose definition lies outside the analyzed method. The output is evidence for later graph work, not sufficient semantic proof and never Hook authorization.
+
+The next implementation step is to add parameter/return edges between methods and field-value propagation, then validate the recovered graph against manually confirmed 2.7.3/2.7.5 SSE routes and negative candidates. Any incomplete CFG, unknown opcode, index mismatch or non-convergent dataflow remains ineligible as a complete dataflow evidence family.
