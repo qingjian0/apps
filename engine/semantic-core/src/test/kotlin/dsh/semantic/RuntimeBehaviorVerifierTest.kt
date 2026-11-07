@@ -11,7 +11,8 @@ class RuntimeBehaviorVerifierTest {
         RoleId("prompt.compose"), MethodShape("Lq/a;", "m9", "()V", emptyList(), "V"), host,
         listOf(
             Evidence(EvidenceFamily.PROTOCOL_ANCHOR, "custom_instructions", 0.9),
-            Evidence(EvidenceFamily.TYPE_SHAPE, "prompt-dto", 0.8)
+            Evidence(EvidenceFamily.TYPE_SHAPE, "prompt-dto", 0.8),
+            Evidence(EvidenceFamily.DATA_FLOW, "prompt-source-to-request-field", 0.85)
         )
     )
     private val scenario = BehaviorScenario("send-with-custom-prompt", "idle", setOf("prompt.source.read", "request.dto.write"))
