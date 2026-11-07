@@ -632,7 +632,7 @@ def build_interprocedural_value_graph(methods):
             "incomplete_dataflow_call_sites":incomplete_dataflow_calls,
             "truncated_callsite_methods":truncated_callsite_methods,
             "edge_count":total_edge_count,"stored_edge_count":len(edges),
-            "edges_truncated":total_edge_count>200000}
+            "edges_truncated":total_edge_count>200000}}
 
 
 def build_field_slot_index(methods):
