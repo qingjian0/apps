@@ -6,6 +6,7 @@ on:
     paths:
       - .github/workflows/deepseek-universal-hook-audit.yml
       - scripts/audit_deepseek_apk.py
+      - tests/test_audit_smali_graph.py
       - scripts/aggregate_deepseek_hook_audit.py
       - engine/semantic-core/**
       - DeepSeek_2.7.5.apk
