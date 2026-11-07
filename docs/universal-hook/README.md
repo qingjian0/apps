@@ -198,3 +198,18 @@ JADX 反编译失败必须保留退出码和错误日志；Smali 是控制流复
 首轮 Resolver 曾把第三方验证 SDK 错判为宿主 Local API，且 2.7.5 会话候选仅以约 0.355 分差胜出。已移除宿主 APK 中的 Local API Gateway 角色映射，默认胜出分差提高至 0.5；HookCoordinator 现要求完整运行时宿主身份和 \`HOST_IDENTITY\`、\`RUNTIME_BEHAVIOR\` 证据。对应回归测试已加入，等待最新 Semantic Core CI 验证。
 
 **静态候选报告不会被标记为真机 Hook 成功。** 当前尚无完整 LSPosed Android Backend、功能桥接和真机闭环测试。
+
+
+## 语义图分析增量（2026-11-07）
+
+在原有 Smali CFG 与寄存器 reaching-definitions 基础上，审计器新增跨方法参数/返回值证据：
+- 方法描述符解析与实例/静态方法参数 word 布局；
+- 方法入口参数定义 entry:pN；
+- invoke 调用点寄存器列表（含 /range）和 move-result 关联；
+- 以完整 owner + method + descriptor 精确匹配生成参数边和返回值边；
+- 字段访问点与精确 field descriptor 分组，保留 value/receiver 寄存器；
+- 未解析/多重目标、数据流不完整、证据截断和 wide-register 指令保持 fail-closed。
+
+新增产物：interprocedural-value-edges.jsonl.gz、field-slot-index.jsonl.gz。字段槽分组不证明对象实例相同，不能作为强语义证据；对象 points-to/alias 传播仍待实现。
+
+专用 Python 静态分析验证工作流：.github/workflows/universal-hook-semantic-audit.yml。测试未通过 Actions 成功结果前，不将本轮标记为 CI 通过。当前工作保留在 Draft PR #2，不合并 main。
