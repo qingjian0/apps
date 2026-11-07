@@ -67,6 +67,71 @@ def feature_set(m):
         if s.startswith("/api/v0/chat/") or s in ("text/event-stream","DeltaCommand","ToolOpenFragment","ToolFindFragment","SearchFragment"):
             out.add("string:"+s)
     return out
+def mutual_best_matches(left_candidates, right_candidates, minimum_score=0.48, minimum_margin=0.06):
+    """Return conservative one-to-one cross-version matches; ambiguous ties are never emitted."""
+    if not left_candidates or not right_candidates:
+        return [], {"left_ambiguous": 0, "right_ambiguous": 0, "non_mutual": 0, "below_threshold": 0}
+
+    scores = [
+        [prepared_similarity(left, right) for right in right_candidates]
+        for left in left_candidates
+    ]
+
+    def best_and_margin(values):
+        ranked = sorted(values, reverse=True)
+        best = ranked[0]
+        second = ranked[1] if len(ranked) > 1 else 0.0
+        return best, best - second
+
+    left_best = []
+    left_ambiguous = 0
+    below_threshold = 0
+    for row in scores:
+        best, margin = best_and_margin(row)
+        index = max(range(len(row)), key=row.__getitem__)
+        if best < minimum_score:
+            below_threshold += 1
+            left_best.append(None)
+        elif margin < minimum_margin:
+            left_ambiguous += 1
+            left_best.append(None)
+        else:
+            left_best.append(index)
+
+    right_best = []
+    right_ambiguous = 0
+    for column in zip(*scores):
+        best, margin = best_and_margin(column)
+        index = max(range(len(column)), key=column.__getitem__)
+        if best < minimum_score:
+            right_best.append(None)
+        elif margin < minimum_margin:
+            right_ambiguous += 1
+            right_best.append(None)
+        else:
+            right_best.append(index)
+
+    matches = []
+    non_mutual = 0
+    for left_index, right_index in enumerate(left_best):
+        if right_index is None:
+            continue
+        if right_best[right_index] != left_index:
+            non_mutual += 1
+            continue
+        matches.append((scores[left_index][right_index],
+                        left_candidates[left_index][0],
+                        right_candidates[right_index][0]))
+
+    matches.sort(key=lambda item: -item[0])
+    return matches, {
+        "left_ambiguous": left_ambiguous,
+        "right_ambiguous": right_ambiguous,
+        "non_mutual": non_mutual,
+        "below_threshold": below_threshold,
+    }
+
+
 def similarity(a,b):
     A=feature_set(a); B=feature_set(b)
     if not A or not B: return 0.0
@@ -143,8 +208,9 @@ def main():
                 if role in role_names:
                     candidates[v][role].append(compact)
     pairs=[]
+    match_diagnostics=[]
     # Match methods by semantic role, API-family calls, stable protocol anchors and normalized opcode shape.
-    for role in ("request_route","pow","sse_transport","sse_dispatch","flow_coroutine","serialization","agent_tool","session","prompt_pipeline","agent_planning","tool_registry_execution","local_api_gateway","multimodal_image","multimodal_audio","attachment_file","search_web","storage_sync","account_capability","ui_settings"):
+    for role in role_names:
         by_version={}
         for v in candidates:
             selected=list(candidates[v].get(role,[]))
@@ -157,14 +223,14 @@ def main():
         present=[v for v in by_version if identities[v]["trusted_for_cross_version"] and by_version[v]]
         for i,va in enumerate(present):
             for vb in present[i+1:]:
-                for prepared_a in by_version[va]:
-                    a=prepared_a[0]
-                    ranked=sorted(((prepared_similarity(prepared_a,b),b[0]) for b in by_version[vb]),key=lambda x:-x[0])[:3]
-                    for score,b in ranked:
-                        if score>=0.48:
-                            pairs.append({"role":role,"from_version":va,"from":a["class"]+"->"+a["name"]+a["descriptor"],
-                              "to_version":vb,"to":b["class"]+"->"+b["name"]+b["descriptor"],
-                              "score":score,"confidence":"candidate" if score<0.68 else "strong-candidate"})
+                matches, diagnostics=mutual_best_matches(by_version[va],by_version[vb])
+                match_diagnostics.append({"role":role,"from_version":va,"to_version":vb,**diagnostics,
+                                          "accepted_matches":len(matches)})
+                for score,a,b in matches:
+                    pairs.append({"role":role,"from_version":va,"from":a["class"]+"->"+a["name"]+a["descriptor"],
+                      "to_version":vb,"to":b["class"]+"->"+b["name"]+b["descriptor"],
+                      "score":score,"confidence":"candidate" if score<0.68 else "strong-candidate",
+                      "match_policy":"mutual-best-with-margin"})
     pairs.sort(key=lambda x:(x["role"],x["from_version"],x["from"],-x["score"]))
     report=["# DeepSeek 通用 Hook 跨版本语义审计","",
       "> 本报告由 GitHub Actions 从 apps 仓库内的宿主 APK/APKM、日志和 SSE 证据包生成。静态候选不等于设备 Hook 已成功。","",
@@ -184,7 +250,7 @@ def main():
             ident=comp.get("manifest",{})
             identity_status = "package+version+signer+hash" if ident.get("version_code") and ident.get("version_name") and ident.get("signing_sha256") else ("package+version+hash" if ident.get("version_code") and ident.get("version_name") else ("package+signer+hash" if ident.get("signing_sha256") else "package+hash (version/signer attrs absent)"))
             report.append(f"| {v} | {comp.get('apk','')} | {ident.get('package','')} | {ident.get('version_code','')} | {ident.get('version_name','')} | {ident.get('split','')} | `{ident.get('signing_sha256','')}` | {identity_status} | `{comp.get('sha256','')}` |")
-    report += ["","## 语义候选匹配","","匹配分数由语义锚点、稳定框架/API 调用族和规范化 opcode 分布组成；候选截取前先按锚点数量、稳定 API 调用量和方法体规模排序。分数仅用于排序，必须回看源码/Smali 和调用者/被调用者证据。","",
+    report += ["","## 语义候选匹配","","匹配分数由语义锚点、稳定框架/API 调用族和规范化 opcode 分布组成；候选截取前先按锚点数量、稳定 API 调用量和方法体规模排序。仅保留双向最佳且领先第二名至少 0.06 的匹配；并列或非互选候选被拒绝。分数仅用于排序，必须回看源码/Smali 和调用者/被调用者证据。","",
       "| 角色 | 来源版本 | 来源方法 | 目标版本 | 候选方法 | 相似度 |","|---|---|---|---|---|---:|"]
     for x in pairs[:1000]:
         report.append(f"| {x['role']} | {x['from_version']} | `{x['from']}` | {x['to_version']} | `{x['to']}` | {x['score']:.4f} |")
@@ -206,7 +272,7 @@ def main():
     outdir=root/"universal-hook"; outdir.mkdir(parents=True,exist_ok=True)
     (outdir/"version-identity.json").write_text(json.dumps(identities,indent=2,ensure_ascii=True))
     (outdir/"universal-hook-report.md").write_text("\n".join(report))
-    (outdir/"semantic-method-matches.json").write_text(json.dumps(pairs,indent=2,ensure_ascii=True))
+    (outdir/"semantic-method-matches.json").write_text(json.dumps(pairs,indent=2,ensure_ascii=True))\n    (outdir/"semantic-match-diagnostics.json").write_text(json.dumps(match_diagnostics,indent=2,ensure_ascii=True))
     (outdir/"probe-log-summary.json").write_text(json.dumps(probe_summary(pathlib.Path(".")),indent=2,ensure_ascii=True))
     (outdir/"evidence-zip-inventory.json").write_text(json.dumps(evidence_zip_summary(pathlib.Path(".")),indent=2,ensure_ascii=True))
     (outdir/"version-summary.json").write_text(json.dumps(summaries,indent=2,ensure_ascii=True))
