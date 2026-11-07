@@ -232,7 +232,12 @@ def main():
     summary={"version_label":a.version,"source_file":src.name,"source_bytes":src.stat().st_size,
       "source_sha256":sha256(src),"components":[x.name for x in components],"component_metadata":[json.loads((out/x.stem/"component.json").read_text()) for x in components],"dex":inventory,
       "dex_count":len(inventory),"class_count":len(all_classes),"method_count":len(all_methods),
-      "call_edge_count":len(all_edges),"candidate_method_count":len(candidates),
+      "call_edge_count":len(all_edges),
+      "field_read_count":sum(len(m.get("field_reads",[])) for m in all_methods),
+      "field_write_count":sum(len(m.get("field_writes",[])) for m in all_methods),
+      "methods_with_control_flow":sum(1 for m in all_methods if m.get("control_flow",{}).get("branch_count",0)>0),
+      "control_flow_branch_count":sum(m.get("control_flow",{}).get("branch_count",0) for m in all_methods),
+      "candidate_method_count":len(candidates),
       "native_libraries":native,"tool_limits":{"JADX":"best-effort; inspect exit status and APKTool smali evidence",
       "Hook":"static candidate discovery only; no device Hook is claimed"}}
     (out/"summary.json").write_text(json.dumps(summary,indent=2,ensure_ascii=True))
