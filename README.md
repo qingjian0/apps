@@ -195,6 +195,7 @@ MacroState 的固定金融因子说明：即使领域对象和 Pipeline 看起�
 | SHA-256 | ddc52ef868b991fd33e634de834a3e2c022b0cd7ff9e854f4f141996aaeadb70 |
 | DEX 文件 | 3 个：classes.dex、classes2.dex、classes3.dex |
 | JADX 输出 | 13,940 个 Java 源文件 |
+| 首方类索引 | 12,596 个类、142,073 个方法签名、215,523 个字段签名 |
 | JADX 状态 | exit code 3；报告 344 个反编译错误 |
 | 分析范围 | 网络、API 路由、PoW/Challenge、异步/流式、Agent/Tools |
 | 结论级别 | 静态候选与符号交叉引用；尚无 2.7.5 真机运行时调用证据 |
