@@ -261,6 +261,7 @@ class StaticProgramGraph private constructor(
             }
             val pointsToSummaryComplete = pointsToSummary?.let { summary ->
                 summary["records_truncated"]?.jsonPrimitive?.contentOrNull?.toBooleanStrictOrNull() == false &&
+                    summary["context_expansion_complete"]?.jsonPrimitive?.contentOrNull?.toBooleanStrictOrNull() == true &&
                     summary["recursive_fixed_point"]?.jsonPrimitive?.contentOrNull?.toBooleanStrictOrNull() == false &&
                     summary["runtime_identity_proven"]?.jsonPrimitive?.contentOrNull?.toBooleanStrictOrNull() == false
             } == true
@@ -279,7 +280,7 @@ class StaticProgramGraph private constructor(
                             val runtimeProven = obj["runtime_identity_proven"]?.jsonPrimitive?.contentOrNull
                                 ?.toBooleanStrictOrNull()
                             if (caller !in methods || callee !in methods ||
-                                scope != "one-callsite-context" || runtimeProven != false) {
+                                scope != "bounded-call-string-context" || runtimeProven != false) {
                                 error("invalid contextual points-to evidence row")
                             }
                             receiverCount++
