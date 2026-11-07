@@ -163,7 +163,11 @@ class SemanticResolverTest {
 
     @Test fun productionRolePolicyRejectsCandidateMissingRequiredDataFlow() {
         val productionPolicy = RolePolicy.forRole(role)
-        val result = SemanticResolver().resolve(host, productionPolicy, listOf(candidate("a", goodEvidence)))
+        val incompleteEvidence = goodEvidence.filterNot { it.family == EvidenceFamily.DATA_FLOW } + listOf(
+            Evidence(EvidenceFamily.FRAMEWORK_INTERACTION, "stable-framework-boundary", 0.8),
+            Evidence(EvidenceFamily.CONTROL_FLOW, "branch-shape", 0.8)
+        )
+        val result = SemanticResolver().resolve(host, productionPolicy, listOf(candidate("a", incompleteEvidence)))
         assertFalse(result.accepted)
         assertEquals("required-evidence-family-missing", result.rejection)
     }
