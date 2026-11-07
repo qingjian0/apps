@@ -15,10 +15,27 @@ class StaticProgramGraphTest {
         return path.toString()
     }
 
+    @Test fun incompleteCfgDoesNotBecomeControlFlowEvidence() {
+        val methods = gzipLines(listOf(
+            """{"class":"Lx/A;","name":"compose","descriptor":"()V","field_reads":[],"field_writes":[],"control_flow":{"branch_count":4,"label_count":5,"return_count":1,"throw_count":0,"cfg":{"block_count":6,"edge_count":7,"unresolved_target_count":1,"complete":false}}}"""
+        ))
+        val edges = gzipLines(emptyList())
+        val classes = gzipLines(listOf("""{"descriptor":"Lx/A;","super":"Ljava/lang/Object;","interfaces":[]}"""))
+        val host = HostFingerprint("com.deepseek.chat", 300, "future", "cert", "dex-300", "loader")
+        val candidate = SemanticCandidate(
+            RoleId("prompt.compose"),
+            MethodShape("Lx/A;", "compose", "()V", emptyList(), "V"),
+            host,
+            listOf(Evidence(EvidenceFamily.PROTOCOL_ANCHOR, "custom_instructions", 0.9))
+        )
+        val enriched = StaticProgramGraph.load(methods, edges, classes).enrich(candidate)
+        assertTrue(enriched.evidence.none { it.family == EvidenceFamily.CONTROL_FLOW })
+    }
+
     @Test fun joinsCallersCalleesAndCrossMethodFieldFlow() {
         val target = "Lx/A;->compose()V"
         val methods = gzipLines(listOf(
-            """{"class":"Lx/A;","name":"compose","descriptor":"()V","field_reads":["Lx/State;->prompt:Ljava/lang/String;"],"field_writes":[],"control_flow":{"branch_count":2,"label_count":3,"return_count":1,"throw_count":0}}""",
+            """{"class":"Lx/A;","name":"compose","descriptor":"()V","field_reads":["Lx/State;->prompt:Ljava/lang/String;"],"field_writes":[],"control_flow":{"branch_count":2,"label_count":3,"return_count":1,"throw_count":0,"cfg":{"block_count":4,"edge_count":4,"unresolved_target_count":0,"complete":true}}}""",
             """{"class":"Lx/State;","name":"update","descriptor":"()V","field_reads":[],"field_writes":["Lx/State;->prompt:Ljava/lang/String;"],"roles":[{"role":"prompt_pipeline","anchors":["custom_instructions"]}],"control_flow":{"branch_count":1,"label_count":1,"return_count":1,"throw_count":0}}""",
             """{"class":"Lx/Caller;","name":"start","descriptor":"()V","field_reads":[],"field_writes":[],"roles":[{"role":"prompt_pipeline","anchors":["custom_instructions"]}],"control_flow":{"branch_count":0,"label_count":0,"return_count":1,"throw_count":0}}"""
         ))
