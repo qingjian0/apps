@@ -185,7 +185,7 @@
     "from": "Lmna;->onRecvCustomCmdMsg(Ljava/lang/String;II[B)V",
     "to_version": "2.7.2",
     "to": "Lqsa;->onRecvCustomCmdMsg(Ljava/lang/String;II[B)V",
-    "score": 0.9072,
+    "score": 0.8914,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -195,7 +195,7 @@
     "from": "Lmna;->onRecvCustomCmdMsg(Ljava/lang/String;II[B)V",
     "to_version": "2.7.5",
     "to": "Lzsa;->onRecvCustomCmdMsg(Ljava/lang/String;II[B)V",
-    "score": 0.9072,
+    "score": 0.8914,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -205,7 +205,7 @@
     "from": "Lmna;->onRecvCustomCmdMsg(Ljava/lang/String;II[B)V",
     "to_version": "2.7.4",
     "to": "Lwwa;->onRecvCustomCmdMsg(Ljava/lang/String;II[B)V",
-    "score": 0.9063,
+    "score": 0.8905,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -245,7 +245,7 @@
     "from": "Lnz6;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lhv7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9081,
+    "score": 0.9037,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -255,7 +255,7 @@
     "from": "Lnz6;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lav7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9074,
+    "score": 0.9029,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -265,7 +265,7 @@
     "from": "Lnz6;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Luw7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9074,
+    "score": 0.9029,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -3785,7 +3785,7 @@
     "from": "Lde;->k(IZLjava/util/List;ILjp3;Lyt2;Lkp3;Lbx4;Lbx4;Ldx4;Ldx4;Leg7;Ln05;I)V",
     "to_version": "2.7.2",
     "to": "Lq60;->e(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7693,
+    "score": 0.7433,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -3795,7 +3795,7 @@
     "from": "Lde;->k(IZLjava/util/List;ILjp3;Lyt2;Lkp3;Lbx4;Lbx4;Ldx4;Ldx4;Leg7;Ln05;I)V",
     "to_version": "2.7.4",
     "to": "Lv60;->e(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7693,
+    "score": 0.7433,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -3805,7 +3805,7 @@
     "from": "Lde;->k(IZLjava/util/List;ILjp3;Lyt2;Lkp3;Lbx4;Lbx4;Ldx4;Ldx4;Leg7;Ln05;I)V",
     "to_version": "2.7.5",
     "to": "Lt60;->e(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7693,
+    "score": 0.7433,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -4705,7 +4705,7 @@
     "from": "La9;->run()V",
     "to_version": "2.7.4",
     "to": "Ld9;->run()V",
-    "score": 0.7707,
+    "score": 0.7612,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -5015,7 +5015,7 @@
     "from": "Lbr8;->toString()Ljava/lang/String;",
     "to_version": "2.7.2",
     "to": "Llu8;->toString()Ljava/lang/String;",
-    "score": 0.658,
+    "score": 0.58,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -5025,7 +5025,7 @@
     "from": "Lbr8;->toString()Ljava/lang/String;",
     "to_version": "2.7.4",
     "to": "Lzx8;->toString()Ljava/lang/String;",
-    "score": 0.658,
+    "score": 0.58,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -5035,7 +5035,7 @@
     "from": "Lbr8;->toString()Ljava/lang/String;",
     "to_version": "2.7.5",
     "to": "Lsu8;->toString()Ljava/lang/String;",
-    "score": 0.658,
+    "score": 0.58,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -5045,7 +5045,7 @@
     "from": "Lcb7;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lmqa;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7361,
+    "score": 0.7114,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -5055,7 +5055,7 @@
     "from": "Lcb7;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lnva;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7331,
+    "score": 0.7083,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -5065,8 +5065,8 @@
     "from": "Lcb7;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lqta;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.6929,
-    "confidence": "strong-candidate",
+    "score": 0.662,
+    "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
   {
@@ -5755,7 +5755,7 @@
     "from": "Lfr0;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lbs0;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.6462,
+    "score": 0.6115,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -5765,7 +5765,7 @@
     "from": "Lfr0;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lcs0;->z(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.6462,
+    "score": 0.6115,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -5775,7 +5775,7 @@
     "from": "Lfr0;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lqt0;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.6458,
+    "score": 0.6111,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -6955,7 +6955,7 @@
     "from": "Lo5c;->run()V",
     "to_version": "2.7.2",
     "to": "Ljbc;->run()V",
-    "score": 0.9777,
+    "score": 0.9758,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -6965,7 +6965,7 @@
     "from": "Lo5c;->run()V",
     "to_version": "2.7.4",
     "to": "Lzfc;->run()V",
-    "score": 0.9777,
+    "score": 0.9758,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -6975,7 +6975,7 @@
     "from": "Lo5c;->run()V",
     "to_version": "2.7.5",
     "to": "Libc;->run()V",
-    "score": 0.9777,
+    "score": 0.9758,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -6985,7 +6985,7 @@
     "from": "Lo7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lq7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.8109,
+    "score": 0.7982,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -6995,7 +6995,7 @@
     "from": "Lo7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lp7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.8093,
+    "score": 0.7966,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -7005,7 +7005,7 @@
     "from": "Lo7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lq7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.8093,
+    "score": 0.7966,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -7045,7 +7045,7 @@
     "from": "Loq0;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lkr0;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7837,
+    "score": 0.766,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -7055,7 +7055,7 @@
     "from": "Loq0;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lat0;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7837,
+    "score": 0.766,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -7065,7 +7065,7 @@
     "from": "Loq0;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Llr0;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7837,
+    "score": 0.766,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -8265,7 +8265,7 @@
     "from": "Lzdc;->onRefresh(Lorg/json/JSONObject;Z)V",
     "to_version": "2.7.2",
     "to": "Lwjc;->onRefresh(Lorg/json/JSONObject;Z)V",
-    "score": 0.9617,
+    "score": 0.9578,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -8275,7 +8275,7 @@
     "from": "Lzdc;->onRefresh(Lorg/json/JSONObject;Z)V",
     "to_version": "2.7.4",
     "to": "Lhoc;->onRefresh(Lorg/json/JSONObject;Z)V",
-    "score": 0.9617,
+    "score": 0.9578,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -8285,7 +8285,7 @@
     "from": "Lzdc;->onRefresh(Lorg/json/JSONObject;Z)V",
     "to_version": "2.7.5",
     "to": "Lvjc;->onRefresh(Lorg/json/JSONObject;Z)V",
-    "score": 0.9617,
+    "score": 0.9578,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -8735,7 +8735,7 @@
     "from": "Lc9;->run()V",
     "to_version": "2.7.4",
     "to": "Ld9;->run()V",
-    "score": 0.7747,
+    "score": 0.7652,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -10365,7 +10365,7 @@
     "from": "Lqta;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lnva;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9357,
+    "score": 0.9259,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -10375,7 +10375,7 @@
     "from": "Lqta;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lmqa;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9301,
+    "score": 0.9203,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -11305,7 +11305,7 @@
     "from": "Ld9;->run()V",
     "to_version": "2.7.5",
     "to": "Ld9;->run()V",
-    "score": 0.7747,
+    "score": 0.7652,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -13025,7 +13025,7 @@
     "from": "Ldz1;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Le81;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.57,
+    "score": 0.5556,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -13035,7 +13035,7 @@
     "from": "Ldz1;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lp61;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.5698,
+    "score": 0.5553,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -13045,7 +13045,7 @@
     "from": "Ldz1;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lo61;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.5588,
+    "score": 0.5444,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -13325,7 +13325,7 @@
     "from": "Lh0c;->run()V",
     "to_version": "2.7.2",
     "to": "Ld6c;->run()V",
-    "score": 0.9816,
+    "score": 0.9806,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -13335,7 +13335,7 @@
     "from": "Lh0c;->run()V",
     "to_version": "2.7.4",
     "to": "Lrac;->run()V",
-    "score": 0.9816,
+    "score": 0.9806,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -13345,7 +13345,7 @@
     "from": "Lh0c;->run()V",
     "to_version": "2.7.5",
     "to": "Ld6c;->run()V",
-    "score": 0.9816,
+    "score": 0.9806,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -14045,7 +14045,7 @@
     "from": "Llp2;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Llq2;->z(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9596,
+    "score": 0.9564,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -14055,7 +14055,7 @@
     "from": "Llp2;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Ljq2;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7252,
+    "score": 0.7016,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -14065,7 +14065,7 @@
     "from": "Llp2;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lzr2;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7249,
+    "score": 0.7013,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -14465,7 +14465,7 @@
     "from": "Lql0;->b(Lvqa;Leg7;ZLjsa;Lv96;Lt96;Lypa;Lnr0;Lhpa;Ltf9;Ln05;II)V",
     "to_version": "2.7.2",
     "to": "Lem0;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.6456,
+    "score": 0.6178,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -14475,7 +14475,7 @@
     "from": "Lql0;->b(Lvqa;Leg7;ZLjsa;Lv96;Lt96;Lypa;Lnr0;Lhpa;Ltf9;Ln05;II)V",
     "to_version": "2.7.4",
     "to": "Lon0;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.6456,
+    "score": 0.6178,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -14485,7 +14485,7 @@
     "from": "Lql0;->b(Lvqa;Leg7;ZLjsa;Lv96;Lt96;Lypa;Lnr0;Lhpa;Ltf9;Ln05;II)V",
     "to_version": "2.7.5",
     "to": "Lfm0;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.6456,
+    "score": 0.6178,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -15565,7 +15565,7 @@
     "from": "Lzdc;->onRefresh(Lorg/json/JSONObject;Z)V",
     "to_version": "2.7.2",
     "to": "Lwjc;->onRefresh(Lorg/json/JSONObject;Z)V",
-    "score": 0.9617,
+    "score": 0.9578,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -15575,7 +15575,7 @@
     "from": "Lzdc;->onRefresh(Lorg/json/JSONObject;Z)V",
     "to_version": "2.7.4",
     "to": "Lhoc;->onRefresh(Lorg/json/JSONObject;Z)V",
-    "score": 0.9617,
+    "score": 0.9578,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -15585,7 +15585,7 @@
     "from": "Lzdc;->onRefresh(Lorg/json/JSONObject;Z)V",
     "to_version": "2.7.5",
     "to": "Lvjc;->onRefresh(Lorg/json/JSONObject;Z)V",
-    "score": 0.9617,
+    "score": 0.9578,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -16605,7 +16605,7 @@
     "from": "Ljq2;->y(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Llq2;->z(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7518,
+    "score": 0.7291,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -19135,7 +19135,7 @@
     "from": "Lzr2;->y(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Llq2;->z(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7514,
+    "score": 0.7288,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -19535,7 +19535,7 @@
     "from": "Lag;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lag;->z(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9648,
+    "score": 0.9633,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -19545,7 +19545,7 @@
     "from": "Lag;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lzf;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9647,
+    "score": 0.9631,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -19555,7 +19555,7 @@
     "from": "Lag;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lbg;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9647,
+    "score": 0.9631,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -19595,7 +19595,7 @@
     "from": "Lb51;->toString()Ljava/lang/String;",
     "to_version": "2.7.2",
     "to": "Lu51;->toString()Ljava/lang/String;",
-    "score": 0.867,
+    "score": 0.8531,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -19605,7 +19605,7 @@
     "from": "Lb51;->toString()Ljava/lang/String;",
     "to_version": "2.7.4",
     "to": "Lj71;->toString()Ljava/lang/String;",
-    "score": 0.867,
+    "score": 0.8531,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -19615,7 +19615,7 @@
     "from": "Lb51;->toString()Ljava/lang/String;",
     "to_version": "2.7.5",
     "to": "Lv51;->toString()Ljava/lang/String;",
-    "score": 0.867,
+    "score": 0.8531,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -19715,7 +19715,7 @@
     "from": "Lcb7;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lmqa;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7361,
+    "score": 0.7114,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -19725,7 +19725,7 @@
     "from": "Lcb7;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lnva;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7331,
+    "score": 0.7083,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -19735,8 +19735,8 @@
     "from": "Lcb7;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lqta;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.6929,
-    "confidence": "strong-candidate",
+    "score": 0.662,
+    "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
   {
@@ -21695,7 +21695,7 @@
     "from": "Lf0;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lf0;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9458,
+    "score": 0.9435,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -21705,7 +21705,7 @@
     "from": "Lf0;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lf0;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9456,
+    "score": 0.9433,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -21715,7 +21715,7 @@
     "from": "Lf0;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lf0;->z(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9456,
+    "score": 0.9433,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -22505,7 +22505,7 @@
     "from": "Lss9;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lap9;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.8046,
+    "score": 0.7983,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -22515,7 +22515,7 @@
     "from": "Lss9;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lys9;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.8044,
+    "score": 0.7981,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -24815,7 +24815,7 @@
     "from": "Lqta;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lnva;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9357,
+    "score": 0.9259,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -24825,7 +24825,7 @@
     "from": "Lqta;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lmqa;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9301,
+    "score": 0.9203,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -26405,7 +26405,7 @@
     "from": "Lag;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lag;->z(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9648,
+    "score": 0.9633,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -26415,7 +26415,7 @@
     "from": "Lag;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lzf;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9647,
+    "score": 0.9631,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -26425,7 +26425,7 @@
     "from": "Lag;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lbg;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9647,
+    "score": 0.9631,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -26855,7 +26855,7 @@
     "from": "Lxj;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lwj;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9192,
+    "score": 0.9146,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -26865,7 +26865,7 @@
     "from": "Lxj;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lxj;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9192,
+    "score": 0.9146,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -26875,7 +26875,7 @@
     "from": "Lxj;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lyj;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9185,
+    "score": 0.9139,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -27725,7 +27725,7 @@
     "from": "Lr31;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Ltz0;->z(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9538,
+    "score": 0.9505,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -27735,7 +27735,7 @@
     "from": "Lr31;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lk41;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9534,
+    "score": 0.95,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -27745,7 +27745,7 @@
     "from": "Lr31;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lz51;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9534,
+    "score": 0.95,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -28205,7 +28205,7 @@
     "from": "Lo5b;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lt9b;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.8386,
+    "score": 0.83,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -28215,7 +28215,7 @@
     "from": "Lo5b;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Ldeb;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.8386,
+    "score": 0.83,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -28225,7 +28225,7 @@
     "from": "Lo5b;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lv8b;->z(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7422,
+    "score": 0.7596,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -28235,7 +28235,7 @@
     "from": "Lr31;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Ltz0;->z(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9538,
+    "score": 0.9505,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -28245,7 +28245,7 @@
     "from": "Lr31;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lk41;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9534,
+    "score": 0.95,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -28255,7 +28255,7 @@
     "from": "Lr31;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lz51;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9534,
+    "score": 0.95,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -28465,7 +28465,7 @@
     "from": "Lt9b;->y(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lv8b;->z(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.883,
+    "score": 0.9133,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -28525,7 +28525,7 @@
     "from": "Ldeb;->y(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lv8b;->z(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.883,
+    "score": 0.9133,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -28585,7 +28585,7 @@
     "from": "La9;->run()V",
     "to_version": "2.7.4",
     "to": "Ld9;->run()V",
-    "score": 0.7707,
+    "score": 0.7612,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -28685,7 +28685,7 @@
     "from": "Landroidx/appcompat/app/b;->q(ZZ)Z",
     "to_version": "2.7.2",
     "to": "Landroidx/appcompat/app/b;->p(ZZ)Z",
-    "score": 0.844,
+    "score": 0.8403,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -28695,7 +28695,7 @@
     "from": "Landroidx/appcompat/app/b;->q(ZZ)Z",
     "to_version": "2.7.4",
     "to": "Landroidx/appcompat/app/b;->r(ZZ)Z",
-    "score": 0.844,
+    "score": 0.8403,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -28705,7 +28705,7 @@
     "from": "Landroidx/appcompat/app/b;->q(ZZ)Z",
     "to_version": "2.7.5",
     "to": "Landroidx/appcompat/app/b;->p(ZZ)Z",
-    "score": 0.844,
+    "score": 0.8403,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -28865,7 +28865,7 @@
     "from": "Landroidx/appcompat/widget/h;->g()V",
     "to_version": "2.7.2",
     "to": "Landroidx/appcompat/widget/h;->f()V",
-    "score": 0.977,
+    "score": 0.9764,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -28875,7 +28875,7 @@
     "from": "Landroidx/appcompat/widget/h;->g()V",
     "to_version": "2.7.4",
     "to": "Landroidx/appcompat/widget/h;->g()V",
-    "score": 0.977,
+    "score": 0.9764,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -28885,7 +28885,7 @@
     "from": "Landroidx/appcompat/widget/h;->g()V",
     "to_version": "2.7.5",
     "to": "Landroidx/appcompat/widget/h;->f()V",
-    "score": 0.977,
+    "score": 0.9764,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -28925,7 +28925,7 @@
     "from": "Landroidx/compose/ui/platform/AndroidComposeView;-><init>(Landroid/content/Context;Le53;)V",
     "to_version": "2.7.2",
     "to": "Landroidx/compose/ui/platform/AndroidComposeView;-><init>(Landroid/content/Context;Lo53;)V",
-    "score": 0.8676,
+    "score": 0.8601,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -28935,7 +28935,7 @@
     "from": "Landroidx/compose/ui/platform/AndroidComposeView;-><init>(Landroid/content/Context;Le53;)V",
     "to_version": "2.7.5",
     "to": "Landroidx/compose/ui/platform/AndroidComposeView;-><init>(Landroid/content/Context;Lt53;)V",
-    "score": 0.8676,
+    "score": 0.8601,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -28945,7 +28945,7 @@
     "from": "Landroidx/compose/ui/platform/AndroidComposeView;-><init>(Landroid/content/Context;Le53;)V",
     "to_version": "2.7.4",
     "to": "Landroidx/compose/ui/platform/AndroidComposeView;-><init>(Landroid/content/Context;Ll73;)V",
-    "score": 0.867,
+    "score": 0.8595,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -29075,7 +29075,7 @@
     "from": "Lat;->attachBaseContext(Landroid/content/Context;)V",
     "to_version": "2.7.2",
     "to": "Lkt;->attachBaseContext(Landroid/content/Context;)V",
-    "score": 0.8608,
+    "score": 0.8532,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -29085,7 +29085,7 @@
     "from": "Lat;->attachBaseContext(Landroid/content/Context;)V",
     "to_version": "2.7.4",
     "to": "Lnt;->attachBaseContext(Landroid/content/Context;)V",
-    "score": 0.8608,
+    "score": 0.8532,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -29095,7 +29095,7 @@
     "from": "Lat;->attachBaseContext(Landroid/content/Context;)V",
     "to_version": "2.7.5",
     "to": "Llt;->attachBaseContext(Landroid/content/Context;)V",
-    "score": 0.8608,
+    "score": 0.8532,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -29755,7 +29755,7 @@
     "from": "Ldcc;->run()V",
     "to_version": "2.7.4",
     "to": "Lfnc;->run()V",
-    "score": 0.8856,
+    "score": 0.8807,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -30155,7 +30155,7 @@
     "from": "Lfq;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lrq;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9279,
+    "score": 0.9224,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -30165,7 +30165,7 @@
     "from": "Lfq;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lqq;->a(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.6445,
+    "score": 0.6309,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -30175,7 +30175,7 @@
     "from": "Lfq;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lsq;->a(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.6445,
+    "score": 0.6309,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -30215,7 +30215,7 @@
     "from": "Lh0c;->run()V",
     "to_version": "2.7.2",
     "to": "Ld6c;->run()V",
-    "score": 0.9816,
+    "score": 0.9806,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -30225,7 +30225,7 @@
     "from": "Lh0c;->run()V",
     "to_version": "2.7.4",
     "to": "Lrac;->run()V",
-    "score": 0.9816,
+    "score": 0.9806,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -30235,7 +30235,7 @@
     "from": "Lh0c;->run()V",
     "to_version": "2.7.5",
     "to": "Ld6c;->run()V",
-    "score": 0.9816,
+    "score": 0.9806,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -30395,7 +30395,7 @@
     "from": "Lji;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lii;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9086,
+    "score": 0.8975,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -30405,7 +30405,7 @@
     "from": "Lji;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lki;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9086,
+    "score": 0.8975,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -30415,7 +30415,7 @@
     "from": "Lji;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lji;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9085,
+    "score": 0.8973,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -30695,7 +30695,7 @@
     "from": "Llh6;->g(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lem6;->e(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9096,
+    "score": 0.9026,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -30705,7 +30705,7 @@
     "from": "Llh6;->g(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lmj6;->e(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9092,
+    "score": 0.9021,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -30715,7 +30715,7 @@
     "from": "Llh6;->g(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lsj6;->e(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9092,
+    "score": 0.9021,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31135,7 +31135,7 @@
     "from": "Lnz6;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lhv7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9081,
+    "score": 0.9037,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31145,7 +31145,7 @@
     "from": "Lnz6;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lav7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9074,
+    "score": 0.9029,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31155,7 +31155,7 @@
     "from": "Lnz6;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Luw7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9074,
+    "score": 0.9029,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31165,7 +31165,7 @@
     "from": "Lo5c;->run()V",
     "to_version": "2.7.2",
     "to": "Ljbc;->run()V",
-    "score": 0.9777,
+    "score": 0.9758,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31175,7 +31175,7 @@
     "from": "Lo5c;->run()V",
     "to_version": "2.7.4",
     "to": "Lzfc;->run()V",
-    "score": 0.9777,
+    "score": 0.9758,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31185,7 +31185,7 @@
     "from": "Lo5c;->run()V",
     "to_version": "2.7.5",
     "to": "Libc;->run()V",
-    "score": 0.9777,
+    "score": 0.9758,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31195,7 +31195,7 @@
     "from": "Lot;->onWindowStartingActionMode(Landroid/view/ActionMode$Callback;I)Landroid/view/ActionMode;",
     "to_version": "2.7.2",
     "to": "Ltt;->onWindowStartingActionMode(Landroid/view/ActionMode$Callback;I)Landroid/view/ActionMode;",
-    "score": 0.9672,
+    "score": 0.966,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31205,7 +31205,7 @@
     "from": "Lot;->onWindowStartingActionMode(Landroid/view/ActionMode$Callback;I)Landroid/view/ActionMode;",
     "to_version": "2.7.4",
     "to": "Lwt;->onWindowStartingActionMode(Landroid/view/ActionMode$Callback;I)Landroid/view/ActionMode;",
-    "score": 0.9672,
+    "score": 0.966,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31215,7 +31215,7 @@
     "from": "Lot;->onWindowStartingActionMode(Landroid/view/ActionMode$Callback;I)Landroid/view/ActionMode;",
     "to_version": "2.7.5",
     "to": "Lut;->onWindowStartingActionMode(Landroid/view/ActionMode$Callback;I)Landroid/view/ActionMode;",
-    "score": 0.9672,
+    "score": 0.966,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31225,7 +31225,7 @@
     "from": "Lou;->f(Landroid/util/AttributeSet;I)V",
     "to_version": "2.7.2",
     "to": "Lqu;->h(Landroid/util/AttributeSet;I)V",
-    "score": 0.8963,
+    "score": 0.8939,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31235,7 +31235,7 @@
     "from": "Lou;->f(Landroid/util/AttributeSet;I)V",
     "to_version": "2.7.5",
     "to": "Lru;->h(Landroid/util/AttributeSet;I)V",
-    "score": 0.8963,
+    "score": 0.8939,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31245,7 +31245,7 @@
     "from": "Lou;->f(Landroid/util/AttributeSet;I)V",
     "to_version": "2.7.4",
     "to": "Ltu;->h(Landroid/util/AttributeSet;I)V",
-    "score": 0.8958,
+    "score": 0.8935,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31255,7 +31255,7 @@
     "from": "Loy5;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lyz0;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.5711,
+    "score": 0.548,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31265,7 +31265,7 @@
     "from": "Loy5;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Ln11;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.5711,
+    "score": 0.548,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31275,7 +31275,7 @@
     "from": "Loy5;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "La01;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.5711,
+    "score": 0.548,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31315,7 +31315,7 @@
     "from": "Lpc7;->v(IILn05;)Ld58;",
     "to_version": "2.7.2",
     "to": "Lk27;->D(IILr15;)Lk88;",
-    "score": 0.9231,
+    "score": 0.9219,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31325,7 +31325,7 @@
     "from": "Lpc7;->v(IILn05;)Ld58;",
     "to_version": "2.7.5",
     "to": "Ls27;->E(IILv15;)Lq88;",
-    "score": 0.9231,
+    "score": 0.9219,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31335,7 +31335,7 @@
     "from": "Lpc7;->v(IILn05;)Ld58;",
     "to_version": "2.7.4",
     "to": "Loa8;->o(IILa45;)Lla8;",
-    "score": 0.9214,
+    "score": 0.9202,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31375,8 +31375,8 @@
     "from": "Lpw9;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Le1a;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.6803,
-    "confidence": "strong-candidate",
+    "score": 0.6686,
+    "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
   {
@@ -31385,8 +31385,8 @@
     "from": "Lpw9;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lk1a;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.6803,
-    "confidence": "strong-candidate",
+    "score": 0.6686,
+    "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
   {
@@ -31395,7 +31395,7 @@
     "from": "Lpw9;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Ld5a;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.6798,
+    "score": 0.6681,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31435,7 +31435,7 @@
     "from": "Lq13;->k(Lmn;Leg7;Ljsa;Lk;Ln05;II)V",
     "to_version": "2.7.2",
     "to": "Lk27;->b(Lsn;Lyj7;Lbya;Lk;Lr15;II)V",
-    "score": 0.8413,
+    "score": 0.8387,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31445,7 +31445,7 @@
     "from": "Lq13;->k(Lmn;Leg7;Ljsa;Lk;Ln05;II)V",
     "to_version": "2.7.4",
     "to": "Lp57;->F(Lun;Lrl7;Lh2b;Lk;La45;II)V",
-    "score": 0.8413,
+    "score": 0.8387,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31455,7 +31455,7 @@
     "from": "Lq13;->k(Lmn;Leg7;Ljsa;Lk;Ln05;II)V",
     "to_version": "2.7.5",
     "to": "Ls27;->b(Ltn;Lfk7;Liya;Lk;Lv15;II)V",
-    "score": 0.8413,
+    "score": 0.8387,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31615,7 +31615,7 @@
     "from": "Lrd;->t(I)Lj3;",
     "to_version": "2.7.5",
     "to": "Lsd;->C(I)Lm3;",
-    "score": 0.9695,
+    "score": 0.9688,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31625,7 +31625,7 @@
     "from": "Lrd;->t(I)Lj3;",
     "to_version": "2.7.4",
     "to": "Ltd;->E(I)Lm3;",
-    "score": 0.9693,
+    "score": 0.9686,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31635,7 +31635,7 @@
     "from": "Lrd;->t(I)Lj3;",
     "to_version": "2.7.2",
     "to": "Lrd;->C(I)Lm3;",
-    "score": 0.9034,
+    "score": 0.9013,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31675,7 +31675,7 @@
     "from": "Ls0a;->r(Lkn;Ljava/lang/String;Ljava/util/List;ZLn05;II)V",
     "to_version": "2.7.2",
     "to": "Low5;->C(Lqn;Ljava/lang/String;Ljava/util/List;ZLr15;II)V",
-    "score": 0.921,
+    "score": 0.9192,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31685,7 +31685,7 @@
     "from": "Ls0a;->r(Lkn;Ljava/lang/String;Ljava/util/List;ZLn05;II)V",
     "to_version": "2.7.4",
     "to": "Lbp3;->E(Lsn;Ljava/lang/String;Ljava/util/List;ZLa45;II)V",
-    "score": 0.921,
+    "score": 0.9192,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -31695,7 +31695,7 @@
     "from": "Ls0a;->r(Lkn;Ljava/lang/String;Ljava/util/List;ZLn05;II)V",
     "to_version": "2.7.5",
     "to": "Ltw5;->w(Lrn;Ljava/lang/String;Ljava/util/List;ZLv15;II)V",
-    "score": 0.921,
+    "score": 0.9192,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -32422,36 +32422,6 @@
   {
     "role": "search_web",
     "from_version": "2.7.1",
-    "from": "Ly6;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "to_version": "2.7.2",
-    "to": "Lce;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.4854,
-    "confidence": "candidate",
-    "match_policy": "mutual-best-with-margin"
-  },
-  {
-    "role": "search_web",
-    "from_version": "2.7.1",
-    "from": "Ly6;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "to_version": "2.7.4",
-    "to": "Lee;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.4854,
-    "confidence": "candidate",
-    "match_policy": "mutual-best-with-margin"
-  },
-  {
-    "role": "search_web",
-    "from_version": "2.7.1",
-    "from": "Ly6;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "to_version": "2.7.5",
-    "to": "Lde;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.4854,
-    "confidence": "candidate",
-    "match_policy": "mutual-best-with-margin"
-  },
-  {
-    "role": "search_web",
-    "from_version": "2.7.1",
     "from": "Ly6c;->d([Ljava/lang/String;Z)V",
     "to_version": "2.7.2",
     "to": "Lwcc;->d([Ljava/lang/String;Z)V",
@@ -32695,7 +32665,7 @@
     "from": "Lzy6;->w()Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Ls08;->v()Ljava/lang/Object;",
-    "score": 0.7846,
+    "score": 0.7931,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -32705,7 +32675,7 @@
     "from": "Lzy6;->w()Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Ln28;->v()Ljava/lang/Object;",
-    "score": 0.7846,
+    "score": 0.7931,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -32715,7 +32685,7 @@
     "from": "Lzy6;->w()Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lz08;->w()Ljava/lang/Object;",
-    "score": 0.7846,
+    "score": 0.7931,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -33145,7 +33115,7 @@
     "from": "Lc9;->run()V",
     "to_version": "2.7.4",
     "to": "Ld9;->run()V",
-    "score": 0.7747,
+    "score": 0.7652,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -33695,7 +33665,7 @@
     "from": "Ldic;->run()V",
     "to_version": "2.7.4",
     "to": "Lfnc;->run()V",
-    "score": 0.886,
+    "score": 0.881,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -34825,7 +34795,7 @@
     "from": "Lqq;->a(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lrq;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.6984,
+    "score": 0.6887,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -34875,7 +34845,7 @@
     "from": "Lrd;->C(I)Lm3;",
     "to_version": "2.7.5",
     "to": "Lsd;->C(I)Lm3;",
-    "score": 0.9314,
+    "score": 0.9299,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -34885,7 +34855,7 @@
     "from": "Lrd;->C(I)Lm3;",
     "to_version": "2.7.4",
     "to": "Ltd;->E(I)Lm3;",
-    "score": 0.9313,
+    "score": 0.9297,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -36125,7 +36095,7 @@
     "from": "Ld9;->run()V",
     "to_version": "2.7.5",
     "to": "Ld9;->run()V",
-    "score": 0.7747,
+    "score": 0.7652,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -36225,7 +36195,7 @@
     "from": "Lfnc;->run()V",
     "to_version": "2.7.5",
     "to": "Lcic;->run()V",
-    "score": 0.886,
+    "score": 0.881,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -36745,7 +36715,7 @@
     "from": "Lsq;->a(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lrq;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.6984,
+    "score": 0.6887,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -37235,7 +37205,7 @@
     "from": "Lag;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lag;->z(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9648,
+    "score": 0.9633,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -37245,7 +37215,7 @@
     "from": "Lag;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lzf;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9647,
+    "score": 0.9631,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -37255,7 +37225,7 @@
     "from": "Lag;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lbg;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9647,
+    "score": 0.9631,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -37445,7 +37415,7 @@
     "from": "Lbf8;->w()Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lv39;->v()Ljava/lang/Object;",
-    "score": 0.5683,
+    "score": 0.5714,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -37455,7 +37425,7 @@
     "from": "Lbf8;->w()Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Ll79;->v()Ljava/lang/Object;",
-    "score": 0.5683,
+    "score": 0.5714,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -37465,7 +37435,7 @@
     "from": "Lbf8;->w()Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lc49;->w()Ljava/lang/Object;",
-    "score": 0.5683,
+    "score": 0.5714,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -37965,7 +37935,7 @@
     "from": "Lgb0;->b(Lcs6;Lnb3;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lkc0;->b(Lbx6;Lvd3;)Ljava/lang/Object;",
-    "score": 0.9492,
+    "score": 0.9483,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -37975,7 +37945,7 @@
     "from": "Lgb0;->b(Lcs6;Lnb3;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Ljv;->b(Lhu6;Ldc3;)Ljava/lang/Object;",
-    "score": 0.9492,
+    "score": 0.9483,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -37985,7 +37955,7 @@
     "from": "Lh;->w()Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lh;->v()Ljava/lang/Object;",
-    "score": 0.6083,
+    "score": 0.5737,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -37995,7 +37965,7 @@
     "from": "Lh;->w()Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lh;->v()Ljava/lang/Object;",
-    "score": 0.6083,
+    "score": 0.5737,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -38005,7 +37975,7 @@
     "from": "Lh;->w()Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lh;->w()Ljava/lang/Object;",
-    "score": 0.6083,
+    "score": 0.5737,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -38525,7 +38495,7 @@
     "from": "Lmna;->onRecvCustomCmdMsg(Ljava/lang/String;II[B)V",
     "to_version": "2.7.2",
     "to": "Lqsa;->onRecvCustomCmdMsg(Ljava/lang/String;II[B)V",
-    "score": 0.9072,
+    "score": 0.8914,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -38535,7 +38505,7 @@
     "from": "Lmna;->onRecvCustomCmdMsg(Ljava/lang/String;II[B)V",
     "to_version": "2.7.5",
     "to": "Lzsa;->onRecvCustomCmdMsg(Ljava/lang/String;II[B)V",
-    "score": 0.9072,
+    "score": 0.8914,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -38545,7 +38515,7 @@
     "from": "Lmna;->onRecvCustomCmdMsg(Ljava/lang/String;II[B)V",
     "to_version": "2.7.4",
     "to": "Lwwa;->onRecvCustomCmdMsg(Ljava/lang/String;II[B)V",
-    "score": 0.9063,
+    "score": 0.8905,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -38705,7 +38675,7 @@
     "from": "Lnz6;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lhv7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9081,
+    "score": 0.9037,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -38715,7 +38685,7 @@
     "from": "Lnz6;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lav7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9074,
+    "score": 0.9029,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -38725,7 +38695,7 @@
     "from": "Lnz6;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Luw7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9074,
+    "score": 0.9029,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -39695,7 +39665,7 @@
     "from": "Lym7;-><init>(Lno7;Ld66;Ljava/util/Map;)V",
     "to_version": "2.7.2",
     "to": "Ljq7;-><init>(Lvr7;Lf86;Ljava/util/Map;)V",
-    "score": 0.7186,
+    "score": 0.7049,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -39705,7 +39675,7 @@
     "from": "Lym7;-><init>(Lno7;Ld66;Ljava/util/Map;)V",
     "to_version": "2.7.4",
     "to": "Las7;-><init>(Lmt7;Lxa6;Ljava/util/Map;)V",
-    "score": 0.7186,
+    "score": 0.7049,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -39715,7 +39685,7 @@
     "from": "Lym7;-><init>(Lno7;Ld66;Ljava/util/Map;)V",
     "to_version": "2.7.5",
     "to": "Lrq7;-><init>(Lcs7;Ll86;Ljava/util/Map;)V",
-    "score": 0.7186,
+    "score": 0.7049,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -39725,7 +39695,7 @@
     "from": "Lyv1;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lqw1;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7978,
+    "score": 0.7866,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -39735,7 +39705,7 @@
     "from": "Lyv1;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lhy1;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7978,
+    "score": 0.7866,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -39745,7 +39715,7 @@
     "from": "Lyv1;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lsw1;->z(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7978,
+    "score": 0.7866,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -39875,7 +39845,7 @@
     "from": "Lzy6;->w()Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Ls08;->v()Ljava/lang/Object;",
-    "score": 0.7846,
+    "score": 0.7931,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -39885,7 +39855,7 @@
     "from": "Lzy6;->w()Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Ln28;->v()Ljava/lang/Object;",
-    "score": 0.7846,
+    "score": 0.7931,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -39895,7 +39865,7 @@
     "from": "Lzy6;->w()Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lz08;->w()Ljava/lang/Object;",
-    "score": 0.7846,
+    "score": 0.7931,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -40335,7 +40305,7 @@
     "from": "Lec0;->b(Lbu6;Lyb3;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lkc0;->b(Lbx6;Lvd3;)Ljava/lang/Object;",
-    "score": 0.957,
+    "score": 0.9561,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -40345,7 +40315,7 @@
     "from": "Lec0;->b(Lbu6;Lyb3;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Ljv;->b(Lhu6;Ldc3;)Ljava/lang/Object;",
-    "score": 0.957,
+    "score": 0.9561,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -42995,7 +42965,7 @@
     "from": "Lag;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lag;->z(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9648,
+    "score": 0.9633,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -43005,7 +42975,7 @@
     "from": "Lag;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lzf;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9647,
+    "score": 0.9631,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -43015,7 +42985,7 @@
     "from": "Lag;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lbg;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9647,
+    "score": 0.9631,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -43085,7 +43055,7 @@
     "from": "Lcb7;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lmqa;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7361,
+    "score": 0.7114,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -43095,7 +43065,7 @@
     "from": "Lcb7;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lnva;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7331,
+    "score": 0.7083,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -43105,8 +43075,8 @@
     "from": "Lcb7;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lqta;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.6929,
-    "confidence": "strong-candidate",
+    "score": 0.662,
+    "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
   {
@@ -43115,7 +43085,7 @@
     "from": "Lcm0;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lwm0;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7895,
+    "score": 0.7722,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -43125,7 +43095,7 @@
     "from": "Lcm0;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lgo0;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7895,
+    "score": 0.7722,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -43135,7 +43105,7 @@
     "from": "Lcm0;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lxm0;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7895,
+    "score": 0.7722,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -43625,7 +43595,7 @@
     "from": "Lfq;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lrq;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9279,
+    "score": 0.9224,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -43635,7 +43605,7 @@
     "from": "Lfq;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lqq;->a(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.6445,
+    "score": 0.6309,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -43645,7 +43615,7 @@
     "from": "Lfq;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lsq;->a(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.6445,
+    "score": 0.6309,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -43655,7 +43625,7 @@
     "from": "Lfr0;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lbs0;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.6462,
+    "score": 0.6115,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -43665,7 +43635,7 @@
     "from": "Lfr0;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lcs0;->z(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.6462,
+    "score": 0.6115,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -43675,7 +43645,7 @@
     "from": "Lfr0;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lqt0;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.6458,
+    "score": 0.6111,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44015,7 +43985,7 @@
     "from": "Lj;->w()Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lj;->v()Ljava/lang/Object;",
-    "score": 0.8858,
+    "score": 0.8793,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44025,7 +43995,7 @@
     "from": "Lj;->w()Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lj;->v()Ljava/lang/Object;",
-    "score": 0.8858,
+    "score": 0.8793,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44035,7 +44005,7 @@
     "from": "Lj;->w()Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lj;->w()Ljava/lang/Object;",
-    "score": 0.8853,
+    "score": 0.8788,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44105,7 +44075,7 @@
     "from": "Lji;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lii;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9086,
+    "score": 0.8975,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44115,7 +44085,7 @@
     "from": "Lji;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lki;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9086,
+    "score": 0.8975,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44125,7 +44095,7 @@
     "from": "Lji;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lji;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9085,
+    "score": 0.8973,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44315,7 +44285,7 @@
     "from": "Lli6;->w()Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lxl5;->v()Ljava/lang/Object;",
-    "score": 0.7564,
+    "score": 0.7461,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44325,7 +44295,7 @@
     "from": "Lli6;->w()Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lcm5;->w()Ljava/lang/Object;",
-    "score": 0.7564,
+    "score": 0.7461,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44335,7 +44305,7 @@
     "from": "Lli6;->w()Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lho5;->v()Ljava/lang/Object;",
-    "score": 0.7561,
+    "score": 0.7458,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44375,7 +44345,7 @@
     "from": "Ln3;->a(Ljava/lang/Object;Lnb3;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lr3;->a(Ljava/lang/Object;Lyb3;)Ljava/lang/Object;",
-    "score": 0.9253,
+    "score": 0.9239,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44385,7 +44355,7 @@
     "from": "Ln3;->a(Ljava/lang/Object;Lnb3;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lr3;->a(Ljava/lang/Object;Ldc3;)Ljava/lang/Object;",
-    "score": 0.9253,
+    "score": 0.9239,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44395,7 +44365,7 @@
     "from": "Ln3;->a(Ljava/lang/Object;Lnb3;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lq3;->a(Ljava/lang/Object;Lvd3;)Ljava/lang/Object;",
-    "score": 0.8445,
+    "score": 0.8419,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44495,7 +44465,7 @@
     "from": "Lo7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lq7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.8109,
+    "score": 0.7982,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44505,7 +44475,7 @@
     "from": "Lo7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lp7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.8093,
+    "score": 0.7966,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44515,7 +44485,7 @@
     "from": "Lo7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lq7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.8093,
+    "score": 0.7966,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44645,7 +44615,7 @@
     "from": "Loq0;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lkr0;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7837,
+    "score": 0.766,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44655,7 +44625,7 @@
     "from": "Loq0;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lat0;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7837,
+    "score": 0.766,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44665,7 +44635,7 @@
     "from": "Loq0;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Llr0;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7837,
+    "score": 0.766,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44845,7 +44815,7 @@
     "from": "Lq5;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lu5;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9412,
+    "score": 0.9396,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44855,7 +44825,7 @@
     "from": "Lq5;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lv5;->z(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9412,
+    "score": 0.9396,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44865,7 +44835,7 @@
     "from": "Lq5;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lt5;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9409,
+    "score": 0.9392,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44935,7 +44905,7 @@
     "from": "Lr31;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Ltz0;->z(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9538,
+    "score": 0.9505,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44945,7 +44915,7 @@
     "from": "Lr31;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lk41;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9534,
+    "score": 0.95,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44955,7 +44925,7 @@
     "from": "Lr31;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lz51;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9534,
+    "score": 0.95,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44975,7 +44945,7 @@
     "from": "Lrd2;-><init>(Lad9;Loe9;)V",
     "to_version": "2.7.2",
     "to": "Loe2;-><init>(Log9;Ldi9;)V",
-    "score": 0.8359,
+    "score": 0.7969,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44985,7 +44955,7 @@
     "from": "Lrd2;-><init>(Lad9;Loe9;)V",
     "to_version": "2.7.5",
     "to": "Lte2;-><init>(Lvg9;Lki9;)V",
-    "score": 0.8353,
+    "score": 0.7963,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -44995,7 +44965,7 @@
     "from": "Lrd2;->A(Lps;)V",
     "to_version": "2.7.2",
     "to": "Loe2;->A(Lys;)V",
-    "score": 0.7081,
+    "score": 0.6844,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -45005,7 +44975,7 @@
     "from": "Lrd2;->A(Lps;)V",
     "to_version": "2.7.5",
     "to": "Lte2;->A(Lzs;)V",
-    "score": 0.7073,
+    "score": 0.6837,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -45015,7 +44985,7 @@
     "from": "Lrd2;->A(Lps;)V",
     "to_version": "2.7.4",
     "to": "Lfg2;->A(Lbt;)V",
-    "score": 0.7066,
+    "score": 0.683,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -45055,7 +45025,7 @@
     "from": "Lrj5;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lfk5;->z(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7725,
+    "score": 0.7632,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -45065,7 +45035,7 @@
     "from": "Lrj5;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lil5;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7694,
+    "score": 0.7602,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -45075,7 +45045,7 @@
     "from": "Lrj5;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lsn5;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7694,
+    "score": 0.7602,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -45295,7 +45265,7 @@
     "from": "Luc;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Ltc;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.8585,
+    "score": 0.8325,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -45305,7 +45275,7 @@
     "from": "Luc;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lvc;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.8585,
+    "score": 0.8325,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -45315,7 +45285,7 @@
     "from": "Luc;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Luc;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.8585,
+    "score": 0.8325,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -45685,7 +45655,7 @@
     "from": "Lw5;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lp0;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.8008,
+    "score": 0.7813,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -45695,7 +45665,7 @@
     "from": "Lw5;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lp0;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.8005,
+    "score": 0.7809,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -45705,7 +45675,7 @@
     "from": "Lw5;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lp0;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.8003,
+    "score": 0.7807,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -45715,7 +45685,7 @@
     "from": "Lwa2;->w()Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lf62;->v()Ljava/lang/Object;",
-    "score": 0.5469,
+    "score": 0.5358,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -45725,7 +45695,7 @@
     "from": "Lwa2;->w()Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lw72;->v()Ljava/lang/Object;",
-    "score": 0.5469,
+    "score": 0.5358,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -45735,7 +45705,7 @@
     "from": "Lwa2;->w()Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lk62;->w()Ljava/lang/Object;",
-    "score": 0.5469,
+    "score": 0.5358,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -45785,7 +45755,7 @@
     "from": "Lx10;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lx10;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9385,
+    "score": 0.9369,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -45795,7 +45765,7 @@
     "from": "Lx10;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lc20;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9384,
+    "score": 0.9367,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -45835,7 +45805,7 @@
     "from": "Lxj;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lwj;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9192,
+    "score": 0.9146,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -45845,7 +45815,7 @@
     "from": "Lxj;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lxj;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9192,
+    "score": 0.9146,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -45855,7 +45825,7 @@
     "from": "Lxj;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lyj;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9185,
+    "score": 0.9139,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -46045,7 +46015,7 @@
     "from": "Lz5;->w()Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lb6;->v()Ljava/lang/Object;",
-    "score": 0.9568,
+    "score": 0.9555,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -46055,7 +46025,7 @@
     "from": "Lz5;->w()Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lc6;->v()Ljava/lang/Object;",
-    "score": 0.9565,
+    "score": 0.9552,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -46065,7 +46035,7 @@
     "from": "Lz5;->w()Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Ld6;->w()Ljava/lang/Object;",
-    "score": 0.9565,
+    "score": 0.9552,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -47395,7 +47365,7 @@
     "from": "Loe2;-><init>(Log9;Ldi9;)V",
     "to_version": "2.7.4",
     "to": "Lfg2;-><init>(Ljk9;Lbm9;)V",
-    "score": 0.844,
+    "score": 0.805,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -47655,7 +47625,7 @@
     "from": "Lqq;->a(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lrq;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.6984,
+    "score": 0.6887,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -47695,7 +47665,7 @@
     "from": "Lqta;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lnva;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9357,
+    "score": 0.9259,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -47705,7 +47675,7 @@
     "from": "Lqta;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lmqa;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9301,
+    "score": 0.9203,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -47765,7 +47735,7 @@
     "from": "Lr3;->a(Ljava/lang/Object;Lyb3;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lq3;->a(Ljava/lang/Object;Lvd3;)Ljava/lang/Object;",
-    "score": 0.9111,
+    "score": 0.9097,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -47785,7 +47755,7 @@
     "from": "Lrq7;->a()V",
     "to_version": "2.7.5",
     "to": "Ldo7;->a()V",
-    "score": 0.9062,
+    "score": 0.8954,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -48105,7 +48075,7 @@
     "from": "Lx10;->y(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lkv;->z(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9382,
+    "score": 0.9365,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -48565,7 +48535,7 @@
     "from": "Lc20;->y(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lkv;->z(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.938,
+    "score": 0.9364,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -48695,7 +48665,7 @@
     "from": "Lfg2;-><init>(Ljk9;Lbm9;)V",
     "to_version": "2.7.5",
     "to": "Lte2;-><init>(Lvg9;Lki9;)V",
-    "score": 0.8434,
+    "score": 0.8044,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -48885,7 +48855,7 @@
     "from": "Lis7;->a()V",
     "to_version": "2.7.5",
     "to": "Ldo7;->a()V",
-    "score": 0.898,
+    "score": 0.8872,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -49175,7 +49145,7 @@
     "from": "Lq3;->a(Ljava/lang/Object;Lvd3;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lr3;->a(Ljava/lang/Object;Ldc3;)Ljava/lang/Object;",
-    "score": 0.9111,
+    "score": 0.9097,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -49245,7 +49215,7 @@
     "from": "Lsq;->a(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lrq;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.6984,
+    "score": 0.6887,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -49565,7 +49535,7 @@
     "from": "Llp2;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Llq2;->z(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9596,
+    "score": 0.9564,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -49575,7 +49545,7 @@
     "from": "Llp2;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Ljq2;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7252,
+    "score": 0.7016,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -49585,7 +49555,7 @@
     "from": "Llp2;->z(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lzr2;->y(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7249,
+    "score": 0.7013,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -49695,7 +49665,7 @@
     "from": "Ljq2;->y(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Llq2;->z(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7518,
+    "score": 0.7291,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -49795,7 +49765,7 @@
     "from": "Lzr2;->y(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Llq2;->z(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7514,
+    "score": 0.7288,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -50285,7 +50255,7 @@
     "from": "La79;-><init>(I)V",
     "to_version": "2.7.2",
     "to": "Lng9;-><init>(I)V",
-    "score": 0.8938,
+    "score": 0.8851,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -50295,7 +50265,7 @@
     "from": "La79;-><init>(I)V",
     "to_version": "2.7.5",
     "to": "Lug9;-><init>(I)V",
-    "score": 0.8938,
+    "score": 0.8851,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -50305,7 +50275,7 @@
     "from": "La79;-><init>(I)V",
     "to_version": "2.7.4",
     "to": "Lf99;-><init>(I)V",
-    "score": 0.7864,
+    "score": 0.7687,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -50335,7 +50305,7 @@
     "from": "La9;->run()V",
     "to_version": "2.7.4",
     "to": "Ld9;->run()V",
-    "score": 0.7707,
+    "score": 0.7612,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -51485,7 +51455,7 @@
     "from": "Ldcc;->run()V",
     "to_version": "2.7.4",
     "to": "Lfnc;->run()V",
-    "score": 0.8856,
+    "score": 0.8807,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -51945,7 +51915,7 @@
     "from": "Lh0c;->run()V",
     "to_version": "2.7.2",
     "to": "Ld6c;->run()V",
-    "score": 0.9816,
+    "score": 0.9806,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -51955,7 +51925,7 @@
     "from": "Lh0c;->run()V",
     "to_version": "2.7.4",
     "to": "Lrac;->run()V",
-    "score": 0.9816,
+    "score": 0.9806,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -51965,7 +51935,7 @@
     "from": "Lh0c;->run()V",
     "to_version": "2.7.5",
     "to": "Ld6c;->run()V",
-    "score": 0.9816,
+    "score": 0.9806,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -52965,7 +52935,7 @@
     "from": "Lo5c;->run()V",
     "to_version": "2.7.2",
     "to": "Ljbc;->run()V",
-    "score": 0.9777,
+    "score": 0.9758,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -52975,7 +52945,7 @@
     "from": "Lo5c;->run()V",
     "to_version": "2.7.4",
     "to": "Lzfc;->run()V",
-    "score": 0.9777,
+    "score": 0.9758,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -52985,7 +52955,7 @@
     "from": "Lo5c;->run()V",
     "to_version": "2.7.5",
     "to": "Libc;->run()V",
-    "score": 0.9777,
+    "score": 0.9758,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -52995,7 +52965,7 @@
     "from": "Loy5;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lyz0;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.5711,
+    "score": 0.548,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -53005,7 +52975,7 @@
     "from": "Loy5;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Ln11;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.5711,
+    "score": 0.548,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -53015,7 +52985,7 @@
     "from": "Loy5;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "La01;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.5711,
+    "score": 0.548,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -53105,7 +53075,7 @@
     "from": "Lq0c;->run()V",
     "to_version": "2.7.4",
     "to": "Labc;->run()V",
-    "score": 0.892,
+    "score": 0.8586,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -53285,7 +53255,7 @@
     "from": "Ls0a;->Y(Ls2a;ILjava/lang/Object;)V",
     "to_version": "2.7.2",
     "to": "Le8c;->G0(Lz7a;ILjava/lang/Object;)V",
-    "score": 0.8686,
+    "score": 0.85,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -53295,7 +53265,7 @@
     "from": "Ls0a;->Y(Ls2a;ILjava/lang/Object;)V",
     "to_version": "2.7.4",
     "to": "Li48;->X(Lyba;ILjava/lang/Object;)V",
-    "score": 0.8686,
+    "score": 0.85,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -53305,7 +53275,7 @@
     "from": "Ls0a;->Y(Ls2a;ILjava/lang/Object;)V",
     "to_version": "2.7.5",
     "to": "Le8c;->z0(Lh8a;ILjava/lang/Object;)V",
-    "score": 0.8686,
+    "score": 0.85,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -54525,7 +54495,7 @@
     "from": "Lc9;->run()V",
     "to_version": "2.7.4",
     "to": "Ld9;->run()V",
-    "score": 0.7747,
+    "score": 0.7652,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -55305,7 +55275,7 @@
     "from": "Ldic;->run()V",
     "to_version": "2.7.4",
     "to": "Lfnc;->run()V",
-    "score": 0.886,
+    "score": 0.881,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -55865,7 +55835,7 @@
     "from": "Lm6c;->run()V",
     "to_version": "2.7.4",
     "to": "Labc;->run()V",
-    "score": 0.892,
+    "score": 0.8586,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -55925,7 +55895,7 @@
     "from": "Lng9;-><init>(I)V",
     "to_version": "2.7.4",
     "to": "Lf99;-><init>(I)V",
-    "score": 0.8137,
+    "score": 0.7995,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -56955,7 +56925,7 @@
     "from": "Labc;->run()V",
     "to_version": "2.7.5",
     "to": "Lm6c;->run()V",
-    "score": 0.892,
+    "score": 0.8586,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -57345,7 +57315,7 @@
     "from": "Ld9;->run()V",
     "to_version": "2.7.5",
     "to": "Ld9;->run()V",
-    "score": 0.7747,
+    "score": 0.7652,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -57385,7 +57355,7 @@
     "from": "Lf99;-><init>(I)V",
     "to_version": "2.7.5",
     "to": "Lug9;-><init>(I)V",
-    "score": 0.8137,
+    "score": 0.7995,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -57405,7 +57375,7 @@
     "from": "Lfnc;->run()V",
     "to_version": "2.7.5",
     "to": "Lcic;->run()V",
-    "score": 0.886,
+    "score": 0.881,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -58235,7 +58205,7 @@
     "from": "Lde;->k(IZLjava/util/List;ILjp3;Lyt2;Lkp3;Lbx4;Lbx4;Ldx4;Ldx4;Leg7;Ln05;I)V",
     "to_version": "2.7.2",
     "to": "Lq60;->e(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7693,
+    "score": 0.7433,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -58245,7 +58215,7 @@
     "from": "Lde;->k(IZLjava/util/List;ILjp3;Lyt2;Lkp3;Lbx4;Lbx4;Ldx4;Ldx4;Leg7;Ln05;I)V",
     "to_version": "2.7.4",
     "to": "Lv60;->e(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7693,
+    "score": 0.7433,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -58255,7 +58225,7 @@
     "from": "Lde;->k(IZLjava/util/List;ILjp3;Lyt2;Lkp3;Lbx4;Lbx4;Ldx4;Ldx4;Leg7;Ln05;I)V",
     "to_version": "2.7.5",
     "to": "Lt60;->e(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.7693,
+    "score": 0.7433,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -58975,7 +58945,7 @@
     "from": "La9;->run()V",
     "to_version": "2.7.4",
     "to": "Ld9;->run()V",
-    "score": 0.7707,
+    "score": 0.7612,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -59015,7 +58985,7 @@
     "from": "Landroidx/compose/ui/platform/AndroidComposeView;-><init>(Landroid/content/Context;Le53;)V",
     "to_version": "2.7.2",
     "to": "Landroidx/compose/ui/platform/AndroidComposeView;-><init>(Landroid/content/Context;Lo53;)V",
-    "score": 0.8676,
+    "score": 0.8601,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -59025,7 +58995,7 @@
     "from": "Landroidx/compose/ui/platform/AndroidComposeView;-><init>(Landroid/content/Context;Le53;)V",
     "to_version": "2.7.5",
     "to": "Landroidx/compose/ui/platform/AndroidComposeView;-><init>(Landroid/content/Context;Lt53;)V",
-    "score": 0.8676,
+    "score": 0.8601,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -59035,7 +59005,7 @@
     "from": "Landroidx/compose/ui/platform/AndroidComposeView;-><init>(Landroid/content/Context;Le53;)V",
     "to_version": "2.7.4",
     "to": "Landroidx/compose/ui/platform/AndroidComposeView;-><init>(Landroid/content/Context;Ll73;)V",
-    "score": 0.867,
+    "score": 0.8595,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -59195,7 +59165,7 @@
     "from": "Landroidx/compose/ui/platform/AndroidComposeView;->l(Landroid/view/MotionEvent;)I",
     "to_version": "2.7.2",
     "to": "Landroidx/compose/ui/platform/AndroidComposeView;->j(Landroid/view/MotionEvent;)I",
-    "score": 0.9172,
+    "score": 0.9151,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -59205,7 +59175,7 @@
     "from": "Landroidx/compose/ui/platform/AndroidComposeView;->l(Landroid/view/MotionEvent;)I",
     "to_version": "2.7.4",
     "to": "Landroidx/compose/ui/platform/AndroidComposeView;->j(Landroid/view/MotionEvent;)I",
-    "score": 0.9172,
+    "score": 0.9151,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -59215,7 +59185,7 @@
     "from": "Landroidx/compose/ui/platform/AndroidComposeView;->l(Landroid/view/MotionEvent;)I",
     "to_version": "2.7.5",
     "to": "Landroidx/compose/ui/platform/AndroidComposeView;->j(Landroid/view/MotionEvent;)I",
-    "score": 0.9172,
+    "score": 0.9151,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -59225,7 +59195,7 @@
     "from": "Landroidx/compose/ui/platform/AndroidComposeView;->onAttachedToWindow()V",
     "to_version": "2.7.2",
     "to": "Landroidx/compose/ui/platform/AndroidComposeView;->onAttachedToWindow()V",
-    "score": 0.7265,
+    "score": 0.7137,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -59235,7 +59205,7 @@
     "from": "Landroidx/compose/ui/platform/AndroidComposeView;->onAttachedToWindow()V",
     "to_version": "2.7.4",
     "to": "Landroidx/compose/ui/platform/AndroidComposeView;->onAttachedToWindow()V",
-    "score": 0.7265,
+    "score": 0.7137,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -59245,7 +59215,7 @@
     "from": "Landroidx/compose/ui/platform/AndroidComposeView;->onAttachedToWindow()V",
     "to_version": "2.7.5",
     "to": "Landroidx/compose/ui/platform/AndroidComposeView;->onAttachedToWindow()V",
-    "score": 0.7265,
+    "score": 0.7137,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -59405,7 +59375,7 @@
     "from": "Lb40;->a(ILfj6;Lnr;Lwe7;Lps;ZLdx4;Ldx4;Ldx4;Ldx4;Lf77;Leg7;Ln05;I)V",
     "to_version": "2.7.2",
     "to": "Le40;->a(ILel6;Lxr;Lvi7;Lys;ZLhy4;Lhy4;Lhy4;Lhy4;Lhb7;Lyj7;Lr15;I)V",
-    "score": 0.7226,
+    "score": 0.7055,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -59415,7 +59385,7 @@
     "from": "Lb40;->a(ILfj6;Lnr;Lwe7;Lps;ZLdx4;Ldx4;Ldx4;Ldx4;Lf77;Leg7;Ln05;I)V",
     "to_version": "2.7.4",
     "to": "Lj40;->a(ILwn6;Lzr;Lok7;Lbt;ZLp05;Lp05;Lp05;Lp05;Lad7;Lrl7;La45;I)V",
-    "score": 0.7106,
+    "score": 0.6934,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -59425,7 +59395,7 @@
     "from": "Lb40;->a(ILfj6;Lnr;Lwe7;Lps;ZLdx4;Ldx4;Ldx4;Ldx4;Lf77;Leg7;Ln05;I)V",
     "to_version": "2.7.5",
     "to": "Lh40;->a(ILkl6;Lyr;Lcj7;Lzs;ZLly4;Lly4;Lly4;Lly4;Lob7;Lfk7;Lv15;I)V",
-    "score": 0.7106,
+    "score": 0.6934,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -60205,7 +60175,7 @@
     "from": "Ldcc;->run()V",
     "to_version": "2.7.4",
     "to": "Lfnc;->run()V",
-    "score": 0.8856,
+    "score": 0.8807,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -60215,7 +60185,7 @@
     "from": "Ldk3;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Ln63;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9132,
+    "score": 0.9023,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -60225,7 +60195,7 @@
     "from": "Ldk3;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lk83;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9132,
+    "score": 0.9023,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -60235,7 +60205,7 @@
     "from": "Ldk3;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Ls63;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9132,
+    "score": 0.9023,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -60245,7 +60215,7 @@
     "from": "Ldn7;->q(Ldn7;Lbf2;)V",
     "to_version": "2.7.2",
     "to": "Lpq7;->g(Lpq7;Ljava/lang/Object;)V",
-    "score": 0.9007,
+    "score": 0.8956,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -60255,7 +60225,7 @@
     "from": "Ldn7;->q(Ldn7;Lbf2;)V",
     "to_version": "2.7.4",
     "to": "Lgs7;->g(Lgs7;Ljava/lang/Object;)V",
-    "score": 0.9007,
+    "score": 0.8956,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -60265,7 +60235,7 @@
     "from": "Ldn7;->q(Ldn7;Lbf2;)V",
     "to_version": "2.7.5",
     "to": "Lxq7;->g(Lxq7;Ljava/lang/Object;)V",
-    "score": 0.9007,
+    "score": 0.8956,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -60365,7 +60335,7 @@
     "from": "Le53;->a(Landroidx/compose/ui/platform/AndroidComposeView;Lrx4;Ln05;I)V",
     "to_version": "2.7.4",
     "to": "Landroidx/compose/ui/platform/AndroidComposeView;->getSavedStateRegistry()Lg14;",
-    "score": 0.6221,
+    "score": 0.6094,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -60375,7 +60345,7 @@
     "from": "Le53;->a(Landroidx/compose/ui/platform/AndroidComposeView;Lrx4;Ln05;I)V",
     "to_version": "2.7.2",
     "to": "Landroidx/compose/ui/platform/AndroidComposeView;->getSavedStateRegistry()Lgz3;",
-    "score": 0.6213,
+    "score": 0.6085,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -60385,7 +60355,7 @@
     "from": "Le53;->a(Landroidx/compose/ui/platform/AndroidComposeView;Lrx4;Ln05;I)V",
     "to_version": "2.7.5",
     "to": "Landroidx/compose/ui/platform/AndroidComposeView;->getSavedStateRegistry()Lkz3;",
-    "score": 0.6213,
+    "score": 0.6085,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -60665,7 +60635,7 @@
     "from": "Lgm7;->f()Lwmb;",
     "to_version": "2.7.2",
     "to": "Ltp7;->f()Lqsb;",
-    "score": 0.6285,
+    "score": 0.5505,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -60675,7 +60645,7 @@
     "from": "Lgm7;->f()Lwmb;",
     "to_version": "2.7.4",
     "to": "Lkr7;->f()Ldxb;",
-    "score": 0.6285,
+    "score": 0.5505,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -60685,7 +60655,7 @@
     "from": "Lgm7;->f()Lwmb;",
     "to_version": "2.7.5",
     "to": "Lbq7;->f()Lqsb;",
-    "score": 0.6285,
+    "score": 0.5505,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -60695,7 +60665,7 @@
     "from": "Lh0c;->run()V",
     "to_version": "2.7.2",
     "to": "Ld6c;->run()V",
-    "score": 0.9816,
+    "score": 0.9806,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -60705,7 +60675,7 @@
     "from": "Lh0c;->run()V",
     "to_version": "2.7.4",
     "to": "Lrac;->run()V",
-    "score": 0.9816,
+    "score": 0.9806,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -60715,7 +60685,7 @@
     "from": "Lh0c;->run()V",
     "to_version": "2.7.5",
     "to": "Ld6c;->run()V",
-    "score": 0.9816,
+    "score": 0.9806,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -60945,7 +60915,7 @@
     "from": "Lji;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lii;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9086,
+    "score": 0.8975,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -60955,7 +60925,7 @@
     "from": "Lji;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lki;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9086,
+    "score": 0.8975,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -60965,7 +60935,7 @@
     "from": "Lji;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lji;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9085,
+    "score": 0.8973,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -61335,7 +61305,7 @@
     "from": "Lkn7;->b(Ldn7;Lan7;Leg7;Lda;Ldx4;Ldx4;Ldx4;Ldx4;Ln05;I)V",
     "to_version": "2.7.4",
     "to": "Lrcc;->w(Lgs7;Lcs7;Lrl7;Lha;Lp05;Lp05;Lp05;Lp05;Ld15;Ld15;La45;II)V",
-    "score": 0.7421,
+    "score": 0.7387,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -61345,7 +61315,7 @@
     "from": "Lkn7;->b(Ldn7;Lan7;Leg7;Lda;Ldx4;Ldx4;Ldx4;Ldx4;Ln05;I)V",
     "to_version": "2.7.5",
     "to": "Li17;->a(Lxq7;Ltq7;Lfk7;Lga;Lly4;Lly4;Lly4;Lly4;Lzy4;Lzy4;Lv15;II)V",
-    "score": 0.7413,
+    "score": 0.7379,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -61355,7 +61325,7 @@
     "from": "Lkn7;->b(Ldn7;Lan7;Leg7;Lda;Ldx4;Ldx4;Ldx4;Ldx4;Ln05;I)V",
     "to_version": "2.7.2",
     "to": "La17;->b(Lpq7;Llq7;Lyj7;Lfa;Lhy4;Lhy4;Lhy4;Lhy4;Lvy4;Lvy4;Lr15;II)V",
-    "score": 0.7408,
+    "score": 0.7374,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -61485,7 +61455,7 @@
     "from": "Llh6;->g(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lem6;->e(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9096,
+    "score": 0.9026,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -61495,7 +61465,7 @@
     "from": "Llh6;->g(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lmj6;->e(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9092,
+    "score": 0.9021,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -61505,7 +61475,7 @@
     "from": "Llh6;->g(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lsj6;->e(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.9092,
+    "score": 0.9021,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -61665,7 +61635,7 @@
     "from": "Lo5c;->run()V",
     "to_version": "2.7.2",
     "to": "Ljbc;->run()V",
-    "score": 0.9777,
+    "score": 0.9758,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -61675,7 +61645,7 @@
     "from": "Lo5c;->run()V",
     "to_version": "2.7.4",
     "to": "Lzfc;->run()V",
-    "score": 0.9777,
+    "score": 0.9758,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -61685,7 +61655,7 @@
     "from": "Lo5c;->run()V",
     "to_version": "2.7.5",
     "to": "Libc;->run()V",
-    "score": 0.9777,
+    "score": 0.9758,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -61695,7 +61665,7 @@
     "from": "Lo7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lq7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.8109,
+    "score": 0.7982,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -61705,7 +61675,7 @@
     "from": "Lo7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lp7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.8093,
+    "score": 0.7966,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -61715,7 +61685,7 @@
     "from": "Lo7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lq7;->j(Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.8093,
+    "score": 0.7966,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -61905,8 +61875,8 @@
     "from": "Lq7;->a()V",
     "to_version": "2.7.2",
     "to": "Lr7;->a()V",
-    "score": 0.6779,
-    "confidence": "candidate",
+    "score": 0.6892,
+    "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
   {
@@ -61915,8 +61885,8 @@
     "from": "Lq7;->a()V",
     "to_version": "2.7.4",
     "to": "Ls7;->a()V",
-    "score": 0.6779,
-    "confidence": "candidate",
+    "score": 0.6892,
+    "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
   {
@@ -61925,7 +61895,7 @@
     "from": "Lq7;->a()V",
     "to_version": "2.7.5",
     "to": "Ls7;->a()V",
-    "score": 0.5434,
+    "score": 0.5426,
     "confidence": "candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -61965,7 +61935,7 @@
     "from": "Lrd;->t(I)Lj3;",
     "to_version": "2.7.5",
     "to": "Lsd;->C(I)Lm3;",
-    "score": 0.9695,
+    "score": 0.9688,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -61975,7 +61945,7 @@
     "from": "Lrd;->t(I)Lj3;",
     "to_version": "2.7.4",
     "to": "Ltd;->E(I)Lm3;",
-    "score": 0.9693,
+    "score": 0.9686,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -61985,7 +61955,7 @@
     "from": "Lrd;->t(I)Lj3;",
     "to_version": "2.7.2",
     "to": "Lrd;->C(I)Lm3;",
-    "score": 0.9034,
+    "score": 0.9013,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -62085,7 +62055,7 @@
     "from": "Lsx8;->e(Lcl6;Lok6;)V",
     "to_version": "2.7.2",
     "to": "Lc19;->e(Lcn6;Lnm6;)V",
-    "score": 0.8344,
+    "score": 0.8293,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -62095,7 +62065,7 @@
     "from": "Lsx8;->e(Lcl6;Lok6;)V",
     "to_version": "2.7.4",
     "to": "Ls49;->e(Lvp6;Lgp6;)V",
-    "score": 0.8344,
+    "score": 0.8293,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -62105,7 +62075,7 @@
     "from": "Lsx8;->e(Lcl6;Lok6;)V",
     "to_version": "2.7.5",
     "to": "Lj19;->e(Lin6;Ltm6;)V",
-    "score": 0.8344,
+    "score": 0.8293,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -62265,7 +62235,7 @@
     "from": "Luk6;-><init>(I)V",
     "to_version": "2.7.2",
     "to": "Ltm6;-><init>(I)V",
-    "score": 0.9202,
+    "score": 0.9131,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -62275,7 +62245,7 @@
     "from": "Luk6;-><init>(I)V",
     "to_version": "2.7.4",
     "to": "Lmp6;-><init>(I)V",
-    "score": 0.9202,
+    "score": 0.9131,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -62285,7 +62255,7 @@
     "from": "Luk6;-><init>(I)V",
     "to_version": "2.7.5",
     "to": "Lzm6;-><init>(I)V",
-    "score": 0.9202,
+    "score": 0.9131,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -62475,7 +62445,7 @@
     "from": "Lw5;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.4",
     "to": "Lp0;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.8008,
+    "score": 0.7813,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -62485,7 +62455,7 @@
     "from": "Lw5;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.5",
     "to": "Lp0;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.8005,
+    "score": 0.7809,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -62495,7 +62465,7 @@
     "from": "Lw5;->r(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
     "to_version": "2.7.2",
     "to": "Lp0;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "score": 0.8003,
+    "score": 0.7807,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -62535,7 +62505,7 @@
     "from": "Lwd;->e(ILj3;Ljava/lang/String;Landroid/os/Bundle;)V",
     "to_version": "2.7.2",
     "to": "Lvd;->e(ILm3;Ljava/lang/String;Landroid/os/Bundle;)V",
-    "score": 0.8723,
+    "score": 0.8667,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -62545,7 +62515,7 @@
     "from": "Lwd;->e(ILj3;Ljava/lang/String;Landroid/os/Bundle;)V",
     "to_version": "2.7.4",
     "to": "Lxd;->e(ILm3;Ljava/lang/String;Landroid/os/Bundle;)V",
-    "score": 0.8723,
+    "score": 0.8667,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -62555,7 +62525,7 @@
     "from": "Lwd;->e(ILj3;Ljava/lang/String;Landroid/os/Bundle;)V",
     "to_version": "2.7.5",
     "to": "Lwd;->e(ILm3;Ljava/lang/String;Landroid/os/Bundle;)V",
-    "score": 0.8723,
+    "score": 0.8667,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -63395,7 +63365,7 @@
     "from": "Lc9;->run()V",
     "to_version": "2.7.4",
     "to": "Ld9;->run()V",
-    "score": 0.7747,
+    "score": 0.7652,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -63985,7 +63955,7 @@
     "from": "Ldic;->run()V",
     "to_version": "2.7.4",
     "to": "Lfnc;->run()V",
-    "score": 0.886,
+    "score": 0.881,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -65115,7 +65085,7 @@
     "from": "Lr7;->a()V",
     "to_version": "2.7.5",
     "to": "Ls7;->a()V",
-    "score": 0.7022,
+    "score": 0.6899,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -65125,7 +65095,7 @@
     "from": "Lrd;->C(I)Lm3;",
     "to_version": "2.7.5",
     "to": "Lsd;->C(I)Lm3;",
-    "score": 0.9314,
+    "score": 0.9299,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -65135,7 +65105,7 @@
     "from": "Lrd;->C(I)Lm3;",
     "to_version": "2.7.4",
     "to": "Ltd;->E(I)Lm3;",
-    "score": 0.9313,
+    "score": 0.9297,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -66285,7 +66255,7 @@
     "from": "Ld9;->run()V",
     "to_version": "2.7.5",
     "to": "Ld9;->run()V",
-    "score": 0.7747,
+    "score": 0.7652,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -66385,7 +66355,7 @@
     "from": "Lfnc;->run()V",
     "to_version": "2.7.5",
     "to": "Lcic;->run()V",
-    "score": 0.886,
+    "score": 0.881,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
@@ -66965,7 +66935,7 @@
     "from": "Ls7;->a()V",
     "to_version": "2.7.5",
     "to": "Ls7;->a()V",
-    "score": 0.7022,
+    "score": 0.6899,
     "confidence": "strong-candidate",
     "match_policy": "mutual-best-with-margin"
   },
