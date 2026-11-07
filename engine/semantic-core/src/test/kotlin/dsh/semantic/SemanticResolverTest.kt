@@ -42,7 +42,7 @@ class SemanticResolverTest {
         val other = host.copy(dexDigest = "other-dex")
         val result = SemanticResolver().resolve(host, policy, listOf(candidate("a", goodEvidence, other)))
         assertFalse(result.accepted)
-        assertEquals("no-host-matched-candidates", result.rejection)
+        assertEquals("no-well-formed-host-matched-candidates", result.rejection)
     }
 
     @Test fun malformedMethodDescriptorIsRejected() {
