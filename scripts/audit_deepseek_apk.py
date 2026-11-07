@@ -244,7 +244,14 @@ def analyze_register_use_def(body_lines):
     This is local instruction use-def metadata, not reaching-definitions analysis.
     Unknown opcodes are reported and never silently treated as having no uses.
     """
-    register_re=re.compile(r"\b[vp]\d+\b")
+    register_re=re.compile(r"\b([vp])(\d+)\b")
+    def registers_in(text):
+        range_match=re.search(r"\{\s*([vp])(\d+)\s*\.\.\s*([vp])(\d+)\s*\}",text)
+        if range_match and range_match.group(1)==range_match.group(3):
+            prefix,start,end=range_match.group(1),int(range_match.group(2)),int(range_match.group(4))
+            if end>=start and end-start<=255:
+                return [prefix+str(index) for index in range(start,end+1)]
+        return [prefix+number for prefix,number in register_re.findall(text)]
     result=[]; unknown=[]
     read_all_prefixes=("invoke-", "filled-new-array")
     write_first_prefixes=(
@@ -261,7 +268,7 @@ def analyze_register_use_def(body_lines):
         if not match or stripped.startswith((".",":","#")):
             continue
         op=match.group(1)
-        regs=register_re.findall(stripped)
+        regs=registers_in(stripped)
         if not regs:
             continue
         if op.startswith(read_all_prefixes) or op.startswith(read_only_prefixes):
@@ -269,6 +276,9 @@ def analyze_register_use_def(body_lines):
             writes=[]
             if op.startswith("check-cast"):
                 writes=regs[:1]
+        elif "/2addr" in op:
+            reads=regs
+            writes=regs[:1]
         elif op.startswith(write_first_prefixes):
             writes=regs[:1]
             reads=regs[1:]
