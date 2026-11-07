@@ -7,6 +7,7 @@ on:
       - .github/workflows/deepseek-272-static-audit.yml
       - deepseek-2-7-2.apk
       - profiles/deepseek-2.7.2-code289-cn.json
+      - tools/validate_semantic_profile.py
   workflow_dispatch:
 
 permissions:
@@ -298,31 +299,11 @@ jobs:
             python3 -m json.tool "audit/2.7.2/$f" >/dev/null
           done
           python3 -m json.tool profiles/deepseek-2.7.2-code289-cn.json >/dev/null
-          python3 - <<'PY'
-          import json, pathlib
-          root = pathlib.Path("audit/2.7.2")
-          summary = json.loads((root/"summary.json").read_text())
-          classes = json.loads((root/"candidate-class-descriptors.json").read_text())
-          profile = json.loads(pathlib.Path("profiles/deepseek-2.7.2-code289-cn.json").read_text())
-          assert profile["apk"]["sha256"] == summary["sha256"], "profile APK SHA-256 mismatch"
-          def method_set(owner):
-            assert owner in classes, "profile class missing from DEX: " + owner
-            return {m["descriptor"] for m in classes[owner]["methods"]}
-          request = profile["semantic_nodes"]["chat_request_model"]
-          assert all(x in method_set(request["class"]) for x in request["constructors"])
-          dispatch = profile["semantic_nodes"]["transport_dispatch"]
-          owner, method = dispatch["method"].split("->", 1)
-          assert method in method_set(owner)
-          low = profile["semantic_nodes"]["transport_low_level"]
-          owner, method = low["method"].split("->", 1)
-          assert method in method_set(owner)
-          continuation = profile["semantic_nodes"]["async_continuation"]
-          assert all(x in method_set(continuation["class"]) for x in continuation["methods"])
-          result = {"profile_id":profile["profile_id"],"apk_sha256":summary["sha256"],
-                    "validated_classes":4,"status":"validated_against_extracted_dex_descriptors"}
-          (root/"semantic-profile-validation.json").write_text(json.dumps(result,indent=2))
-          print(json.dumps(result,indent=2))
-          PY
+          python3 tools/validate_semantic_profile.py \
+            --profile profiles/deepseek-2.7.2-code289-cn.json \
+            --summary audit/2.7.2/summary.json \
+            --smali-root smali-272 \
+            --output audit/2.7.2/semantic-profile-validation.json
           test -s audit/2.7.2/all-smali.zip
           test -s audit/2.7.2/report.md
           test -s audit/2.7.2/semantic-profile-validation.json
