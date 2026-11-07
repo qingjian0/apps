@@ -237,7 +237,7 @@ class SmaliGraphExtractionTest(unittest.TestCase):
             AUDIT.parameter_registers_for_method("public", "(Ljava/lang/String;J[D)V"),
         )
         self.assertEqual(
-            ["p0", "p1", "p2", "p3"],
+            ["p0", "p1", "p2"],
             AUDIT.parameter_registers_for_method("public static", "(Ljava/lang/String;J)V"),
         )
 
