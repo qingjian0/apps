@@ -212,7 +212,7 @@ class StaticProgramGraph private constructor(
                     callers.getOrPut(to) { mutableSetOf() }.add(from)
                 }
             }
-            val summaryFile = summaryPath?.let(::java.io.File)
+            val summaryFile = summaryPath?.let { java.io.File(it) }
                 ?: java.io.File(methodsPath).parentFile?.resolve("summary.json")
             val valueFlowTruncated = summaryFile?.takeIf { it.isFile }?.let { file ->
                 runCatching {
