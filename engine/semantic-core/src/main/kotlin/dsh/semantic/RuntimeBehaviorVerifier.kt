@@ -23,7 +23,7 @@ class RuntimeBehaviorVerifier {
         observations: List<RuntimeObservation>,
         scenario: BehaviorScenario
     ): SemanticCandidate? {
-        if (candidate.host != observations.firstOrNull()?.host && observations.none { it.host == candidate.host }) return null
+        if (observations.none { it.host == candidate.host }) return null
         val target = observations.filter { it.host == candidate.host && it.scenarioId == scenario.scenarioId }
         val baseline = observations.filter { it.host == candidate.host && it.scenarioId == scenario.baselineScenarioId }
         val targetHits = target.count { it.methodIdentity == candidate.method.stableIdentity }
