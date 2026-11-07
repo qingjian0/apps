@@ -3,6 +3,7 @@ package dsh.semantic
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class FeatureContractTest {
     @Test fun promptContractKeepsMetadataAndDropsUnapprovedFields() {
@@ -23,6 +24,11 @@ class FeatureContractTest {
     @Test fun arbitrarySingleWordCannotMasqueradeAsPromptSource() {
         val contract = DeepSeekFeatureContracts.all.single { it.role.value == "prompt.compose" }
         assertNull(FeatureEventSanitizer().sanitize(contract, mapOf(SafeEventField.SOURCE_LABEL to "Hello")))
+    }
+
+    @Test fun contractsCoverPromptAgentLocalApiAndMultimodalDomains() {
+        val roles = DeepSeekFeatureContracts.all.map { it.role.value }.toSet()
+        assertTrue(roles.containsAll(setOf("prompt.compose", "prompt.instruction.apply", "agent.plan", "agent.tool.dispatch", "agent.result", "tool.registry", "local_api.server", "local_api.request", "local_api.stream", "multimodal.image", "multimodal.audio", "attachment.file")))
     }
 
     @Test fun missingRequiredMetadataRejectsEvent() {
