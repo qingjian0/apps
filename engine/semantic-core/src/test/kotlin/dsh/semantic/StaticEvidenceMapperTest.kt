@@ -53,4 +53,33 @@ class StaticEvidenceMapperTest {
     }
 
 
+    @Test fun genericPromptTokenAloneDoesNotCreateSemanticCandidate() {
+        val host = HostFingerprint("com.deepseek.chat", 289, "2.7.2", "cert", "dex", "loader")
+        val record = StaticMethodRecord(
+            "Lx/y;", "a", "()V", emptyList(), "V", emptyList(), 12,
+            listOf(StaticRoleEvidence("prompt_pipeline", listOf("prompt", "instruction")))
+        )
+        assertTrue(StaticEvidenceMapper().map(host, record).isEmpty())
+    }
+
+    @Test fun coroutineLibraryVocabularyAloneDoesNotCreateStreamRoleCandidate() {
+        val host = HostFingerprint("com.deepseek.chat", 289, "2.7.2", "cert", "dex", "loader")
+        val record = StaticMethodRecord(
+            "Lx/y;", "a", "()V", emptyList(), "V", emptyList(), 12,
+            listOf(StaticRoleEvidence("flow_coroutine", listOf("Continuation", "emit", "collect")))
+        )
+        assertTrue(StaticEvidenceMapper().map(host, record).isEmpty())
+    }
+
+    @Test fun specificPromptSchemaAnchorStillCreatesCandidate() {
+        val host = HostFingerprint("com.deepseek.chat", 289, "2.7.2", "cert", "dex", "loader")
+        val record = StaticMethodRecord(
+            "Lx/y;", "a", "()V", emptyList(), "V", emptyList(), 12,
+            listOf(StaticRoleEvidence("prompt_pipeline", listOf("prompt", "custom_instructions")))
+        )
+        val candidate = StaticEvidenceMapper().map(host, record).single()
+        assertTrue(candidate.evidence.any { it.family == EvidenceFamily.PROTOCOL_ANCHOR && it.key == "custom_instructions" })
+        assertFalse(candidate.evidence.any { it.key == "prompt" })
+    }
+
 }
