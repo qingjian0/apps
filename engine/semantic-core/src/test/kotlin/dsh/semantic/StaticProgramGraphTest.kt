@@ -4,6 +4,7 @@ import java.nio.file.Files
 import java.util.zip.GZIPOutputStream
 import kotlin.test.Test
 import kotlin.test.assertTrue
+import kotlin.test.assertFalse
 
 class StaticProgramGraphTest {
     private fun gzipLines(lines: List<String>): String {
@@ -11,6 +12,13 @@ class StaticProgramGraphTest {
         GZIPOutputStream(Files.newOutputStream(path)).bufferedWriter(Charsets.UTF_8).use { out ->
             lines.forEach { out.appendLine(it) }
         }
+        path.toFile().deleteOnExit()
+        return path.toString()
+    }
+
+    private fun textFile(content: String): String {
+        val path = Files.createTempFile("semantic-graph-summary", ".json")
+        Files.writeString(path, content)
         path.toFile().deleteOnExit()
         return path.toString()
     }
@@ -72,4 +80,42 @@ class StaticProgramGraphTest {
         assertTrue(graph.graphStats()["sharedFields"] == 1)
         assertTrue(graph.graphStats()["classes"] == 3)
     }
+
+    @Test fun interproceduralValueEdgesBecomeDataFlowEvidenceOnlyWhenNotTruncated() {
+        val target = "Lx/Target;->compose(Ljava/lang/String;)Ljava/lang/String;"
+        val caller = "Lx/Caller;->send()V"
+        val methods = gzipLines(listOf(
+            """{"class":"Lx/Target;","name":"compose","descriptor":"(Ljava/lang/String;)Ljava/lang/String;","field_reads":[],"field_writes":[],"roles":[{"role":"prompt_pipeline","anchors":["custom_instructions"]}]}""",
+            """{"class":"Lx/Caller;","name":"send","descriptor":"()V","field_reads":[],"field_writes":[]}"""
+        ))
+        val edges = gzipLines(emptyList())
+        val classes = gzipLines(listOf(
+            """{"descriptor":"Lx/Target;","super":"Ljava/lang/Object;","interfaces":[]}""",
+            """{"descriptor":"Lx/Caller;","super":"Ljava/lang/Object;","interfaces":[]}"""
+        ))
+        val valueEdges = gzipLines(listOf(
+            """{"kind":"argument","from_method":"$caller","from_definition":"d1:v0","to_method":"$target","to_parameter":"entry:p0"}"""
+        ))
+        val completeSummary = textFile("""{"interprocedural_value_flow":{"edges_truncated":false}}""")
+        val host = HostFingerprint("com.deepseek.chat", 300, "future", "cert", "dex-300", "loader")
+        val candidate = SemanticCandidate(
+            RoleId("prompt.compose"),
+            MethodShape("Lx/Target;", "compose", "(Ljava/lang/String;)Ljava/lang/String;",
+                listOf("Ljava/lang/String;"), "Ljava/lang/String;"),
+            host,
+            listOf(Evidence(EvidenceFamily.PROTOCOL_ANCHOR, "custom_instructions", 0.9))
+        )
+        val graph = StaticProgramGraph.load(methods, edges, classes, valueEdges, completeSummary)
+        val enriched = graph.enrich(candidate)
+        val flowEvidence = enriched.evidence.single { it.family == EvidenceFamily.DATA_FLOW }
+        assertTrue(flowEvidence.key.contains("interprocedural-argument-edges=1"))
+        assertTrue(graph.graphStats()["interproceduralArgumentEdges"] == 1)
+
+        val truncatedSummary = textFile("""{"interprocedural_value_flow":{"edges_truncated":true}}""")
+        val truncatedGraph = StaticProgramGraph.load(methods, edges, classes, valueEdges, truncatedSummary)
+        val truncated = truncatedGraph.enrich(candidate)
+        assertFalse(truncated.evidence.any { it.family == EvidenceFamily.DATA_FLOW })
+        assertTrue(truncatedGraph.graphStats()["interproceduralArgumentEdges"] == 0)
+    }
+
 }
