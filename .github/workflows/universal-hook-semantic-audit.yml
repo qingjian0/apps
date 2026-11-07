@@ -1,0 +1,41 @@
+name: Universal Hook Static Analysis
+
+on:
+  push:
+    branches:
+      - work/deepseek-universal-hook-audit
+    paths:
+      - scripts/audit_deepseek_apk.py
+      - tests/test_audit_smali_graph.py
+      - docs/universal-hook/ENGINE-ARCHITECTURE.md
+      - .github/workflows/universal-hook-semantic-audit.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - scripts/audit_deepseek_apk.py
+      - tests/test_audit_smali_graph.py
+      - docs/universal-hook/ENGINE-ARCHITECTURE.md
+      - .github/workflows/universal-hook-semantic-audit.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: universal-hook-static-analysis
+  cancel-in-progress: true
+
+jobs:
+  python-static-analysis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile audit pipeline
+        run: python -m py_compile scripts/audit_deepseek_apk.py
+      - name: Run Smali and semantic graph unit tests
+        run: python -m unittest discover -s tests -p "test_audit_smali_graph.py" -v
