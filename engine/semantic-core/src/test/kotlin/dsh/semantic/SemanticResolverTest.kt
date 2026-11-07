@@ -1,0 +1,81 @@
+package dsh.semantic
+
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
+
+class SemanticResolverTest {
+    private val host = HostFingerprint("com.deepseek.chat", 289, "2.7.2", "cert", "dex-sha", "loader-1")
+    private val role = RoleId("prompt.compose")
+    private val policy = RolePolicy(role, minimumEvidenceFamilies = 3, minimumScore = 2.0, minimumWinnerMargin = 0.3)
+    private fun candidate(name: String, evidence: List<Evidence>, hostOverride: HostFingerprint = host) = SemanticCandidate(
+        role, MethodShape("Lx/y;", name, "()V", emptyList(), "V"), hostOverride, evidence
+    )
+    private val goodEvidence = listOf(
+        Evidence(EvidenceFamily.PROTOCOL_ANCHOR, "prompt-template-schema", 0.9),
+        Evidence(EvidenceFamily.TYPE_SHAPE, "prompt-dto-input", 0.8),
+        Evidence(EvidenceFamily.DATA_FLOW, "dto-to-request-field", 0.9)
+    )
+
+    @Test fun resolvesRenamedMethodFromIndependentEvidence() {
+        val result = SemanticResolver().resolve(host, policy, listOf(candidate("a", goodEvidence)))
+        assertTrue(result.accepted)
+        assertEquals("a", result.selected?.method?.name)
+    }
+
+    @Test fun repeatedSameFamilyEvidenceCannotFakeDiversity() {
+        val repeated = List(10) { Evidence(EvidenceFamily.PROTOCOL_ANCHOR, "marker-$it", 1.0) }
+        val result = SemanticResolver().resolve(host, policy, listOf(candidate("a", repeated)))
+        assertFalse(result.accepted)
+        assertEquals("insufficient-independent-evidence", result.rejection)
+    }
+
+    @Test fun ambiguousCandidatesFailClosed() {
+        val result = SemanticResolver().resolve(host, policy, listOf(candidate("a", goodEvidence), candidate("b", goodEvidence)))
+        assertFalse(result.accepted)
+        assertEquals("ambiguous-candidates", result.rejection)
+    }
+
+    @Test fun candidateFromDifferentHostIsIgnored() {
+        val other = host.copy(dexDigest = "other-dex")
+        val result = SemanticResolver().resolve(host, policy, listOf(candidate("a", goodEvidence, other)))
+        assertFalse(result.accepted)
+        assertEquals("no-host-matched-candidates", result.rejection)
+    }
+
+    @Test fun nonDeepSeekHostIsRejected() {
+        val untrusted = host.copy(packageName = "example.other")
+        val result = SemanticResolver().resolve(untrusted, policy, listOf(candidate("a", goodEvidence)))
+        assertFalse(result.accepted)
+        assertEquals("untrusted-or-incomplete-host", result.rejection)
+    }
+
+    @Test fun forbiddenNegativeEvidenceRejectsCandidate() {
+        val candidate = candidate("a", goodEvidence).copy(negativeEvidence = setOf("ui-click-handler"))
+        val guarded = policy.copy(forbiddenNegativeEvidence = setOf("ui-click-handler"))
+        val result = SemanticResolver().resolve(host, guarded, listOf(candidate))
+        assertFalse(result.accepted)
+        assertTrue(result.rejection!!.startsWith("forbidden-negative-evidence"))
+    }
+
+    @Test fun coordinatorIsIdempotentAndRoleIsolated() {
+        var installs = 0
+        val backend = object : HookBackend {
+            override fun install(method: MethodShape, role: RoleId): HookHandle {
+                installs++
+                return object : HookHandle { override fun uninstall() {} }
+            }
+        }
+        val resolver = SemanticResolver()
+        val resolution = resolver.resolve(host, policy, listOf(candidate("a", goodEvidence)))
+        val coordinator = HookCoordinator(backend)
+        assertEquals(InstallStatus.INSTALLED, coordinator.install(host, policy, resolution).status)
+        assertEquals(InstallStatus.ALREADY_INSTALLED, coordinator.install(host, policy, resolution).status)
+        assertEquals(1, installs)
+        assertEquals(1, coordinator.installedCount())
+        assertEquals(emptyList(), coordinator.uninstallAll())
+        assertEquals(0, coordinator.installedCount())
+    }
+}
