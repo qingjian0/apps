@@ -92,23 +92,45 @@ jobs:
                            decl.group(2).strip() if decl else "", hits, methods, fields, constants))
           rows.sort(key=lambda x: (-x[0], x[1]))
           first_party = []
-          method_sig = re.compile(r"\s*(?!(?:return|throw|new|if|for|while|switch|catch|assert)\b)(?:(?:public|protected|private|static|final|synchronized|native|abstract|strictfp)\s+)*([\w.$<>?, \[\]]+)\s+([\w$]+)\s*\(([^)]*)\)")
-          field_sig = re.compile(r"\s*(?:(?:public|protected|private|static|final|volatile|transient)\s+)*([\w.$<>?, \[\]]+)\s+([\w$]+)\s*(?:=|;)")
+          method_sig = re.compile(r"(?m)^\s*(?!(?:return|throw|new|if|for|while|switch|catch|else|do|try|assert)\b)(?:(?:public|protected|private|static|final|synchronized|native|abstract|strictfp)\s+)*([\w.$<>?, \[\]]+)\s+([\w$]+)\s*\(([^)]*)\)")
+          field_sig = re.compile(r"(?m)^\s*(?:(?:public|protected|private|static|final|volatile|transient)\s+)*([\w.$<>?, \[\]]+)\s+([\w$]+)\s*(?:=[^;]*|;)\s*$")
+          class_sig = re.compile(r"(?m)^\s*(?:(?:public|protected|private|abstract|final|static|synchronized)\s+)*(?:class|interface|enum|record|@interface)\s+([\w$]+)([^\n{]*)")
           for path in java_files:
               rel = str(path.relative_to(root))
               if not (rel.startswith("defpackage/") or rel.startswith("com/deepseek/")): continue
               try: data = path.read_text(encoding="utf-8", errors="replace")
               except Exception: continue
-              decl = re.search(r"(?m)^\s*(?:(?:public|protected|private|abstract|final|static|synchronized)\s+)*(?:class|interface|enum|record)\s+([\w$]+)([^\n{]*)", data)
+              decl = class_sig.search(data)
               package = re.search(r"(?m)^package\s+([\w.]+)\s*;", data)
               methods, fields = [], []
+              depth = 0
+              in_block_comment = False
               for line in data.splitlines():
-                  m = method_sig.match(line)
-                  if m and len(methods) < 100:
-                      methods.append(m.group(2) + "(" + re.sub(r"\s+", " ", m.group(3)).strip() + "):" + m.group(1).strip())
-                  f = field_sig.match(line)
-                  if f and len(fields) < 100:
-                      fields.append(f.group(2) + ":" + f.group(1).strip())
+                  if depth == 1:
+                      m = method_sig.match(line)
+                      if m and len(methods) < 100:
+                          methods.append(m.group(2) + "(" + re.sub(r"\s+", " ", m.group(3)).strip() + "):" + m.group(1).strip())
+                      f = field_sig.match(line)
+                      if f and len(fields) < 100:
+                          fields.append(f.group(2) + ":" + f.group(1).strip())
+                  scan = line
+                  if in_block_comment:
+                      if "*/" in scan:
+                          scan = scan.split("*/", 1)[1]
+                          in_block_comment = False
+                      else:
+                          scan = ""
+                  while "/*" in scan:
+                      left, right = scan.split("/*", 1)
+                      if "*/" in right:
+                          scan = left + right.split("*/", 1)[1]
+                      else:
+                          scan = left
+                          in_block_comment = True
+                          break
+                  scan = re.sub(r'"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'', "", scan)
+                  scan = scan.split("//", 1)[0]
+                  depth += scan.count("{") - scan.count("}")
               first_party.append({
                   "path": rel, "package": package.group(1) if package else "",
                   "class": decl.group(1) if decl else path.stem,
@@ -120,24 +142,60 @@ jobs:
               "ServerChatChallenge", "ChallengeResponse", "X-DS-Challenge-Response",
               "X-DS-PoW-Response", "/api/v0/chat/create_pow_challenge",
               "/api/v0/chat/stop_stream", "/api/v0/chat/history_messages",
-              "text/event-stream", "chat.deepseek.com", "allow_parallel_streams",
-              "pow_prefetch",
+              "/api/v0/chat/completion", "/api/v0/chat/regenerate",
+              "/api/v0/chat/resume_stream", "/api/v0/chat/continue",
+              "/api/v0/chat/edit_message", "/api/v0/call/start",
+              "text/event-stream", "ServerSentEvent", "EventSource",
+              "WebSocketSession", "WebSockets", "ByteReadChannel", "readUTF8Line",
+              "sse_auto_scroll_one_screen_v2", "allow_parallel_streams",
+              "pow_prefetch", "pow_prefetch_count",
+              "tool_calls", "function_call", "tool_choice", "tool_result",
+              "ToolCall", "ToolResult", "ToolExecutor", "AgentTool",
+              "kotlinx.serialization", "KSerializer", "SerialDescriptor",
+              "ContentNegotiation", "encodeToString", "decodeFromString",
+              "ly1", "zn3", "jw3", "y60", "qj3", "mr2", "jr2", "mw1",
+              "chat_session_id", "parent_message_id", "thinking_enabled",
+              "search_enabled", "preempt", "target_path",
           ]
           xrefs = {term: [] for term in xref_terms}
-          method_pattern = re.compile(r"(?m)^\s*(?!(?:return|throw|new|if|for|while|switch|catch|assert)\b)(?:(?:public|protected|private|static|final|synchronized|native|abstract|strictfp)\s+)*([\w.$<>?, \[\]]+)\s+([\w$]+)\s*\(")
           for path in java_files:
               try: data = path.read_text(encoding="utf-8", errors="replace")
               except Exception: continue
-              for term in xref_terms:
-                  if term not in data: continue
-                  for match in re.finditer(re.escape(term), data):
-                      before = data[:match.start()]
-                      declarations = list(method_pattern.finditer(before))
-                      method_name = declarations[-1].group(2) if declarations else "<class-or-field>"
-                      rel = str(path.relative_to(root))
-                      entry = {"path": rel, "method": method_name}
-                      if entry not in xrefs[term] and len(xrefs[term]) < 80:
-                          xrefs[term].append(entry)
+              rel = str(path.relative_to(root))
+              depth = 0
+              current_method = None
+              in_block_comment = False
+              for line in data.splitlines():
+                  if depth == 1:
+                      m = method_sig.match(line)
+                      if m:
+                          current_method = m.group(2)
+                  for term in xref_terms:
+                      if term in line:
+                          entry = {"path": rel, "method": current_method or "<class-or-initializer>"}
+                          if entry not in xrefs[term] and len(xrefs[term]) < 120:
+                              xrefs[term].append(entry)
+                  scan = line
+                  if in_block_comment:
+                      if "*/" in scan:
+                          scan = scan.split("*/", 1)[1]
+                          in_block_comment = False
+                      else:
+                          scan = ""
+                  while "/*" in scan:
+                      left, right = scan.split("/*", 1)
+                      if "*/" in right:
+                          scan = left + right.split("*/", 1)[1]
+                      else:
+                          scan = left
+                          in_block_comment = True
+                          break
+                  scan = re.sub(r'"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'', "", scan)
+                  scan = scan.split("//", 1)[0]
+                  old_depth = depth
+                  depth += scan.count("{") - scan.count("}")
+                  if old_depth >= 2 and depth < 2:
+                      current_method = None
           with zipfile.ZipFile(apk) as z:
               dex = [(i.filename, i.file_size) for i in z.infolist() if re.fullmatch(r"classes[0-9]*\.dex", i.filename)]
           stdout = pathlib.Path("audit/jadx.stdout.log").read_text(errors="replace").splitlines()
@@ -212,12 +270,40 @@ jobs:
           fields = sum(len(x.get("fields", [])) for x in classes)
           sha = pathlib.Path("apk.sha256").read_text().split()[0]
           jadx_exit = pathlib.Path("audit/jadx.exit-code").read_text().strip()
+          import hashlib, subprocess, tempfile, re, shutil
+          native_zip = out / "native-libraries.zip"
+          native_lines = ["# Native library inventory", ""]
+          native_count = 0
+          with zipfile.ZipFile("DeepSeek_2.7.5.apk") as apk_zip:
+              native_entries = [i for i in apk_zip.infolist() if i.filename.startswith("lib/") and i.filename.endswith(".so")]
+              with zipfile.ZipFile(native_zip, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as nz:
+                  for info in native_entries:
+                      data = apk_zip.read(info.filename)
+                      nz.writestr(info.filename, data)
+                      native_count += 1
+                      native_lines += [f"## {info.filename}", f"- Bytes: {len(data):,}", f"- SHA-256: {hashlib.sha256(data).hexdigest()}"]
+                      with tempfile.NamedTemporaryFile() as tmp:
+                          tmp.write(data); tmp.flush()
+                          if shutil.which("readelf"):
+                              eh = subprocess.run(["readelf", "-h", tmp.name], capture_output=True, text=True).stdout
+                              for key in ("Class:", "Data:", "Machine:"):
+                                  hit = next((x.strip() for x in eh.splitlines() if key in x), None)
+                                  if hit: native_lines.append(f"- {hit}")
+                              syms = subprocess.run(["readelf", "-Ws", tmp.name], capture_output=True, text=True).stdout
+                          else:
+                              syms = ""
+                          strings_out = subprocess.run(["strings", "-a", tmp.name], capture_output=True, text=True).stdout if shutil.which("strings") else ""
+                          relevant = [x.strip() for x in (syms + "\n" + strings_out).splitlines() if re.search(r"pow|deepseek|hash|challenge|jni|crypto|sha|blake|signature", x, re.I)]
+                          native_lines += [f"- Relevant symbol/string: {x[:220]}" for x in relevant[:30]]
+                      native_lines.append("")
+          (out / "native-library-index.md").write_text("\n".join(native_lines) + "\n", encoding="utf-8")
           summary = {
               "apk_sha256": sha, "jadx_exit_code": int(jadx_exit),
               "candidate_classes": len(candidates), "first_party_classes": len(classes),
               "indexed_methods": methods, "indexed_fields": fields,
               "cross_reference_terms": len(xrefs), "archived_source_files": count,
-              "source_archive_bytes": source_zip.stat().st_size
+              "source_archive_bytes": source_zip.stat().st_size,
+              "native_library_count": native_count, "native_archive_bytes": native_zip.stat().st_size
           }
           (out / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
           quality = [
@@ -235,7 +321,8 @@ jobs:
               "- Candidate ranking is keyword-based navigation, not a semantic classifier.",
               "- String/symbol cross-references do not prove a runtime call path or execution order.",
               "- JADX can emit source while returning a non-zero status; all affected classes must be checked against DEX where decompilation is incomplete.",
-              "- The signature index is a line-oriented parser; inspect archived Java source for overloads, multiline declarations, synthetic bridges, and Kotlin-generated methods.",
+              "- The signature index is line-oriented and brace-depth scoped; inspect archived Java source for overloads, multiline declarations, synthetic bridges, and Kotlin-generated methods.",
+              "- Native library symbols/strings are reconnaissance only; they do not replace disassembly or JNI control-flow analysis.",
               "- No endpoint, PoW, stream, or Agent semantics should be claimed from keyword matches alone."
           ]
           (out / "index-quality.md").write_text("\n".join(quality) + "\n", encoding="utf-8")
@@ -253,6 +340,8 @@ jobs:
             audit/summary.json
             audit/index-quality.md
             audit/decompiled-first-party.zip
+            audit/native-libraries.zip
+            audit/native-library-index.md
             audit/jadx.exit-code
             audit/jadx.stderr.log
             apk.sha256
