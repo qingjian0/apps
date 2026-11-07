@@ -21,7 +21,7 @@ class StaticEvidenceMapper {
         "flow_coroutine" to "stream.flow", "serialization" to "serializer.model",
         "agent_tool" to "agent.result", "session" to "conversation.session",
         "prompt_pipeline" to "prompt.compose", "agent_planning" to "agent.plan",
-        "tool_registry_execution" to "tool.registry", "local_api_gateway" to "local_api.request",
+        "tool_registry_execution" to "tool.registry",
         "multimodal_image" to "multimodal.image", "multimodal_audio" to "multimodal.audio",
         "attachment_file" to "attachment.file", "search_web" to "search.query",
         "storage_sync" to "storage.preference", "account_capability" to "account.capability",
