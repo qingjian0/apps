@@ -26,11 +26,11 @@ class StaticEvidenceMapperTest {
         val host = HostFingerprint("com.deepseek.chat", 301, "future", "cert", "dex-new", "loader-new")
         val record = StaticMethodRecord(
             "Lq/a;", "m", "()V", emptyList(), "V", emptyList(), 8,
-            listOf(StaticRoleEvidence("prompt_pipeline", listOf("custom_instructions", "prompt")))
+            listOf(StaticRoleEvidence("prompt_pipeline", listOf("custom_instructions", "system_prompt")))
         )
-        val candidate = StaticEvidenceMapper().map(host, record, mapOf("custom_instructions" to 1, "prompt" to 400)).single()
+        val candidate = StaticEvidenceMapper().map(host, record, mapOf("custom_instructions" to 1, "system_prompt" to 400)).single()
         val weights = candidate.evidence.filter { it.family == EvidenceFamily.PROTOCOL_ANCHOR }.associate { it.key to it.weight }
-        assertTrue(weights.getValue("custom_instructions") > weights.getValue("prompt"))
+        assertTrue(weights.getValue("custom_instructions") > weights.getValue("system_prompt"))
     }
     @Test fun moduleOwnedLocalApiGatewayIsNotResolvedFromHostApk() {
         val host = HostFingerprint("com.deepseek.chat", null, "2.7.3", null, "dex", "static-audit")
