@@ -32,6 +32,27 @@ data class RolePolicy(
     val forbiddenNegativeEvidence: Set<String> = setOf("framework-owner", "third-party-sdk-owner")
 ) {
     init { require(minimumEvidenceFamilies >= 1); require(minimumScore >= 0.0); require(minimumWinnerMargin >= 0.0) }
+
+    companion object {
+        fun forRole(role: RoleId): RolePolicy {
+            val core = setOf(EvidenceFamily.PROTOCOL_ANCHOR, EvidenceFamily.CALL_GRAPH, EvidenceFamily.TYPE_SHAPE)
+            val additional = when (role.value) {
+                "prompt.compose", "agent.plan", "agent.result", "tool.registry", "conversation.session",
+                "storage.preference", "search.query", "multimodal.image", "multimodal.audio",
+                "attachment.file", "account.capability", "settings.toggle" -> setOf(EvidenceFamily.DATA_FLOW)
+                "network.route", "stream.flow" -> setOf(EvidenceFamily.FRAMEWORK_INTERACTION)
+                "sse.parse", "sse.dispatch", "network.pow" -> setOf(EvidenceFamily.CONTROL_FLOW)
+                else -> emptySet()
+            }
+            return RolePolicy(
+                role = role,
+                minimumEvidenceFamilies = 4,
+                minimumScore = 2.0,
+                minimumWinnerMargin = 0.5,
+                requiredFamilies = core + additional
+            )
+        }
+    }
 }
 
 data class Resolution(val role: RoleId, val selected: SemanticCandidate?, val score: Double, val runnerUpScore: Double, val evidenceFamilies: Set<EvidenceFamily>, val rejection: String? = null) {
