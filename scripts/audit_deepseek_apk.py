@@ -1002,7 +1002,7 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4):
         if expand and linear_safe:
             for nested_site in sorted(method.get("invoke_sites",[]),key=lambda x:x["instruction"]):
                 nested_parsed=parse_method_descriptor(nested_site.get("descriptor",""))
-                if (not nested_parsed or not nested_parsed["return_type"].startswith(("L","["])
+                if (not nested_parsed or not nested_parsed["return_type"].startswith(("L","["))
                         or not nested_site.get("result_register")
                         or nested_site.get("result_instruction") is None):
                     continue
