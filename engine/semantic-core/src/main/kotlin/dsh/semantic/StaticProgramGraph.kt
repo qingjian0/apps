@@ -41,6 +41,10 @@ class StaticProgramGraph private constructor(
     private val interproceduralNeighbors: Map<String, Set<String>>,
     private val contextualReceiverCount: Int,
     private val singletonContextReceiverCount: Int,
+    private val pointsToExpectedReceiverCount: Int,
+    private val pointsToExpectedSingletonReceiverCount: Int,
+    private val pointsToLoadedRecordCount: Int,
+    private val pointsToCountsMatch: Boolean,
     private val interproceduralPointsToLoaded: Boolean,
     private val valueFlowExpectedEdgeCount: Int,
     private val valueFlowStoredEdgeCount: Int,
@@ -144,6 +148,10 @@ class StaticProgramGraph private constructor(
         "interproceduralValueFlowMethods" to interproceduralNeighbors.size,
         "interproceduralContextualReceivers" to contextualReceiverCount,
         "interproceduralSingletonContextReceivers" to singletonContextReceiverCount,
+        "interproceduralPointsToExpectedReceivers" to pointsToExpectedReceiverCount,
+        "interproceduralPointsToExpectedSingletonReceivers" to pointsToExpectedSingletonReceiverCount,
+        "interproceduralPointsToLoadedRecords" to pointsToLoadedRecordCount,
+        "interproceduralPointsToCountsMatch" to if (pointsToCountsMatch) 1 else 0,
         "interproceduralPointsToLoaded" to if (interproceduralPointsToLoaded) 1 else 0,
         "interproceduralValueFlowExpectedEdges" to valueFlowExpectedEdgeCount,
         "interproceduralValueFlowStoredEdges" to valueFlowStoredEdgeCount,
@@ -282,8 +290,14 @@ class StaticProgramGraph private constructor(
                 valueFlowSkippedMissingMethods == 0
             var contextualReceiverCount = 0
             var singletonContextReceiverCount = 0
+            var pointsToLoadedRecordCount = 0
+            var pointsToCountsMatch = false
             var interproceduralPointsToLoaded = false
             val pointsToSummary = summaryObject?.get("interprocedural_points_to")?.jsonObject
+            val pointsToExpectedReceiverCount = pointsToSummary?.get("contextual_receiver_count")
+                ?.jsonPrimitive?.intOrNull ?: 0
+            val pointsToExpectedSingletonReceiverCount = pointsToSummary?.get("singleton_context_receiver_count")
+                ?.jsonPrimitive?.intOrNull ?: 0
             val pointsToSummaryComplete = pointsToSummary?.let { summary ->
                 summary["records_truncated"]?.jsonPrimitive?.contentOrNull?.toBooleanStrictOrNull() == false &&
                     summary["context_expansion_complete"]?.jsonPrimitive?.contentOrNull?.toBooleanStrictOrNull() == true &&
@@ -321,14 +335,21 @@ class StaticProgramGraph private constructor(
                 loaded.onSuccess { counts ->
                     contextualReceiverCount = counts.first
                     singletonContextReceiverCount = counts.second
-                    interproceduralPointsToLoaded = true
+                    pointsToLoadedRecordCount = counts.first
+                    pointsToCountsMatch = counts.first == pointsToExpectedReceiverCount &&
+                        counts.second == pointsToExpectedSingletonReceiverCount
+                    // A summary can claim completeness while its companion JSONL is stale,
+                    // truncated, or mismatched. Never load it as complete unless row counts agree.
+                    interproceduralPointsToLoaded = pointsToCountsMatch
                 }
             }
             val methodCountsByOwner = methods.keys.groupingBy { it.substringBefore("->") }.eachCount()
             return StaticProgramGraph(
                 callers, callees, readers, writers, methods, methodAnchors,
                 interproceduralArgumentEdges, interproceduralReturnEdges, interproceduralNeighbors,
-                contextualReceiverCount, singletonContextReceiverCount, interproceduralPointsToLoaded,
+                contextualReceiverCount, singletonContextReceiverCount,
+                pointsToExpectedReceiverCount, pointsToExpectedSingletonReceiverCount,
+                pointsToLoadedRecordCount, pointsToCountsMatch, interproceduralPointsToLoaded,
                 valueFlowExpectedEdgeCount, valueFlowStoredEdgeCount, valueFlowLoadedEdgeCount,
                 valueFlowSkippedMissingMethods, valueFlowFilePresent, valueFlowComplete,
                 methodCountsByOwner, classes, subclasses, implementors
