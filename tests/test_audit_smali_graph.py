@@ -568,6 +568,7 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         caller = method("Lx/Caller;", "run", "()V", [
             "    invoke-static {}, Lx/Factory;->make()Lx/Thing;",
             "    move-result-object v0",
+            "    iget-object v2, v0, Lx/Thing;->value:Ljava/lang/Object;",
             "    invoke-static {v0}, Lx/Sink;->consume(Lx/Thing;)V",
             "    return-void",
         ])
@@ -592,6 +593,13 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         )
         self.assertEqual("singleton", factory_call["return_value"]["identity_status"])
         self.assertEqual(1, graph["summary"]["return_identity_propagations"])
+        direct_receiver = next(
+            row for row in graph["contextual_receivers"]
+            if row["callee"] == "Lx/Caller;->run()V"
+            and row["field"] == "Lx/Thing;->value:Ljava/lang/Object;"
+        )
+        self.assertEqual("singleton", direct_receiver["identity_status"])
+        self.assertEqual(receiver["identity"], direct_receiver["identity"])
 
     def test_interprocedural_points_to_propagates_returned_formal_identity(self):
         def method(owner, name, descriptor, body):
