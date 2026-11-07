@@ -28,13 +28,17 @@ class StaticEvidenceMapper {
         "ui_settings" to "settings.toggle"
     )
 
-    fun map(host: HostFingerprint, record: StaticMethodRecord): List<SemanticCandidate> {
+    fun map(host: HostFingerprint, record: StaticMethodRecord, anchorFrequency: Map<String, Int> = emptyMap()): List<SemanticCandidate> {
         val method = MethodShape(record.ownerDescriptor, record.methodName, record.descriptor,
             record.parameterTypes, record.returnType, record.isStatic)
         return record.roles.mapNotNull { roleEvidence ->
             val roleName = roleAliases[roleEvidence.roleLabel] ?: return@mapNotNull null
             val evidence = buildList {
-                roleEvidence.anchors.distinct().forEach { add(Evidence(EvidenceFamily.PROTOCOL_ANCHOR, it, 0.9)) }
+                roleEvidence.anchors.distinct().forEach { anchor ->
+                    val frequency = anchorFrequency[anchor] ?: 1
+                    val specificity = (0.35 + 0.65 / kotlin.math.sqrt(frequency.toDouble().coerceAtLeast(1.0))).coerceIn(0.35, 1.0)
+                    add(Evidence(EvidenceFamily.PROTOCOL_ANCHOR, anchor, specificity))
+                }
                 if (record.descriptor.isNotBlank() && record.returnType.isNotBlank())
                     add(Evidence(EvidenceFamily.TYPE_SHAPE, "arity=" + record.parameterTypes.size + ";return=" + record.returnType, 0.65))
                 if (record.invokes.isNotEmpty()) add(Evidence(EvidenceFamily.CALL_GRAPH, "outgoing-call-count=" + record.invokes.size, 0.55))
