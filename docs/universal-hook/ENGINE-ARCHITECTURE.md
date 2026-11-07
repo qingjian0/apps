@@ -341,3 +341,18 @@ The next implementation step is to add parameter/return edges between methods an
 StaticProgramGraph / StaticAuditCli 已接入同目录的 interprocedural-value-edges.jsonl.gz，并读取 summary.json 的 edges_truncated 状态。只有 summary 明确确认值边文件未截断时才加载；旧审计目录缺少该索引或摘要时不会补造 DATA_FLOW 证据。
 
 **重要修正：** 同一字段描述符的跨方法读写共现不再单独生成 DATA_FLOW 证据。由于尚无 receiver points-to/alias 证明，它只保留为诊断统计。DATA_FLOW 现在必须来自已解析的参数边或返回值边；字段槽共现不能满足 RolePolicy 的 DATA_FLOW 要求。新增 Kotlin 回归覆盖未截断值边可产生证据、截断值边不产生证据，以及字段槽共现单独不足以产生 DATA_FLOW。
+
+
+### Conservative object points-to / receiver identity
+
+The static audit now includes an intraprocedural, CFG-sensitive points-to pass. Its
+initial supported sources are reference-typed method parameters, the instance receiver,
+`new-instance` allocation sites, and `move-object` copies. Unsupported object-producing
+operations (including object field loads and object method results) become unknown rather
+than inheriting a guessed identity. A field receiver is eligible for same-instance evidence
+only when its points-to set is a singleton and is not marked unknown. Repeated accesses
+to the same field through that same abstract identity are grouped as confirmed same-instance
+within the analyzed method. This is not a global alias/no-alias proof: distinct parameter
+tokens may still denote the same runtime object, and interprocedural parameter/return
+propagation is not yet implemented. Incomplete CFGs and non-convergent analysis fail closed.
+
