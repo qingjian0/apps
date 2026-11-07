@@ -371,3 +371,16 @@ and non-convergent analysis fail closed.
 验证：Universal Hook Static Analysis Run `42373677093` 已成功，Python 单元测试 `36/36` 通过（含新增异常边用例）。Semantic Core CI Run `42373677128` 当时仍在运行，完成状态需以 GitHub Actions 最终结果为准。
 
 边界：该修复仍是单方法激活范围的 Points-to；尚未把 caller 的实际对象身份跨 invoke 传播到 callee 的 receiver/formal 参数，也未解决反射、动态 dispatch、数组元素、JNI/Native 对象来源及协程恢复。任何不完整 CFG、未知对象来源或多重 points-to 集合均不得生成 singleton receiver 证据。
+
+
+## 2026-11-07 跨方法 Receiver 身份投影（one-callsite context）
+
+在既有 exact owner/name/full-descriptor 参数边与单方法 Points-to 之上，新增调用点对象实参快照与跨方法 Receiver 投影：
+
+- 单方法 Points-to 在每个 invoke 指令执行前记录引用类型 receiver/argument 的寄存器、formal p-register、points-to 集合、unknown 状态和参数 word 对齐状态。
+- 新增 `build_interprocedural_points_to_graph`，只解析唯一 exact owner + name + full descriptor 目标，并优先采用同 component 唯一定义。
+- 对 callee 的 field receiver，如果其 singleton 身份来自 callee formal parameter，则用该调用点 caller actual 的 points-to 身份替换；callee 内部 allocation identity 会加上 callsite context，避免把不同调用激活中的同一静态 allocation site 误当成同一运行时对象。
+- 输出 `interprocedural-points-to.jsonl.gz` 与 `summary.json.interprocedural_points_to`，用于后续 Kotlin Semantic Core 消费与审计。
+- caller/callee Points-to 不完整、调用点清单截断、参数 word 对齐失败、目标缺失或歧义时，不生成可用于 Receiver 的上下文事实；unknown/multiple 不会升级为 singleton。
+
+**严格边界：** 当前是 one-callsite-context 的直接投影，不是递归/全程序 Points-to 固定点；不传播跨多层调用链的上下文，不处理对象返回值的跨调用 Points-to、反射/动态 dispatch、JNI/Native、数组元素和协程恢复。输出的 singleton 仅表示静态证据在该调用点上下文内唯一，不表示 ART 运行时身份已验证，也不授权 Hook。后续需增加多调用点隔离、递归/循环调用收敛、返回值身份传播、Kotlin 消费门槛和五版本真实 APK 回归。
