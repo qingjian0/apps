@@ -14,40 +14,40 @@
 
 ## 组件身份核对
 
-| 版本 | 组件 | 包名 | versionCode | versionName | split | APK SHA-256 |
+| 版本 | 组件 | 包名 | versionCode | versionName | split | 身份完整度 | APK SHA-256 |
 |---|---|---|---|---|---|---|
-| 2.7.1 | deepseek271.apk |  |  |  |  | `86e77d419fed957dde8857a14d2f5340499ea40549f10cc3180c596e3f77efc8` |
-| 2.7.2 | deepseek-2-7-2.apk |  |  |  |  | `3c2fe31c73575400b9d59e46dde05daa2ef06491498ebfef658801e99eca1aff` |
-| 2.7.3 | deepseek 273.apk |  |  |  |  | `a6d025c14c98118a5a67849e04aaef6f3c9c13aaf0fa62caaee0e47091374ea3` |
-| 2.7.4 | component-0-base.apk |  |  |  |  | `2e898602374ed75f53d8e4c162fa625f5f4e1793b16fbd567f6dd02f6277a709` |
-| 2.7.4 | component-1-split_config.ar.apk |  |  |  |  | `293fe0329d975432a39887a08166d5d81d0dc7423360f2b73bc2d1842e6180ed` |
-| 2.7.4 | component-2-split_config.arm64_v8a.apk |  |  |  |  | `482af60defab32a280810bcbdb2a96d9505cb3214eab0d2c46b41d6a34bee03c` |
-| 2.7.4 | component-3-split_config.de.apk |  |  |  |  | `02be66ae9c5911d788c19b1ac2c0ed2bd5f94076d53bd1bcbd99f22f9f0983c3` |
-| 2.7.4 | component-4-split_config.es.apk |  |  |  |  | `7de28dce9152e065cfa7627f9cc8fe3fb4790700cc88c5b07fa2c7a42a071e11` |
-| 2.7.4 | component-5-split_config.et.apk |  |  |  |  | `d34b1e6fdc43251c96db6829f7b3251b7a82c35685d5432c1292ef6d311e608d` |
-| 2.7.4 | component-6-split_config.fi.apk |  |  |  |  | `7cac52a64af8a0a2315a07cbde54e6de7dcb724fb1647622e30d496a8dfa0f8c` |
-| 2.7.4 | component-7-split_config.fr.apk |  |  |  |  | `a59c05c16be6acc332808fbc091f4dfedb60c4c0128a365aa435fa97f8d4b1ef` |
-| 2.7.4 | component-8-split_config.hi.apk |  |  |  |  | `a97f7a4fa616ad68704704fce87025697aeb214938a79be20d74d9b716cdd15d` |
-| 2.7.4 | component-9-split_config.hu.apk |  |  |  |  | `5d1906f1fb181b3b28067cb4a8f864f6f735a16b40094ad6a617028655ec28a4` |
-| 2.7.4 | component-10-split_config.in.apk |  |  |  |  | `a030373bed90d360392879fa53607a2c01a83b39280ab7869a9a4ef9b0a036bd` |
-| 2.7.4 | component-11-split_config.it.apk |  |  |  |  | `a0e2a3449f0416b42539e5805bade589babcb6add2e4bd17c006aae0cd6d3993` |
-| 2.7.4 | component-12-split_config.ja.apk |  |  |  |  | `52b527b0400f61a0bc07029feb69aa2a4136fc537c3ac203843e69501316b376` |
-| 2.7.4 | component-13-split_config.xxhdpi.apk |  |  |  |  | `94e99356132a1c063e06c05f81de129dcaefe9567aad0eca1a622d4904365356` |
-| 2.7.4 | component-14-split_config.ko.apk |  |  |  |  | `0ce9ca19a8e97e891727be2a88495ae0845c8c5935c4bc1009416247d3338dbe` |
-| 2.7.4 | component-15-split_config.ms.apk |  |  |  |  | `8e9538e19dee5c5c58a1780889ca7ddfbde76c316ab8c2d764838d9ffdab7b58` |
-| 2.7.4 | component-16-split_config.nl.apk |  |  |  |  | `80c4d4b0f049bfcc69649c831764ed874985b7e0d54f32b130dd11ce820686a3` |
-| 2.7.4 | component-17-split_config.pl.apk |  |  |  |  | `23cb96b75f984d04ec00aa7ac260496234c02e38de1a000f6360f3031786ebd2` |
-| 2.7.4 | component-18-split_config.pt.apk |  |  |  |  | `59a81d69b6f8117e88659923b0474661b27a7ac88cdb191c541f15d2b79c0ed6` |
-| 2.7.4 | component-19-split_config.ru.apk |  |  |  |  | `03814bc963c6d45168709aa564fb62dd86a4c8f486555f10978869d9d368a1aa` |
-| 2.7.4 | component-20-split_config.sv.apk |  |  |  |  | `91baa4e705464970c22ea4f043d09c46400ad605874581e932b53c9d3522a4cf` |
-| 2.7.4 | component-21-split_config.th.apk |  |  |  |  | `5434d73f2d5c50c56c64e10b641290db1d1340285f647309b68e5eb1c23144f0` |
-| 2.7.4 | component-22-split_config.tr.apk |  |  |  |  | `9ae32b39bb80a6556a869936e3882d02d55be8dd525ee950f6d0fb650f648108` |
-| 2.7.4 | component-23-split_config.uk.apk |  |  |  |  | `e8bdb1a71af311427c4d07528964cc4d556a6b075ec1d9366fefbdd808f22070` |
-| 2.7.4 | component-24-split_config.vi.apk |  |  |  |  | `e94fbdb7a8b5b9e7796073e1d1d9b2601bc6647742403c5da3e556742934b211` |
-| 2.7.4 | component-25-split_config.xxxhdpi.apk |  |  |  |  | `b8d2eb12aa499ff56739a73c72d3ca06c71145e5869d8617af058b325aba707a` |
-| 2.7.4 | component-26-split_config.zh.apk |  |  |  |  | `22662db8db58f1e4195027f8f842cd211e47360885ac5bc47205d106ad9d0bdd` |
-| 2.7.4 | component-27-split_config.hdpi.apk |  |  |  |  | `8515a693c420f6cc7b53f1d313d88fcd5baff6e2c1460e79ea9bfaed5ffb11be` |
-| 2.7.5 | DeepSeek_2.7.5.apk |  |  |  |  | `ddc52ef868b991fd33e634de834a3e2c022b0cd7ff9e854f4f141996aaeadb70` |
+| 2.7.1 | deepseek271.apk | com.deepseek.chat | None | None | None | package+hash (version attrs absent) | `86e77d419fed957dde8857a14d2f5340499ea40549f10cc3180c596e3f77efc8` |
+| 2.7.2 | deepseek-2-7-2.apk | com.deepseek.chat | None | None | None | package+hash (version attrs absent) | `3c2fe31c73575400b9d59e46dde05daa2ef06491498ebfef658801e99eca1aff` |
+| 2.7.3 | deepseek 273.apk | com.deepseek.chat | None | None | None | package+hash (version attrs absent) | `a6d025c14c98118a5a67849e04aaef6f3c9c13aaf0fa62caaee0e47091374ea3` |
+| 2.7.4 | component-0-base.apk | com.deepseek.chat | None | None | None | package+hash (version attrs absent) | `2e898602374ed75f53d8e4c162fa625f5f4e1793b16fbd567f6dd02f6277a709` |
+| 2.7.4 | component-1-split_config.ar.apk | com.deepseek.chat | None | None | config.ar | package+hash (version attrs absent) | `293fe0329d975432a39887a08166d5d81d0dc7423360f2b73bc2d1842e6180ed` |
+| 2.7.4 | component-2-split_config.arm64_v8a.apk | com.deepseek.chat | 294 | None | config.arm64_v8a | package+hash (version attrs absent) | `482af60defab32a280810bcbdb2a96d9505cb3214eab0d2c46b41d6a34bee03c` |
+| 2.7.4 | component-3-split_config.de.apk | com.deepseek.chat | None | None | config.de | package+hash (version attrs absent) | `02be66ae9c5911d788c19b1ac2c0ed2bd5f94076d53bd1bcbd99f22f9f0983c3` |
+| 2.7.4 | component-4-split_config.es.apk | com.deepseek.chat | None | None | config.es | package+hash (version attrs absent) | `7de28dce9152e065cfa7627f9cc8fe3fb4790700cc88c5b07fa2c7a42a071e11` |
+| 2.7.4 | component-5-split_config.et.apk | com.deepseek.chat | None | None | config.et | package+hash (version attrs absent) | `d34b1e6fdc43251c96db6829f7b3251b7a82c35685d5432c1292ef6d311e608d` |
+| 2.7.4 | component-6-split_config.fi.apk | com.deepseek.chat | None | None | config.fi | package+hash (version attrs absent) | `7cac52a64af8a0a2315a07cbde54e6de7dcb724fb1647622e30d496a8dfa0f8c` |
+| 2.7.4 | component-7-split_config.fr.apk | com.deepseek.chat | None | None | config.fr | package+hash (version attrs absent) | `a59c05c16be6acc332808fbc091f4dfedb60c4c0128a365aa435fa97f8d4b1ef` |
+| 2.7.4 | component-8-split_config.hi.apk | com.deepseek.chat | None | None | config.hi | package+hash (version attrs absent) | `a97f7a4fa616ad68704704fce87025697aeb214938a79be20d74d9b716cdd15d` |
+| 2.7.4 | component-9-split_config.hu.apk | com.deepseek.chat | None | None | config.hu | package+hash (version attrs absent) | `5d1906f1fb181b3b28067cb4a8f864f6f735a16b40094ad6a617028655ec28a4` |
+| 2.7.4 | component-10-split_config.in.apk | com.deepseek.chat | None | None | config.in | package+hash (version attrs absent) | `a030373bed90d360392879fa53607a2c01a83b39280ab7869a9a4ef9b0a036bd` |
+| 2.7.4 | component-11-split_config.it.apk | com.deepseek.chat | None | None | config.it | package+hash (version attrs absent) | `a0e2a3449f0416b42539e5805bade589babcb6add2e4bd17c006aae0cd6d3993` |
+| 2.7.4 | component-12-split_config.ja.apk | com.deepseek.chat | None | None | config.ja | package+hash (version attrs absent) | `52b527b0400f61a0bc07029feb69aa2a4136fc537c3ac203843e69501316b376` |
+| 2.7.4 | component-13-split_config.xxhdpi.apk | com.deepseek.chat | None | None | config.xxhdpi | package+hash (version attrs absent) | `94e99356132a1c063e06c05f81de129dcaefe9567aad0eca1a622d4904365356` |
+| 2.7.4 | component-14-split_config.ko.apk | com.deepseek.chat | None | None | config.ko | package+hash (version attrs absent) | `0ce9ca19a8e97e891727be2a88495ae0845c8c5935c4bc1009416247d3338dbe` |
+| 2.7.4 | component-15-split_config.ms.apk | com.deepseek.chat | None | None | config.ms | package+hash (version attrs absent) | `8e9538e19dee5c5c58a1780889ca7ddfbde76c316ab8c2d764838d9ffdab7b58` |
+| 2.7.4 | component-16-split_config.nl.apk | com.deepseek.chat | None | None | config.nl | package+hash (version attrs absent) | `80c4d4b0f049bfcc69649c831764ed874985b7e0d54f32b130dd11ce820686a3` |
+| 2.7.4 | component-17-split_config.pl.apk | com.deepseek.chat | None | None | config.pl | package+hash (version attrs absent) | `23cb96b75f984d04ec00aa7ac260496234c02e38de1a000f6360f3031786ebd2` |
+| 2.7.4 | component-18-split_config.pt.apk | com.deepseek.chat | None | None | config.pt | package+hash (version attrs absent) | `59a81d69b6f8117e88659923b0474661b27a7ac88cdb191c541f15d2b79c0ed6` |
+| 2.7.4 | component-19-split_config.ru.apk | com.deepseek.chat | None | None | config.ru | package+hash (version attrs absent) | `03814bc963c6d45168709aa564fb62dd86a4c8f486555f10978869d9d368a1aa` |
+| 2.7.4 | component-20-split_config.sv.apk | com.deepseek.chat | None | None | config.sv | package+hash (version attrs absent) | `91baa4e705464970c22ea4f043d09c46400ad605874581e932b53c9d3522a4cf` |
+| 2.7.4 | component-21-split_config.th.apk | com.deepseek.chat | None | None | config.th | package+hash (version attrs absent) | `5434d73f2d5c50c56c64e10b641290db1d1340285f647309b68e5eb1c23144f0` |
+| 2.7.4 | component-22-split_config.tr.apk | com.deepseek.chat | None | None | config.tr | package+hash (version attrs absent) | `9ae32b39bb80a6556a869936e3882d02d55be8dd525ee950f6d0fb650f648108` |
+| 2.7.4 | component-23-split_config.uk.apk | com.deepseek.chat | None | None | config.uk | package+hash (version attrs absent) | `e8bdb1a71af311427c4d07528964cc4d556a6b075ec1d9366fefbdd808f22070` |
+| 2.7.4 | component-24-split_config.vi.apk | com.deepseek.chat | None | None | config.vi | package+hash (version attrs absent) | `e94fbdb7a8b5b9e7796073e1d1d9b2601bc6647742403c5da3e556742934b211` |
+| 2.7.4 | component-25-split_config.xxxhdpi.apk | com.deepseek.chat | None | None | config.xxxhdpi | package+hash (version attrs absent) | `b8d2eb12aa499ff56739a73c72d3ca06c71145e5869d8617af058b325aba707a` |
+| 2.7.4 | component-26-split_config.zh.apk | com.deepseek.chat | None | None | config.zh | package+hash (version attrs absent) | `22662db8db58f1e4195027f8f842cd211e47360885ac5bc47205d106ad9d0bdd` |
+| 2.7.4 | component-27-split_config.hdpi.apk | com.deepseek.chat | None | None | config.hdpi | package+hash (version attrs absent) | `8515a693c420f6cc7b53f1d313d88fcd5baff6e2c1460e79ea9bfaed5ffb11be` |
+| 2.7.5 | DeepSeek_2.7.5.apk | com.deepseek.chat | None | None | None | package+hash (version attrs absent) | `ddc52ef868b991fd33e634de834a3e2c022b0cd7ff9e854f4f141996aaeadb70` |
 
 ## 语义候选匹配
 
@@ -1117,7 +1117,7 @@
 
 ## 已知证据边界
 
-- 2.7.2 APK 已纳入扫描；必须以组件 Manifest 的包名/versionCode/versionName、DEX 指纹和 SHA-256 与 code289-cn 日志核对，不能只按文件名确认。
+- 2.7.2 APK 已纳入扫描；先核对 Manifest 包名、versionCode/versionName（若 APK 提供）、DEX 指纹和 APK SHA-256，再与 code289-cn 运行日志交叉验证。若版本属性缺失，只能标记为 package+hash 身份，不能宣称已确认同一构建。
 - 2.7.4 输入为 APKM，组件级身份必须以本次解包结果为准。
 - 2.7.1 的 APKS/split 历史分析文件属于先前材料，需与当前单文件 deepseek271.apk 的身份核对。
 - 2.7.3 / 2.7.5 既有 SSE 链是静态证据；尚未证明真实设备 Hook 成功。

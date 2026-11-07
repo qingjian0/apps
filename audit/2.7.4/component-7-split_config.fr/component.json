@@ -3,7 +3,16 @@
   "bytes": 131282,
   "sha256": "a59c05c16be6acc332808fbc091f4dfedb60c4c0128a365aa435fa97f8d4b1ef",
   "manifest": {
-    "parse_error": "ParseError"
+    "package": "com.deepseek.chat",
+    "split": "config.fr",
+    "version_code": null,
+    "version_code_major": null,
+    "version_name": null,
+    "root_attributes": {
+      "{http://schemas.android.com/apk/res/android}splitTypes": "",
+      "package": "com.deepseek.chat",
+      "split": "config.fr"
+    }
   },
   "apktool_exit": 0,
   "jadx_exit": 0,
