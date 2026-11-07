@@ -38,6 +38,9 @@ SUPER_RE = re.compile(r"^\.super\s+(L[^;]+;)")
 IMPL_RE = re.compile(r"^\.implements\s+(L[^;]+;)")
 INVOKE_RE = re.compile(r"\binvoke-[\w/-]+\s+\{[^}]*\},?\s*(L[^;]+;)->([^ (]+)(\([^)]*\).+)")
 OP_RE = re.compile(r"^\s*([a-z][a-z0-9_/-]+)(?:\s|$)")
+FIELD_ACCESS_RE = re.compile(r"\b([is](?:get|put)(?:-[a-z]+)*)\s+.*?,\s*(L[^;]+;)->([^:]+):(\S+)")
+BRANCH_RE = re.compile(r"^\s*(?:if-[a-z-]+|goto(?:/16|/32)?|packed-switch|sparse-switch)\b")
+LABEL_RE = re.compile(r"^\s*:[A-Za-z0-9_$-]+\s*$")
 STR_RE = re.compile(r'const-string(?:/jumbo)?\s+[^,]+,\s+"((?:\\.|[^"])*)"')
 
 def sha256(path):
@@ -88,7 +91,9 @@ def analyze_smali(root):
                     if m:
                         current={"class":desc or "", "name":m.group(2), "descriptor":m.group(3),
                                  "access":m.group(1), "file":str(file.relative_to(root)),
-                                 "line":line_no, "strings":[], "invokes":[], "opcodes":collections.Counter()}
+                                 "line":line_no, "strings":[], "invokes":[], "opcodes":collections.Counter(),
+                                 "field_reads":[], "field_writes":[], "branch_count":0, "label_count":0,
+                                 "return_count":0, "throw_count":0}
                         in_method=True
                 continue
             if line.startswith(".end method"):
@@ -101,6 +106,11 @@ def analyze_smali(root):
                     current["roles"]=roles
                     current["opcode_count"]=sum(current["opcodes"].values())
                     current["opcode_histogram"]=dict(current["opcodes"].most_common(24))
+                    current["field_reads"]=sorted(set(current["field_reads"]))[:120]
+                    current["field_writes"]=sorted(set(current["field_writes"]))[:120]
+                    current["control_flow"]={"branch_count":current["branch_count"],"label_count":current["label_count"],
+                        "return_count":current["return_count"],"throw_count":current["throw_count"],
+                        "basic_block_estimate":1+current["label_count"]+current["branch_count"]}
                     current["invokes"]=sorted(set(current["invokes"]))[:120]
                     current["strings"]=sorted(set(current["strings"]))[:100]
                     methods.append(current)
@@ -117,6 +127,18 @@ def analyze_smali(root):
                 target,name,sig=im.groups()
                 current["invokes"].append(target+"->"+name+sig)
                 current.setdefault("_edges",[]).append((target,name,sig))
+            fa=FIELD_ACCESS_RE.search(line)
+            if fa:
+                opcode,owner,field_name,field_type=fa.groups()
+                field_key=owner+"->"+field_name+":"+field_type
+                if opcode.startswith(("iget","sget")): current["field_reads"].append(field_key)
+                else: current["field_writes"].append(field_key)
+            if BRANCH_RE.match(line): current["branch_count"] += 1
+            if LABEL_RE.match(line): current["label_count"] += 1
+            stripped=line.strip()
+            if stripped.startswith(("return","throw")):
+                if stripped.startswith("return"): current["return_count"] += 1
+                else: current["throw_count"] += 1
             op=OP_RE.match(line)
             if op and not line.lstrip().startswith((".",":","#")):
                 current["opcodes"][op.group(1)] += 1
