@@ -177,10 +177,10 @@ def main():
                 root=ET.parse(manifest_path).getroot()
                 android_ns="{http://schemas.android.com/apk/res/android}"
                 manifest={"package":root.attrib.get("package"),"split":root.attrib.get("split"),
-                          "version_code":root.attrib.get(android_ns+"versionCode"),
-                          "version_code_major":root.attrib.get(android_ns+"versionCodeMajor"),
-                          "version_name":root.attrib.get(android_ns+"versionName")}
-            except (ET.ParseError,OSError) as exc:
+                          "version_code":root.attrib.get(android_ns+"versionCode") or root.attrib.get("versionCode"),
+                          "version_code_major":root.attrib.get(android_ns+"versionCodeMajor") or root.attrib.get("versionCodeMajor"),
+                          "version_name":root.attrib.get(android_ns+"versionName") or root.attrib.get("versionName"),
+                          "root_attributes":{k:v for k,v in root.attrib.items()}}
                 manifest={"parse_error":type(exc).__name__,"parse_detail":str(exc)[:240]}
         jadx_dir=work/f"jadx-{i}"
         jadx_rc=run([a.jadx,"--show-bad-code","--no-res","--threads-count","2","-d",str(jadx_dir),str(apk)],comp_out/"jadx.log")
@@ -216,5 +216,5 @@ def main():
     (out/"hook-candidates.json").write_text(json.dumps(candidates,indent=2,ensure_ascii=True))
     (out/"candidate-methods.csv").write_text("version,component,class,method,descriptor,score,roles,file,line\n"+"".join(
       ",".join(json.dumps(v,ensure_ascii=True) for v in [a.version,c["component"],c["class"],c["name"],c["descriptor"],c["score"],"|".join(x["role"] for x in c["roles"]),c["file"],c["line"]])+"\n" for c in candidates))
-    print(json.dumps({k:summary[k] for k in ("version_label","source_sha256","dex_count","class_count","method_count","call_edge_count","candidate_method_count")},ensure_ascii=True))
+    print(json.dumps({k:summary[k] for k in ("version_label","source_sha256","dex_count","class_count","method_count","call_edge_count","candidate_method_count","component_metadata")},ensure_ascii=True))
 if __name__=="__main__": main()
