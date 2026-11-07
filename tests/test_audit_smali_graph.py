@@ -50,6 +50,11 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertEqual([], methods[0]["field_writes"])
         self.assertEqual(0, methods[0]["control_flow"]["branch_count"])
 
+    def test_redaction_marker_cannot_trigger_prompt_anchor(self):
+        redacted = AUDIT.safe_strings('    const-string v0, "prompt body must not persist"')
+        self.assertEqual(["<redacted-content>"], redacted)
+        self.assertNotIn("prompt", redacted[0].lower())
+
 
 if __name__ == "__main__":
     unittest.main()
