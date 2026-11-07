@@ -91,20 +91,20 @@ jobs:
                            decl.group(2).strip() if decl else "", hits, methods, fields, constants))
           rows.sort(key=lambda x: (-x[0], x[1]))
           first_party = []
-          method_sig = re.compile(r"\\s*(?:public|protected|private)\\s+(?:(?:static|final|synchronized|native|abstract)\\s+)*([\\w.$<>?, \\[\\]]+)\\s+([\\w$]+)\\s*\\(([^)]*)\\)")
-          field_sig = re.compile(r"\\s*(?:public|protected|private)\\s+(?:(?:static|final|volatile|transient)\\s+)*([\\w.$<>?, \\[\\]]+)\\s+([\\w$]+)\\s*(?:=|;)")
+          method_sig = re.compile(r"\s*(?:public|protected|private)\s+(?:(?:static|final|synchronized|native|abstract)\s+)*([\w.$<>?, \[\]]+)\s+([\w$]+)\s*\(([^)]*)\)")
+          field_sig = re.compile(r"\s*(?:public|protected|private)\s+(?:(?:static|final|volatile|transient)\s+)*([\w.$<>?, \[\]]+)\s+([\w$]+)\s*(?:=|;)")
           for path in java_files:
               rel = str(path.relative_to(root))
               if not (rel.startswith("defpackage/") or rel.startswith("com/deepseek/")): continue
               try: data = path.read_text(encoding="utf-8", errors="replace")
               except Exception: continue
-              decl = re.search(r"(?m)^\\s*(?:(?:public|protected|private|abstract|final|static|synchronized)\\s+)*(?:class|interface|enum|record)\\s+([\\w$]+)([^\\n{]*)", data)
-              package = re.search(r"(?m)^package\\s+([\\w.]+)\\s*;", data)
+              decl = re.search(r"(?m)^\s*(?:(?:public|protected|private|abstract|final|static|synchronized)\s+)*(?:class|interface|enum|record)\s+([\w$]+)([^\n{]*)", data)
+              package = re.search(r"(?m)^package\s+([\w.]+)\s*;", data)
               methods, fields = [], []
               for line in data.splitlines():
                   m = method_sig.match(line)
                   if m and len(methods) < 100:
-                      methods.append(m.group(2) + "(" + re.sub(r"\\s+", " ", m.group(3)).strip() + "):" + m.group(1).strip())
+                      methods.append(m.group(2) + "(" + re.sub(r"\s+", " ", m.group(3)).strip() + "):" + m.group(1).strip())
                   f = field_sig.match(line)
                   if f and len(fields) < 100:
                       fields.append(f.group(2) + ":" + f.group(1).strip())
