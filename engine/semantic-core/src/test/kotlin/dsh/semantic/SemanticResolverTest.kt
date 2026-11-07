@@ -140,4 +140,14 @@ class SemanticResolverTest {
         assertEquals("ambiguous-candidates", result.rejection)
     }
 
+    @Test fun thirdPartySdkCandidateIsRejectedByDefaultPolicy() {
+        val sdkCandidate = candidate("o", goodEvidence).copy(
+            method = MethodShape("Lcn/fly/verify/bq;", "o", "(Z)Ljava/lang/String;", listOf("Z"), "Ljava/lang/String;"),
+            negativeEvidence = setOf("third-party-sdk-owner")
+        )
+        val result = SemanticResolver().resolve(host, RolePolicy(role, minimumEvidenceFamilies = 3), listOf(sdkCandidate))
+        assertFalse(result.accepted)
+        assertTrue(result.rejection!!.startsWith("forbidden-negative-evidence"))
+    }
+
 }
