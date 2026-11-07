@@ -181,6 +181,7 @@ def main():
                           "version_code_major":root.attrib.get(android_ns+"versionCodeMajor") or root.attrib.get("versionCodeMajor"),
                           "version_name":root.attrib.get(android_ns+"versionName") or root.attrib.get("versionName"),
                           "root_attributes":{k:v for k,v in root.attrib.items()}}
+            except (ET.ParseError,OSError) as exc:
                 manifest={"parse_error":type(exc).__name__,"parse_detail":str(exc)[:240]}
         jadx_dir=work/f"jadx-{i}"
         jadx_rc=run([a.jadx,"--show-bad-code","--no-res","--threads-count","2","-d",str(jadx_dir),str(apk)],comp_out/"jadx.log")
