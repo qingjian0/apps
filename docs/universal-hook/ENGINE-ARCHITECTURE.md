@@ -384,7 +384,7 @@ and non-convergent analysis fail closed.
 - caller/callee Points-to 不完整、调用点清单截断、参数 word 对齐失败、目标缺失或歧义时，不生成可用于 Receiver 的上下文事实；unknown/multiple 不会升级为 singleton。
 - 对对象返回类型的调用，只有 callee 的全部 `return-object` 路径均被捕获，且投影后汇总为同一个已知 identity 时，才把该 identity 写入 caller 对应的 `move-result-object` 寄存器上下文；caller 后续调用点与直接字段 receiver 均仅在 caller 无分支/异常边且结果寄存器中间未被写入时，才消费该返回身份。
 
-**严格边界：** 当前是最多 4 层的 bounded call-string context，不是递归/全程序 Points-to 固定点；递归回边与深度上限会显式计数并截断，存在截断时 `context_expansion_complete=false`，Kotlin 不加载该诊断索引。返回值传播目前只覆盖单个 callee 调用返回到 caller 后续调用点的直接投影；不做跨多层 wrapper 的返回值摘要组合，caller 存在分支或异常边时不传播返回身份，callee 多个 return path 不同、unknown 或不完整时保持 fail-closed。反射/动态 dispatch、JNI/Native、数组元素和协程恢复仍不支持。输出的 singleton 仅表示静态证据在有界调用字符串上下文内唯一，不表示 ART 运行时身份已验证，也不授权 Hook。后续仍需返回摘要组合、递归/循环固定点策略、五版本真实 APK 回归。
+**严格边界：** 当前是最多 4 层的 bounded call-string context，不是递归/全程序 Points-to 固定点。返回值摘要可在该深度内沿唯一 exact call target 递归组合（例如 factory → wrapper → caller），但仅支持无分支、无异常边的调用者路径；结果寄存器在调用返回与后续 use/return 之间被写入时不传播。callee 多个 return path 中出现 unknown、多个不同 identity 或 return-site 覆盖不完整时保持 fail-closed。递归回边与返回摘要深度上限会显式计数，任何此类截断都会令 `context_expansion_complete=false`，Kotlin 不加载该诊断索引。反射/动态 dispatch、JNI/Native、数组元素和协程恢复仍不支持。输出的 singleton 仅表示静态证据在有界调用字符串上下文内唯一，不表示 ART 运行时身份已验证，也不授权 Hook。后续仍需递归/循环固定点策略、五版本真实 APK 回归。
 
 
 ### Kotlin Semantic Core 诊断接入
