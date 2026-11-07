@@ -149,6 +149,7 @@ jobs:
             mkdir -p "audit/$version"
             cp -a "incoming/$artifact/." "audit/$version/"
           done
+          python3 -m unittest discover -s tests -p "test_aggregate_deepseek_hook_audit.py" -v
           python3 scripts/aggregate_deepseek_hook_audit.py
           python3 -m json.tool audit/universal-hook/semantic-method-matches.json >/dev/null
           python3 -m json.tool audit/universal-hook/probe-log-summary.json >/dev/null
