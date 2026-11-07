@@ -46,7 +46,13 @@ class StaticEvidenceMapper {
                     add(Evidence(EvidenceFamily.FRAMEWORK_INTERACTION, "stable-framework-call-family", 0.75))
                 if (record.opcodeCount > 0) add(Evidence(EvidenceFamily.BYTECODE_SHAPE, "method-body-opcodes=" + record.opcodeCount, 0.5))
             }
-            if (evidence.isEmpty()) null else SemanticCandidate(RoleId(roleName), method, host, evidence)
+            val negativeEvidence = buildSet {
+                val frameworkPrefixes = listOf("Landroid/", "Landroidx/", "Ljava/", "Ljavax/", "Lkotlin/", "Lkotlinx/", "Lio/ktor/", "Lokhttp3/", "Lretrofit2/")
+                val vendorPrefixes = listOf("Lcn/fly/", "Lcom/tencent/", "Lcom/google/", "Lcom/alibaba/", "Lcom/aliyun/")
+                if (frameworkPrefixes.any { record.ownerDescriptor.startsWith(it) }) add("framework-owner")
+                if (vendorPrefixes.any { record.ownerDescriptor.startsWith(it) }) add("third-party-sdk-owner")
+            }
+            if (evidence.isEmpty()) null else SemanticCandidate(RoleId(roleName), method, host, evidence, negativeEvidence)
         }
     }
 }
