@@ -927,11 +927,11 @@ def build_interprocedural_value_graph(methods):
 
 
 def build_interprocedural_points_to_graph(methods, max_call_depth=4):
-    """Build bounded call-string contexts for object receiver projection.
+    """Build bounded call-string contexts for receiver and direct return identity projection.
 
-    Every method is a possible analysis root. Contexts carry exact formal-to-actual
-    object identities through up to max_call_depth call edges. Recursive paths and
-    depth/record limits are cut conservatively; this is not a recursive fixed point.
+    Return values are propagated only across straight-line caller methods, and only
+    when the callee's every object-return site resolves to the same known identity.
+    This remains a bounded diagnostic abstraction, not a whole-program fixed point.
     """
     by_signature=collections.defaultdict(list)
     for method in methods:
@@ -944,12 +944,14 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4):
     for root in roots:
         queue.append({
             "method":root,"context_id":"root:"+root["_points_to_key"],
-            "bindings":{},"path":(root["_points_to_key"],),"depth":0
+            "bindings":{},"register_overrides":{},
+            "path":(root["_points_to_key"],),"depth":0
         })
     call_contexts=[]
     contextual_receivers=[]
     resolved=unresolved=ambiguous=incomplete=0
     singleton_context_receivers=0
+    return_propagations=return_unknowns=return_unresolved=0
     recursive_contexts_cut=depth_contexts_cut=0
     records_truncated=False
     record_limit=200000
@@ -982,7 +984,16 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4):
         args_by_instruction=collections.defaultdict(list)
         for item in caller_pts.get("invoke_arguments",[]):
             args_by_instruction[item.get("call_instruction")].append(item)
-        for site in caller.get("invoke_sites",[]):
+        writes_by_register=collections.defaultdict(list)
+        for write in caller_pts.get("instruction_writes",[]):
+            for register in write.get("registers",[]):
+                writes_by_register[register].append(write["instruction"])
+        cfg=caller.get("control_flow",{}).get("cfg",{})
+        linear_return_safe=(caller.get("control_flow",{}).get("branch_count")==0
+            and cfg.get("complete") is True
+            and not any(edge.get("kind")=="exception" for edge in cfg.get("edges",[])))
+        register_overrides=dict(state.get("register_overrides",{}))
+        for site in sorted(caller.get("invoke_sites",[]),key=lambda x:x["instruction"]):
             target=site["owner"]+"->"+site["name"]+site["descriptor"]
             choices=by_signature.get(target,[])
             same_component=[m for m in choices if m.get("component")==caller.get("component")]
@@ -1011,15 +1022,64 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4):
             for item in actuals:
                 identities=[]
                 has_unknown=bool(item.get("unknown"))
-                for identity in item.get("points_to",[]):
-                    projected,unknown=substitute(
-                        identity,caller_key,state["bindings"],state["context_id"],
-                        contextualize_allocations=state["depth"]>0)
-                    identities.extend(projected)
-                    has_unknown=has_unknown or unknown
+                actual_reg=item.get("actual_register")
+                override=register_overrides.get(actual_reg) if actual_reg else None
+                override_valid=False
+                if override and linear_return_safe and site["instruction"]>override["definition_instruction"]:
+                    writes=[x for x in writes_by_register.get(actual_reg,[])
+                            if override["definition_instruction"]<x<site["instruction"]]
+                    override_valid=not writes
+                if override_valid:
+                    identities=list(override["points_to"])
+                    has_unknown=bool(override["unknown"])
+                else:
+                    for identity in item.get("points_to",[]):
+                        projected,unknown=substitute(
+                            identity,caller_key,state["bindings"],state["context_id"],
+                            contextualize_allocations=state["depth"]>0)
+                        identities.extend(projected)
+                        has_unknown=has_unknown or unknown
                 resolved_bindings[item["formal_register"]]={
                     "points_to":sorted(set(identities)),"unknown":has_unknown
                 }
+
+            return_summary={"points_to":[],"unknown":True,"identity_status":"unknown"}
+            parsed_target=parse_method_descriptor(site.get("descriptor",""))
+            is_object_return=(parsed_target is not None and
+                parsed_target["return_type"].startswith(("L","[")))
+            return_facts=callee_pts.get("return_values",[])
+            expected_returns=callee.get("control_flow",{}).get("return_count",0)
+            if is_object_return and site.get("result_register") and site.get("result_instruction") is not None:
+                if expected_returns>0 and len(return_facts)==expected_returns:
+                    returned=set()
+                    has_unknown=False
+                    for fact in return_facts:
+                        has_unknown=has_unknown or bool(fact.get("unknown"))
+                        for identity in fact.get("points_to",[]):
+                            projected,unknown=substitute(
+                                identity,callee_key,resolved_bindings,context_id)
+                            returned.update(projected)
+                            has_unknown=has_unknown or unknown
+                    values=sorted(returned)
+                    status=("unknown" if has_unknown else
+                            "singleton" if len(values)==1 else
+                            "multiple" if len(values)>1 else "unresolved")
+                    return_summary={"points_to":values,"unknown":has_unknown,
+                                    "identity_status":status}
+                else:
+                    return_summary={"points_to":[],"unknown":True,
+                                    "identity_status":"unknown"}
+                if return_summary["identity_status"]=="singleton" and linear_return_safe:
+                    register_overrides[site["result_register"]]={
+                        "definition_instruction":site["result_instruction"],
+                        "points_to":return_summary["points_to"],"unknown":False
+                    }
+                    return_propagations+=1
+                elif return_summary["identity_status"]=="unknown":
+                    return_unknowns+=1
+                else:
+                    return_unresolved+=1
+
             if len(call_contexts)<record_limit:
                 call_contexts.append({
                     "context_id":context_id,"caller":caller_key,"callee":callee_key,
@@ -1035,7 +1095,13 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4):
                             else "singleton" if len(resolved_bindings[x["formal_register"]]["points_to"])==1
                             else "multiple" if len(resolved_bindings[x["formal_register"]]["points_to"])>1
                             else "unresolved")
-                    } for x in actuals]
+                    } for x in actuals],
+                    "return_value":{
+                        "register":site.get("result_register"),
+                        "identity_status":return_summary["identity_status"],
+                        "points_to":return_summary["points_to"],
+                        "unknown":return_summary["unknown"]
+                    }
                 })
             else:
                 records_truncated=True
@@ -1083,7 +1149,7 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4):
             seen_contexts.add(next_state_id)
             queue.append({
                 "method":callee,"context_id":context_id,
-                "bindings":resolved_bindings,
+                "bindings":resolved_bindings,"register_overrides":{},
                 "path":state["path"]+(callee_key,),
                 "depth":state["depth"]+1
             })
@@ -1097,6 +1163,9 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4):
             "ambiguous_call_sites":ambiguous,"incomplete_call_sites":incomplete,
             "contextual_receiver_count":len(contextual_receivers),
             "singleton_context_receiver_count":singleton_context_receivers,
+            "return_identity_propagations":return_propagations,
+            "return_identity_unknown_count":return_unknowns,
+            "return_identity_unresolved_count":return_unresolved,
             "records_truncated":records_truncated,
             "record_limit":record_limit,
             "max_call_depth":max_call_depth,
