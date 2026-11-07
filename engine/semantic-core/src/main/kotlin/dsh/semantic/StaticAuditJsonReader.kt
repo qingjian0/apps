@@ -1,6 +1,7 @@
 package dsh.semantic
 
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -11,8 +12,10 @@ import kotlinx.serialization.json.intOrNull
 class StaticAuditJsonReader(private val mapper: StaticEvidenceMapper = StaticEvidenceMapper()) {
     private val json = Json { ignoreUnknownKeys = true }
 
-    fun readLine(line: String, host: HostFingerprint, anchorFrequency: Map<String, Int> = emptyMap()): List<SemanticCandidate> {
-        val obj = json.parseToJsonElement(line).jsonObject
+    fun readLine(line: String, host: HostFingerprint, anchorFrequency: Map<String, Int> = emptyMap()): List<SemanticCandidate> =
+        readObject(json.parseToJsonElement(line).jsonObject, host, anchorFrequency)
+
+    fun readObject(obj: JsonObject, host: HostFingerprint, anchorFrequency: Map<String, Int> = emptyMap()): List<SemanticCandidate> {
         val owner = obj.string("class") ?: return emptyList()
         val name = obj.string("name") ?: return emptyList()
         val descriptor = obj.string("descriptor") ?: return emptyList()
