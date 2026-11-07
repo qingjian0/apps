@@ -392,3 +392,56 @@ and non-convergent analysis fail closed.
 `StaticAuditCli` 现在可选读取 `interprocedural-points-to.jsonl.gz`。只有当 summary 明确标记 `records_truncated=false`、`recursive_fixed_point=false`、`runtime_identity_proven=false)，且每条记录的 method identity、`bounded-call-string-context` scope 与非运行时证明标记均通过校验时，才计入 Kotlin graph diagnostics。
 
 该索引只增加 `interproceduralContextualReceivers`、`interproceduralSingletonContextReceivers` 和 `interproceduralPointsToLoaded` 统计，不产生 `DATA_FLOW` 证据、不增加 Resolver 分数，也不改变 HookCoordinator 授权。截断、缺失、格式异常或 schema 不匹配时整体不加载。新增 Kotlin 测试验证完整索引只进入诊断统计、截断索引 fail-closed，且静态 Points-to 不会单独升级为 DATA_FLOW。
+
+
+## 17. 2026-11-07 跨版本语义匹配保守化与聚合 CI 修复
+
+### 17.1 发现的问题
+
+原聚合器对每个来源方法取目标版本 Top-3，只要相似度达到 0.48 就写入候选。该策略存在两个误匹配来源：
+
+- **多对多扩散：** 一个方法可同时指向多个相似候选，目标方法也可能被多个来源方法重复认领。
+- **角色标签污染：** 同一角色的候选天然共享 role 特征；当方法缺少可区分协议锚点或稳定 API 特征时，opcode 分布相似仍可能制造虚高分数。
+
+相似度是检索排序信号，不是方法语义等价证明。
+
+### 17.2 新匹配门槛
+
+跨版本候选现在必须同时满足：
+
+1. 至少共享一个可识别的协议锚点、稳定框架/API 调用或协议字符串；单独共享 role 标签不构成匹配证据。
+2. 来源方法对目标版本的最佳候选必须唯一，且领先第二名至少 0.06。
+3. 目标方法反向选择来源版本时，也必须将原方法选为唯一最佳候选，并满足同样分差。
+4. 仅接受双向互选的匹配；并列、低分、非互选和无共享语义证据均拒绝。
+5. 每个版本对、每个角色独立执行一对一互选；不同版本对之间不复用混淆名称。
+6. 输出 `semantic-match-diagnostics.json`，记录歧义、非互选、低分和无共享语义证据的数量；报告中的匹配行增加 `match_policy=mutual-best-with-margin`。
+
+当前阈值为最低相似度 0.48、最佳候选分差 0.06。这些数值用于静态候选筛选，不构成 Hook 安装阈值。匹配结果仍需核对完整方法描述符、调用者/被调用者、参数/返回值、类型和运行时行为证据。
+
+### 17.3 回归测试
+
+新增测试覆盖：
+
+- 清晰的一对一语义匹配；
+- 多个目标方法同分时拒绝；
+- 仅角色标签/opcode 相似、没有共享语义证据时拒绝。
+
+在接入真实 CI 前，测试代码还暴露并修正了两个实现问题：诊断计数变量未初始化，以及测试模块遗漏导入匹配函数。随后 CI 又发现报告写入语句之间误写入字面 `\\n`，已修复为真实换行。
+
+### 17.4 CI 变更与当前验证
+
+`universal-hook-semantic-audit.yml` 现在会编译两个 Python 审计脚本，并分别执行 Smali 图测试与跨版本聚合器测试；并发组按 ref 隔离且不取消正在运行的任务。另增加 `git diff --check`。
+
+验证记录：
+
+- Universal Hook Static Analysis Run `42387983402`：成功；包含 Python 编译、patch whitespace 检查、Smali 图测试及跨版本聚合测试。
+- DeepSeek Semantic Core CI Run `42387989223`：成功。
+- PR #2 保持 Draft，未合并 main。
+- 真机 Hook 尚未执行；本轮结果只证明 Python 聚合逻辑和 Kotlin Semantic Core 单元测试通过。
+
+### 17.5 下一阶段
+
+- 在可运行的五版本聚合任务中重新生成 `semantic-method-matches.json` 和诊断报告，核查匹配数量是否下降、候选是否仍保持合理覆盖。
+- 将人工确认的 2.7.2 / 2.7.4 网络请求边界及 2.7.3 SSE 分派链作为正例；同角色但不同职责的方法作为负例，测量 precision/recall，而不是只看候选数量。
+- 检查 2.7.3 Manifest 标签冲突；在输入身份得到证实前继续隔离其跨版本匹配。
+- 保持 Kotlin Resolver 的独立证据族、角色必需证据和运行时授权门槛，不因静态匹配数量下降而放宽安装策略。
