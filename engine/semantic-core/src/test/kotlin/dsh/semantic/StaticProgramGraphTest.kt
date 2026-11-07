@@ -125,6 +125,14 @@ class StaticProgramGraphTest {
         )
         assertTrue(truncatedGraph.graphStats()["interproceduralPointsToLoaded"] == 0)
         assertTrue(truncatedGraph.graphStats()["interproceduralContextualReceivers"] == 0)
+
+        val runtimeClaimSummary = textFile(
+            """{"interprocedural_points_to":{"records_truncated":false,"recursive_fixed_point":false,"runtime_identity_proven":true}}"""
+        )
+        val runtimeClaimGraph = StaticProgramGraph.load(
+            methods, edges, classes, summaryPath = runtimeClaimSummary, pointsToPath = pointsTo
+        )
+        assertTrue(runtimeClaimGraph.graphStats()["interproceduralPointsToLoaded"] == 0)
     }
 
     @Test fun interproceduralValueEdgesBecomeDataFlowEvidenceOnlyWhenNotTruncated() {
