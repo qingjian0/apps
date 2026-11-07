@@ -318,6 +318,25 @@ class SmaliGraphExtractionTest(unittest.TestCase):
             facts["field_receivers"][1]["identity"],
         )
 
+    def test_object_points_to_rejects_reexecuted_loop_allocation_identity(self):
+        body = [
+            "    :loop",
+            "    new-instance v0, Lx/State;",
+            "    if-eqz v1, :exit",
+            "    goto :loop",
+            "    :exit",
+            "    iput-object v2, v0, Lx/State;->value:Ljava/lang/String;",
+            "    return-void",
+        ]
+        cfg = AUDIT.build_smali_cfg(body)
+        sites = AUDIT.extract_field_access_sites(body)
+        facts = AUDIT.analyze_object_points_to(
+            body, cfg, "Lx/Owner;", "run", "()V", "public static", sites)
+        self.assertTrue(facts["complete"])
+        self.assertEqual(1, facts["cyclic_allocation_site_count"])
+        self.assertEqual("unknown", facts["field_receivers"][0]["identity_status"])
+        self.assertEqual([], facts["same_instance_groups"])
+
     def test_object_points_to_tracks_reference_parameters(self):
         body = [
             "    move-object v0, p1",
