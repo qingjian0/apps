@@ -579,28 +579,30 @@ def build_interprocedural_value_graph(methods):
                     mapping.append((actual_reg,formal_reg,"argument"))
                     actual_word+=1
                 formal_word+=width
-            if actual_word!=len(actual):
+            arguments_aligned=actual_word==len(actual)
+            if not arguments_aligned:
                 unresolved_arguments+=1
             callee_defs={d["register"]:d["id"] for d in callee.get("register_dataflow",{}).get("definitions",[])
                          if d.get("kind")=="parameter"}
-            for actual_reg,formal_reg,kind in mapping:
-                if not actual_reg:
-                    unresolved_arguments+=1
-                    continue
-                formal_id=callee_defs.get(formal_reg)
-                use=uses.get((site["instruction"],actual_reg))
-                reaching=use.get("reaching_definitions",[]) if use else []
-                if not formal_id or not reaching:
-                    unresolved_arguments+=1
-                    continue
-                for source_id in reaching:
-                    append_edge({"kind":"argument","from_method":caller_key,
-                                  "from_definition":source_id,"to_method":callee["_semantic_key"],
-                                  "to_parameter":formal_id,"actual_register":actual_reg,
-                                  "formal_register":formal_reg,"call_instruction":site["instruction"],
-                                  "call_line":site["line"],"argument_kind":kind,
-                                  "component":caller.get("component")})
-                    argument_edges+=1
+            if arguments_aligned:
+                for actual_reg,formal_reg,kind in mapping:
+                    if not actual_reg:
+                        unresolved_arguments+=1
+                        continue
+                    formal_id=callee_defs.get(formal_reg)
+                    use=uses.get((site["instruction"],actual_reg))
+                    reaching=use.get("reaching_definitions",[]) if use else []
+                    if not formal_id or not reaching:
+                        unresolved_arguments+=1
+                        continue
+                    for source_id in reaching:
+                        append_edge({"kind":"argument","from_method":caller_key,
+                                      "from_definition":source_id,"to_method":callee["_semantic_key"],
+                                      "to_parameter":formal_id,"actual_register":actual_reg,
+                                      "formal_register":formal_reg,"call_instruction":site["instruction"],
+                                      "call_line":site["line"],"argument_kind":kind,
+                                      "component":caller.get("component")})
+                        argument_edges+=1
             if site.get("result_instruction") is not None and site.get("result_register"):
                 caller_result_id="d{}:{}".format(site["result_instruction"],site["result_register"])
                 return_uses=[u for u in callee.get("register_dataflow",{}).get("uses",[])
