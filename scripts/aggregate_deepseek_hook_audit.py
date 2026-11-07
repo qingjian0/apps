@@ -137,6 +137,7 @@ def mutual_best_matches(left_candidates, right_candidates, minimum_score=0.48, m
         "right_ambiguous": right_ambiguous,
         "non_mutual": non_mutual,
         "below_threshold": below_threshold,
+        "no_shared_semantic_evidence": no_shared_semantic_evidence,
     }
 
 
