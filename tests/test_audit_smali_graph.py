@@ -292,7 +292,7 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertTrue(facts["complete"])
         self.assertEqual(2, facts["singleton_receiver_count"])
         self.assertEqual(1, len(facts["same_instance_groups"]))
-        self.assertTrue(facts["same_instance_groups"][0]["confirmed_same_instance"])
+        self.assertTrue(facts["same_instance_groups"][0]["same_instance_within_single_activation"])
         self.assertEqual(
             facts["field_receivers"][0]["identity"],
             facts["field_receivers"][1]["identity"],
