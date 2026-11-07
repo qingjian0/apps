@@ -141,6 +141,15 @@ class CandidateProjectionTest(unittest.TestCase):
         self.assertEqual(1, diagnostics["left_ambiguous"])
         self.assertEqual(0, diagnostics["right_ambiguous"])
 
+    def test_role_bucket_does_not_contribute_to_similarity(self):
+        left = prepared_method({"class": "La;", "name": "x", "descriptor": "()V",
+            "roles": [{"role": "request_route", "anchors": ["unknown-left"]}],
+            "opcode_histogram": {"invoke-virtual": 4}})
+        right = prepared_method({"class": "Lb;", "name": "y", "descriptor": "()V",
+            "roles": [{"role": "request_route", "anchors": ["unknown-right"]}],
+            "opcode_histogram": {"invoke-virtual": 4}})
+        self.assertEqual(0.0, prepared_similarity(left, right))
+
     def test_prepared_similarity_is_stable_for_identical_candidates(self):
         method = {
             "class": "Lx;",
