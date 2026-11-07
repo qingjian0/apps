@@ -91,19 +91,20 @@ class StaticProgramGraph private constructor(
         }
         val linkedFields = linkedReads + linkedWrites
         val interproceduralEdges = argumentEdges + returnEdges
-        if (linkedFields > 0 || interproceduralEdges > 0) {
-            val weight = (0.50 +
-                minOf(0.22, linkedFields.coerceAtMost(7) * 0.03) +
-                minOf(0.20, interproceduralEdges.coerceAtMost(8) * 0.025) +
-                minOf(0.08, (fieldAnchorHits.size + valueFlowAnchorHits.size) * 0.02)).coerceAtMost(0.95)
+        // A shared field descriptor is only a field-slot association. Without receiver
+        // points-to/alias proof it must never satisfy the DATA_FLOW evidence contract.
+        if (interproceduralEdges > 0) {
+            val weight = (0.62 +
+                minOf(0.22, interproceduralEdges.coerceAtMost(8) * 0.025) +
+                minOf(0.11, valueFlowAnchorHits.size * 0.055)).coerceAtMost(0.95)
             evidence += Evidence(
                 EvidenceFamily.DATA_FLOW,
-                "cross-method-field-slot-links=" + linkedFields +
-                    ";interprocedural-argument-edges=" + argumentEdges +
+                "interprocedural-argument-edges=" + argumentEdges +
                     ";interprocedural-return-edges=" + returnEdges +
-                    ";field-neighbor-rare-anchor-hits=" + fieldAnchorHits.size +
                     ";value-flow-neighbor-rare-anchor-hits=" + valueFlowAnchorHits.size +
-                    ";anchors=" + (fieldAnchorHits + valueFlowAnchorHits).distinct().sorted().joinToString(","),
+                    ";field-slot-links-diagnostic-only=" + linkedFields +
+                    ";field-neighbor-rare-anchor-hits-diagnostic-only=" + fieldAnchorHits.size +
+                    ";anchors=" + valueFlowAnchorHits.sorted().joinToString(","),
                 weight
             )
         }
