@@ -31,7 +31,7 @@ class StaticProgramGraphTest {
         val edges = gzipLines(emptyList())
         val classes = gzipLines(emptyList())
         val seen = mutableListOf<String>()
-        StaticProgramGraph.load(methods, edges, classes, onMethodRecord = { seen += it })
+        StaticProgramGraph.load(methods, edges, classes, onMethodRecord = { seen += it.toString() })
         assertTrue(seen.size == 2)
         assertTrue(seen.any { it.contains("\"name\":\"one\"") })
         assertTrue(seen.any { it.contains("\"name\":\"two\"") })
