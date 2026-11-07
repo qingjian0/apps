@@ -1153,6 +1153,39 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4):
                 "path":state["path"]+(callee_key,),
                 "depth":state["depth"]+1
             })
+        # A returned object may be used directly as a field receiver in the caller,
+        # not only forwarded as an argument to another invoke.
+        for fact in caller_pts.get("field_receivers",[]):
+            register=fact.get("receiver_register")
+            override=register_overrides.get(register) if register else None
+            if not override or not linear_return_safe:
+                continue
+            definition=override["definition_instruction"]
+            instruction=fact.get("instruction",-1)
+            if instruction<=definition:
+                continue
+            if any(definition<x<instruction for x in writes_by_register.get(register,[])):
+                continue
+            identities=sorted(set(override["points_to"]))
+            unknown=bool(override["unknown"])
+            status=("unknown" if unknown else
+                    "singleton" if len(identities)==1 else
+                    "multiple" if len(identities)>1 else "unresolved")
+            if len(contextual_receivers)<record_limit:
+                contextual_receivers.append({
+                    "context_id":state["context_id"],"caller":caller_key,"callee":caller_key,
+                    "call_instruction":None,"receiver_instruction":instruction,
+                    "receiver_register":register,"field":fact.get("field"),
+                    "access":fact.get("access"),"points_to":identities,"unknown":unknown,
+                    "identity_status":status,
+                    "identity":identities[0] if status=="singleton" else None,
+                    "identity_scope":"bounded-call-string-context",
+                    "runtime_identity_proven":False
+                })
+            else:
+                records_truncated=True
+            if status=="singleton":
+                singleton_context_receivers+=1
     for method in methods:
         method.pop("_points_to_key",None)
     return {
