@@ -234,3 +234,19 @@ Kotlin `StaticProgramGraph` 已读取 CFG 完整性和结构计数；只有 `com
 ### 尚存限制与下一阶段
 
 该 CFG 是 Smali 层的保守结构图，不是 ART/Dex verifier，也不包含寄存器级 def-use、参数/返回值传播、对象别名、支配树或完整协程状态机恢复。下一阶段转向寄存器 use-def 与跨基本块 reaching-def 数据流，并用 2.7.3/2.7.5 已人工复核的 SSE 调用链建立真值集；CFG 不完整或数据流无法闭合时继续 fail-closed。
+
+
+## 14. Dalvik 寄存器操作数 use-def 初步提取（2026-11-07）
+
+在 CFG 结构输出基础上，APK 审计器新增方法级 `register_flow`：
+
+- 对可识别指令记录寄存器读集合与写集合，并保留方法体行号、opcode。
+- 覆盖 move/const/new-instance/array/field access/arithmetic/compare/return/branch/monitor/invoke 等常见指令族。
+- 识别 `invoke-*/range {vN .. vM}` 连续寄存器范围，并展开为实际寄存器列表。
+- 对 `/2addr` 算术指令同时记录目标寄存器的读与写，避免漏掉旧值依赖。
+- 未识别且包含寄存器操作数的 opcode 进入 `unknown_opcodes`，使该方法的 use-def 分类标记为不完整。
+- 输出 `read_registers`、`written_registers`、逐指令 `instructions` 和截断状态。
+
+**边界：** 当前只是单方法、单指令级操作数读写提取，不是 reaching-definitions、SSA、跨基本块/跨方法数据流，也未完整建模 wide/long/double 寄存器对、对象别名、异常路径上的寄存器状态或参数/返回值传播。不得将 `register_flow.complete` 解读为完整程序数据流证明；它只表示本方法中已识别的寄存器指令族没有发现未知 opcode。该数据目前只写入脱敏静态索引，不参与 Resolver 加分或 Hook 授权。
+
+本轮新增测试覆盖普通寄存器读写、字段访问、invoke 参数、invoke/range 展开、二地址算术和未知 opcode fail-closed。待对应 GitHub Actions run 完成后，再记录最终测试与五版本复验结论。
