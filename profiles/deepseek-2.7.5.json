@@ -7,7 +7,8 @@
   "apk": {
     "path": "DeepSeek_2.7.5.apk",
     "sha256": "ddc52ef868b991fd33e634de834a3e2c022b0cd7ff9e854f4f141996aaeadb70",
-    "dex_count": 3
+    "dex_count": 3,
+    "bytes": 22210268
   },
   "evidence": {
     "static_dex": {
@@ -18,8 +19,31 @@
       "jadx_java_files": 13940,
       "jadx_exit_code": 3,
       "jadx_errors": 344,
-      "smali_files": 0,
-      "smali_source": "separate comparison artifact 42338674344 / 2.7.5/all-smali.zip"
+      "smali_files": 15364,
+      "smali_source": "separate comparison artifact 42338674344 / 2.7.5/all-smali.zip",
+      "dex_inventory": [
+        {
+          "name": "classes.dex",
+          "bytes": 12697064
+        },
+        {
+          "name": "classes2.dex",
+          "bytes": 264820
+        },
+        {
+          "name": "classes3.dex",
+          "bytes": 2759260
+        }
+      ],
+      "native_library_count": 16,
+      "native_library_bytes": 9126084,
+      "profile_descriptor_validation": {
+        "status": "manually_verified_against_all_smali_archive",
+        "artifact_run_id": 42338674344,
+        "classes_verified": 14,
+        "methods_verified": 20,
+        "note": "Exact method descriptors and class files were checked against the 2.7.5 all-smali.zip artifact."
+      }
     },
     "dynamic_runtime": {
       "status": "not_provided_for_2.7.5",
