@@ -11,4 +11,11 @@ dependencies {
 }
 
 tasks.test { useJUnitPlatform() }
+
+tasks.register<JavaExec>("ingestAudit") {
+    group = "verification"
+    description = "Map real APK audit JSONL indexes into semantic candidates"
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("dsh.semantic.StaticAuditCliKt")
+}
 kotlin { jvmToolchain(21) }
