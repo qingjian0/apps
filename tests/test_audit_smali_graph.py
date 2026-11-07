@@ -499,7 +499,7 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         receiver = graph["contextual_receivers"][0]
         self.assertEqual("singleton", receiver["identity_status"])
         self.assertEqual(caller_pts["invoke_arguments"][0]["points_to"][0], receiver["identity"])
-        self.assertEqual("one-callsite-context", receiver["identity_scope"])
+        self.assertEqual("bounded-call-string-context", receiver["identity_scope"])
         self.assertFalse(receiver["runtime_identity_proven"])
 
     def test_interprocedural_points_to_propagates_identity_across_two_call_edges(self):
