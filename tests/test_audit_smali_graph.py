@@ -361,5 +361,18 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertFalse(groups[0]["instance_identity_confirmed"])
 
 
+    def test_wide_register_instructions_fail_closed_until_pair_model_exists(self):
+        facts = AUDIT.analyze_register_use_def([
+            "    move-wide v0, v2",
+            "    return-wide v0",
+        ])
+        self.assertFalse(facts["complete"])
+        self.assertEqual(2, facts["unknown_opcode_count"])
+        self.assertTrue(all(
+            item["reason"] == "wide-register-pair-not-modeled"
+            for item in facts["unknown_opcodes"]
+        ))
+
+
 if __name__ == "__main__":
     unittest.main()
