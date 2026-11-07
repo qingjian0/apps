@@ -110,7 +110,7 @@ def build_smali_cfg(body_lines):
     verifier-grade DEX CFG and must not be treated as complete when flagged.
     """
     instructions=[]; labels={}; payload_labels=set(); switch_payloads={}
-    catches=[]; active_payload=None; active_payload_label=None
+    catches=[]; active_payload=None; active_payload_label=None; last_label=None
     label_re=re.compile(r"^\s*(:[A-Za-z0-9_$-]+)\s*$")
     catch_re=re.compile(r"^\s*\.catch(?:all)?\b.*?\{\s*(:[\w$-]+)\s+\.\.\s+(:[\w$-]+)\s*\}\s*(:[\w$-]+)")
     switch_entry_re=re.compile(r"^\s*(?:-?0x[0-9a-fA-F]+|-?\d+)\s*->\s*(:[\w$-]+)")
@@ -120,6 +120,7 @@ def build_smali_cfg(body_lines):
         if lm:
             label=lm.group(1)
             labels[label]=len(instructions)
+            last_label=label
             if active_payload is not None:
                 payload_labels.add(label)
                 active_payload_label=label
@@ -134,9 +135,13 @@ def build_smali_cfg(body_lines):
             continue
         if stripped.startswith(".packed-switch") or stripped.startswith(".sparse-switch"):
             active_payload="switch"
+            active_payload_label=last_label
+            if last_label: payload_labels.add(last_label)
             continue
         if stripped.startswith(".array-data"):
             active_payload="array"
+            active_payload_label=last_label
+            if last_label: payload_labels.add(last_label)
             continue
         cm=catch_re.match(line)
         if cm:
