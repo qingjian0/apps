@@ -91,8 +91,8 @@ jobs:
                            decl.group(2).strip() if decl else "", hits, methods, fields, constants))
           rows.sort(key=lambda x: (-x[0], x[1]))
           first_party = []
-          method_sig = re.compile(r"\s*(?:public|protected|private)\s+(?:(?:static|final|synchronized|native|abstract)\s+)*([\w.$<>?, \[\]]+)\s+([\w$]+)\s*\(([^)]*)\)")
-          field_sig = re.compile(r"\s*(?:public|protected|private)\s+(?:(?:static|final|volatile|transient)\s+)*([\w.$<>?, \[\]]+)\s+([\w$]+)\s*(?:=|;)")
+          method_sig = re.compile(r"\s*(?!(?:return|throw|new|if|for|while|switch|catch|assert)\b)(?:(?:public|protected|private|static|final|synchronized|native|abstract|strictfp)\s+)*([\w.$<>?, \[\]]+)\s+([\w$]+)\s*\(([^)]*)\)")
+          field_sig = re.compile(r"\s*(?:(?:public|protected|private|static|final|volatile|transient)\s+)*([\w.$<>?, \[\]]+)\s+([\w$]+)\s*(?:=|;)")
           for path in java_files:
               rel = str(path.relative_to(root))
               if not (rel.startswith("defpackage/") or rel.startswith("com/deepseek/")): continue
@@ -123,7 +123,7 @@ jobs:
               "pow_prefetch",
           ]
           xrefs = {term: [] for term in xref_terms}
-          method_pattern = re.compile(r"(?m)^\s*(?:public|protected|private)\s+(?:(?:static|final|synchronized|native|abstract)\s+)*[\w.$<>?, \[\]]+\s+([\w$]+)\s*\(")
+          method_pattern = re.compile(r"(?m)^\s*(?!(?:return|throw|new|if|for|while|switch|catch|assert)\b)(?:(?:public|protected|private|static|final|synchronized|native|abstract|strictfp)\s+)*([\w.$<>?, \[\]]+)\s+([\w$]+)\s*\(")
           for path in java_files:
               try: data = path.read_text(encoding="utf-8", errors="replace")
               except Exception: continue
@@ -132,7 +132,7 @@ jobs:
                   for match in re.finditer(re.escape(term), data):
                       before = data[:match.start()]
                       declarations = list(method_pattern.finditer(before))
-                      method_name = declarations[-1].group(1) if declarations else "<class-or-field>"
+                      method_name = declarations[-1].group(2) if declarations else "<class-or-field>"
                       rel = str(path.relative_to(root))
                       entry = {"path": rel, "method": method_name}
                       if entry not in xrefs[term] and len(xrefs[term]) < 80:
@@ -178,7 +178,67 @@ jobs:
           ], ensure_ascii=False, indent=2), encoding="utf-8")
           (out / "cross-references.json").write_text(json.dumps(xrefs, ensure_ascii=False, indent=2), encoding="utf-8")
           (out / "first-party-class-index.json").write_text(json.dumps(first_party, ensure_ascii=False, indent=2), encoding="utf-8")
-          print(f"Indexed {len(rows)} candidate classes")
+          print(f"Indexed {len(rows)} candidate classes and {len(first_party)} first-party classes")
+          PY
+      - name: Validate and package source evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m json.tool audit/candidate-index.json >/dev/null
+          python3 -m json.tool audit/cross-references.json >/dev/null
+          python3 -m json.tool audit/first-party-class-index.json >/dev/null
+          test -s audit/report.md
+          python3 - <<'PY'
+          import json, pathlib, zipfile
+          root = pathlib.Path("decompiled/sources")
+          out = pathlib.Path("audit")
+          classes = json.loads((out / "first-party-class-index.json").read_text())
+          candidates = json.loads((out / "candidate-index.json").read_text())
+          xrefs = json.loads((out / "cross-references.json").read_text())
+          if not classes: raise SystemExit("first-party class index is empty")
+          if not candidates: raise SystemExit("candidate index is empty")
+          if not xrefs.get("PowCalculator"): raise SystemExit("PowCalculator cross-reference missing")
+          source_zip = out / "decompiled-first-party.zip"
+          count = 0
+          with zipfile.ZipFile(source_zip, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as z:
+              for prefix in ("defpackage", "com/deepseek"):
+                  folder = root / prefix
+                  if not folder.exists(): continue
+                  for p in folder.rglob("*.java"):
+                      z.write(p, p.relative_to(root))
+                      count += 1
+          methods = sum(len(x.get("methods", [])) for x in classes)
+          fields = sum(len(x.get("fields", [])) for x in classes)
+          sha = pathlib.Path("apk.sha256").read_text().split()[0]
+          jadx_exit = pathlib.Path("audit/jadx.exit-code").read_text().strip()
+          summary = {
+              "apk_sha256": sha, "jadx_exit_code": int(jadx_exit),
+              "candidate_classes": len(candidates), "first_party_classes": len(classes),
+              "indexed_methods": methods, "indexed_fields": fields,
+              "cross_reference_terms": len(xrefs), "archived_source_files": count,
+              "source_archive_bytes": source_zip.stat().st_size
+          }
+          (out / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+          quality = [
+              "# Static index quality and limitations", "",
+              f"- APK SHA-256: {sha}",
+              f"- JADX exit code: {jadx_exit} (non-zero may indicate partial decompilation; inspect diagnostics)",
+              f"- Candidate classes: {len(candidates)}",
+              f"- First-party classes indexed: {len(classes)}",
+              f"- Method signatures indexed: {methods}",
+              f"- Field signatures indexed: {fields}",
+              f"- Static cross-reference terms: {len(xrefs)}",
+              f"- Decompiled first-party source files archived: {count}",
+              f"- Source archive size: {source_zip.stat().st_size:,} bytes", "",
+              "## Interpretation limits", "",
+              "- Candidate ranking is keyword-based navigation, not a semantic classifier.",
+              "- String/symbol cross-references do not prove a runtime call path or execution order.",
+              "- JADX can emit source while returning a non-zero status; all affected classes must be checked against DEX where decompilation is incomplete.",
+              "- The signature index is a line-oriented parser; inspect archived Java source for overloads, multiline declarations, synthetic bridges, and Kotlin-generated methods.",
+              "- No endpoint, PoW, stream, or Agent semantics should be claimed from keyword matches alone."
+          ]
+          (out / "index-quality.md").write_text("\n".join(quality) + "\n", encoding="utf-8")
+          print(json.dumps(summary, indent=2))
           PY
       - name: Upload evidence report
         uses: actions/upload-artifact@v4
@@ -187,6 +247,11 @@ jobs:
           path: |
             audit/report.md
             audit/candidate-index.json
+            audit/cross-references.json
+            audit/first-party-class-index.json
+            audit/summary.json
+            audit/index-quality.md
+            audit/decompiled-first-party.zip
             audit/jadx.exit-code
             audit/jadx.stderr.log
             apk.sha256
