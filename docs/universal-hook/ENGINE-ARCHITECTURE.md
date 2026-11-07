@@ -331,3 +331,6 @@ The next implementation step is to add parameter/return edges between methods an
 
 
 补充 fail-closed 规则：Dalvik wide 指令（包含 wide / long / double 的寄存器操作）在 pair-aware transfer function 完成前会被标记为 unknown opcode，使该方法的数据流完整性失败；不能只追踪 wide value 的低位寄存器并假装整个值已解析。新增回归用例覆盖 move-wide 与 return-wide。
+
+
+补充调用点完整性门槛：方法内 invoke opcode 总数必须与成功解析的标准 invoke-site 数一致；invoke-custom、invoke-polymorphic、quickened 或无法识别的调用形式不会被猜成普通直接调用。只要调用点清单存在未解析或截断，调用方方法的跨方法值边整体跳过并计入不完整统计。字段访问 opcode 数与字段访问点数也单独核对，避免字段槽索引被误读为完整字段清单。
