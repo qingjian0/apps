@@ -41,6 +41,8 @@ jobs:
         run: |
           python -m py_compile scripts/audit_deepseek_apk.py
           python -m py_compile scripts/aggregate_deepseek_hook_audit.py
+      - name: Check patch whitespace
+        run: git diff --check
       - name: Run Smali and semantic graph unit tests
         run: python -m unittest discover -s tests -p "test_audit_smali_graph.py" -v
       - name: Run cross-version aggregation unit tests
