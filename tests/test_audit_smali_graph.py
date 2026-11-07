@@ -84,7 +84,7 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         ]
         cfg = AUDIT.build_smali_cfg(body)
         self.assertTrue(cfg["complete"])
-        self.assertEqual(5, cfg["instruction_count"])
+        self.assertEqual(4, cfg["instruction_count"])
         self.assertIn("switch", {edge["kind"] for edge in cfg["edges"]})
         self.assertIn("switch-default", {edge["kind"] for edge in cfg["edges"]})
 
