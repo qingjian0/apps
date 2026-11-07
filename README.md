@@ -11,11 +11,12 @@
 
 ## 1. 仓库材料盘点
 
-本仓库当前保留四个宿主版本输入（2.7.1 APK、2.7.3 APK、2.7.4 APKM、2.7.5 APK）、两份运行日志和一份 SSE/Hook 证据包。2.7.3 / 2.7.5 已有静态证据；2.7.1 / 2.7.4 纳入本轮统一重审。2.7.2 当前只有 code289-cn 动态日志，不把它误算成已上传 APK。
+本仓库当前保留五个宿主版本输入（2.7.1 APK、2.7.2 APK、2.7.3 APK、2.7.4 APKM、2.7.5 APK）、两份运行日志和一份 SSE/Hook 证据包。2.7.3 / 2.7.5 已有静态证据；2.7.1 / 2.7.4 纳入本轮统一重审。2.7.2 APK `deepseek-2-7-2.apk` 已上传，需与 code289-cn 动态日志核对构建身份。
 
 | 文件 | 大小 | 本轮处理状态 |
 |---|---:|---|
 | deepseek271.apk | 22,006,745 bytes | 2.7.1 输入；本轮重新核对实际包身份和 DEX |
+| deepseek-2-7-2.apk | 22,205,160 bytes | 2.7.2 新上传输入；与 code289-cn 动态日志交叉验证 |
 | deepseek 273.apk | 14,211,169 bytes | 2.7.3；既有 JADX/Smali 结果，本轮重新统一扫描 |
 | com.deepseek.chat_2.7.4-294_...apkm | 19,476,565 bytes | 2.7.4 / code294 分包容器；按内嵌 APK 组件逐个扫描 |
 | DeepSeek_2.7.5.apk | 22,210,268 bytes | 2.7.5；既有 JADX/Smali 结果，本轮重新统一扫描 |
@@ -1192,7 +1193,7 @@ nativeCalculateDeepSeekHashV1Pow(String base, String challenge, long difficulty)
 
 ## 29. 跨版本通用 Hook 重新审计
 
-本轮将分析范围扩展到仓库内全部 DeepSeek 宿主 APK/APKM：2.7.1、2.7.3、2.7.4/code294、2.7.5；并将 2.7.2/code289-cn 的动态日志作为独立证据集。2.7.4 是 APKM，必须按内嵌 APK 组件拆分分析；2.7.2 没有对应 APK 输入，不得伪造静态 Profile。
+本轮将分析范围扩展到仓库内全部 DeepSeek 宿主 APK/APKM：2.7.1、2.7.2/code289-cn、2.7.3、2.7.4/code294、2.7.5；2.7.2 APK 与设备日志作为关联证据集。2.7.4 是 APKM，必须按内嵌 APK 组件拆分分析；2.7.2 已有 APK 输入，需先核对签名、versionCode 与日志设备构建身份，再生成静态 Profile。
 
 - 通用 Hook 设计文档：[docs/universal-hook/README.md](docs/universal-hook/README.md)
 - 审计脚本：[scripts/audit_deepseek_apk.py](scripts/audit_deepseek_apk.py)
