@@ -167,6 +167,7 @@ F. 使用未参与开发的新版本 APK 盲测。盲测报告记录自动定位
 - 已完成：五版本（2.7.1–2.7.5，含 2.7.4 APKM）Actions 全量静态审计，Run `42345954380` 的五个版本任务和 aggregate 均成功；完整统计、输入哈希、组件清单、DEX/方法/调用边/字段/控制流指标记录于 `docs/universal-hook/五版本静态审计与语义解析记录-2026-11-07.md` 和 `audit/universal-hook/`。
 - 已发现并纠正：首轮静态解析把第三方验证 SDK 的方法误判为宿主 `local_api.request`；已移除宿主 APK 对模块 Local API Gateway 的角色映射。首轮 2.7.5 `conversation.session` 候选的胜出分差仅约 0.355，已将默认 margin 提高至 0.5。
 - 已增加 HookCoordinator 安装授权门槛：要求完整运行时 HostFingerprint（含 versionCode/versionName/签名摘要/DEX/ClassLoader）以及 `HOST_IDENTITY`、`RUNTIME_BEHAVIOR` 证据；静态候选不得直接安装。
+- 身份核验增强：扫描器现调用 `aapt dump badging` 提取二进制 Manifest 的 package/versionCode/versionName/split，并调用 `apksigner verify --print-certs` 记录签名证书 SHA-256；Ubuntu runner 首次未找到预装 build-tools，已改为 apt 安装 `aapt`/`apksigner`。新审计 Run `42347209753` 需验证安装与输出。
 - 本轮新增的 Local API 边界、静态候选禁止安装、运行时身份缺失禁止安装、近似并列拒绝测试，等待最新 Semantic Core CI 结果。
 - 已有核心原型：Kotlin/JVM SemanticResolver（独立证据族、候选歧义和 fail-closed）、角色级幂等 HookCoordinator、HookBackend 抽象、元数据 FeatureContract、StaticAuditJsonReader/StaticEvidenceMapper/StaticAuditCli、RuntimeBehaviorVerifier，以及 StaticProgramGraph（调用者/被调用者索引、跨方法字段读写关联、控制流形态统计、类继承与接口实现关系）。
 - 最新五版本真实数据接入曾全部拒绝 19 个角色，原因是候选锚点过宽、歧义过高；这是正确的 fail-closed 结果，不是 Hook 解析成功。当前已增加锚点稀有度加权、调用图和字段流证据，并为 Smali 字段/控制流解析新增回归测试，等待新一轮 CI 验证。
