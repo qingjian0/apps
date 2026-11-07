@@ -23,6 +23,7 @@
 - 五版本静态审计已全部通过（Run `42345954380`，五个版本任务与 aggregate 成功）；生成完整 DEX/类/方法/调用边/字段/控制流索引及跨版本报告，见 [五版本详细审计记录](docs/universal-hook/五版本静态审计与语义解析记录-2026-11-07.md) 和 `audit/universal-hook/`。
 - 首轮 Resolver 的静态候选存在误判：2.7.3 把第三方验证 SDK 误认为宿主 Local API，2.7.5 的会话候选胜出分差仅约 0.355。已移除宿主 APK 的 Local API 映射、将默认胜出分差提高至 0.5，并要求 HookCoordinator 同时具备完整运行时宿主身份和运行行为证据。
 - 以上是静态审计与语义核心进展，不代表已完成 LSPosed Hook；最新安装门槛和回归测试以本轮 Semantic Core CI 为准。
+- Resolver 已进一步增加四证据族门槛、框架/第三方 SDK 负面证据、稀有锚点沿调用图/字段流传播，以及按功能域定义的必需证据族；语义引擎改动会自动触发五版本重新接入。
 
 **当前限制：** 这是引擎核心原型，不是已完成的 DEX 自动语义发现器，也没有接入 LSPosed Android Backend。Agent、提示词、本地 API 等全功能域已列入覆盖目标，但必须逐域完成静态证据、运行时验证、桥接和回归测试后才能标记完成。详情：[全功能覆盖矩阵](docs/universal-hook/README.md) · [Kotlin Semantic Core](engine/semantic-core/)。
 
