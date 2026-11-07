@@ -163,7 +163,7 @@ def main():
                     raw=z.read(item.filename)
                     native.append({"component":apk.name,"path":item.filename,"bytes":len(raw),"sha256":hashlib.sha256(raw).hexdigest()})
         smali=work/f"smali-{i}"
-        apktool_rc=run(["java","-jar",a.apktool,"d","-f","-r","-o",str(smali),str(apk)],comp_out/"apktool.log")
+        apktool_rc=run(["java","-jar",a.apktool,"d","-f","-o",str(smali),str(apk)],comp_out/"apktool.log")
         if smali.exists():
             cls,meth,edges=analyze_smali(smali)
             for x in cls: x["component"]=apk.name
@@ -181,7 +181,7 @@ def main():
                           "version_code_major":root.attrib.get(android_ns+"versionCodeMajor"),
                           "version_name":root.attrib.get(android_ns+"versionName")}
             except (ET.ParseError,OSError) as exc:
-                manifest={"parse_error":type(exc).__name__}
+                manifest={"parse_error":type(exc).__name__,"parse_detail":str(exc)[:240]}
         jadx_dir=work/f"jadx-{i}"
         jadx_rc=run([a.jadx,"--show-bad-code","--no-res","--threads-count","2","-d",str(jadx_dir),str(apk)],comp_out/"jadx.log")
         java_count=len(list((jadx_dir/"sources").rglob("*.java"))) if (jadx_dir/"sources").exists() else 0
