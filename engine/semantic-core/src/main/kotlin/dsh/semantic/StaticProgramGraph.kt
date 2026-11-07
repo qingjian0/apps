@@ -35,6 +35,9 @@ class StaticProgramGraph private constructor(
     private val writers: Map<String, Set<String>>,
     private val methods: Map<String, MethodGraphFacts>,
     private val methodAnchors: Map<String, Set<String>>,
+    private val interproceduralArgumentEdges: Map<String, Int>,
+    private val interproceduralReturnEdges: Map<String, Int>,
+    private val interproceduralNeighbors: Map<String, Set<String>>,
     private val methodCountsByOwner: Map<String, Int>,
     private val classes: Map<String, ClassGraphFacts>,
     private val subclasses: Map<String, Set<String>>,
@@ -55,6 +58,11 @@ class StaticProgramGraph private constructor(
         val neighborAnchorHits = graphNeighbors.flatMap { methodAnchors[it].orEmpty() }.filter { it in rareAnchors }.distinct()
         val fieldNeighbors = facts?.fieldReads.orEmpty().flatMap { writers[it].orEmpty() } + facts?.fieldWrites.orEmpty().flatMap { readers[it].orEmpty() }
         val fieldAnchorHits = fieldNeighbors.filter { it != id }.flatMap { methodAnchors[it].orEmpty() }.filter { it in rareAnchors }.distinct()
+        val argumentEdges = interproceduralArgumentEdges[id] ?: 0
+        val returnEdges = interproceduralReturnEdges[id] ?: 0
+        val valueFlowNeighbors = interproceduralNeighbors[id].orEmpty()
+        val valueFlowAnchorHits = valueFlowNeighbors.flatMap { methodAnchors[it].orEmpty() }
+            .filter { it in rareAnchors }.distinct()
         val evidence = candidate.evidence.filterNot {
             it.family == EvidenceFamily.CALL_GRAPH ||
                 it.family == EvidenceFamily.DATA_FLOW ||
@@ -82,12 +90,21 @@ class StaticProgramGraph private constructor(
             evidence += Evidence(EvidenceFamily.CALL_GRAPH, topology, weight)
         }
         val linkedFields = linkedReads + linkedWrites
-        if (linkedFields > 0) {
+        val interproceduralEdges = argumentEdges + returnEdges
+        if (linkedFields > 0 || interproceduralEdges > 0) {
+            val weight = (0.50 +
+                minOf(0.22, linkedFields.coerceAtMost(7) * 0.03) +
+                minOf(0.20, interproceduralEdges.coerceAtMost(8) * 0.025) +
+                minOf(0.08, (fieldAnchorHits.size + valueFlowAnchorHits.size) * 0.02)).coerceAtMost(0.95)
             evidence += Evidence(
                 EvidenceFamily.DATA_FLOW,
-                "cross-method-field-links=" + linkedFields + ";read-links=" + linkedReads + ";write-links=" + linkedWrites +
-                    ";field-neighbor-rare-anchor-hits=" + fieldAnchorHits.size + ";anchors=" + fieldAnchorHits.sorted().joinToString(","),
-                (0.52 + minOf(0.32, linkedFields.coerceAtMost(7) * 0.045) + minOf(0.11, fieldAnchorHits.size * 0.055)).coerceAtMost(0.95)
+                "cross-method-field-slot-links=" + linkedFields +
+                    ";interprocedural-argument-edges=" + argumentEdges +
+                    ";interprocedural-return-edges=" + returnEdges +
+                    ";field-neighbor-rare-anchor-hits=" + fieldAnchorHits.size +
+                    ";value-flow-neighbor-rare-anchor-hits=" + valueFlowAnchorHits.size +
+                    ";anchors=" + (fieldAnchorHits + valueFlowAnchorHits).distinct().sorted().joinToString(","),
+                weight
             )
         }
         // Only a resolved CFG contributes control-flow evidence. Legacy branch/label
@@ -111,6 +128,9 @@ class StaticProgramGraph private constructor(
         "fieldReaderMethods" to readers.values.sumOf { it.size },
         "fieldWriterMethods" to writers.values.sumOf { it.size },
         "sharedFields" to readers.keys.intersect(writers.keys).size,
+        "interproceduralArgumentEdges" to (interproceduralArgumentEdges.values.sum() / 2),
+        "interproceduralReturnEdges" to (interproceduralReturnEdges.values.sum() / 2),
+        "interproceduralValueFlowMethods" to interproceduralNeighbors.size,
         "classes" to classes.size,
         "interfaceImplementors" to implementors.values.sumOf { it.size }
     )
@@ -122,13 +142,22 @@ class StaticProgramGraph private constructor(
             "Lokhttp3/", "Lretrofit2/", "Landroidx/"
         )
 
-        fun load(methodsPath: String, edgesPath: String, classesPath: String): StaticProgramGraph {
+        fun load(
+            methodsPath: String,
+            edgesPath: String,
+            classesPath: String,
+            valueEdgesPath: String? = null,
+            summaryPath: String? = null
+        ): StaticProgramGraph {
             val callers = mutableMapOf<String, MutableSet<String>>()
             val callees = mutableMapOf<String, MutableSet<String>>()
             val readers = mutableMapOf<String, MutableSet<String>>()
             val writers = mutableMapOf<String, MutableSet<String>>()
             val methods = mutableMapOf<String, MethodGraphFacts>()
             val methodAnchors = mutableMapOf<String, MutableSet<String>>()
+            val interproceduralArgumentEdges = mutableMapOf<String, Int>()
+            val interproceduralReturnEdges = mutableMapOf<String, Int>()
+            val interproceduralNeighbors = mutableMapOf<String, MutableSet<String>>()
             val classes = mutableMapOf<String, ClassGraphFacts>()
             val subclasses = mutableMapOf<String, MutableSet<String>>()
             val implementors = mutableMapOf<String, MutableSet<String>>()
@@ -183,8 +212,43 @@ class StaticProgramGraph private constructor(
                     callers.getOrPut(to) { mutableSetOf() }.add(from)
                 }
             }
+            val summaryFile = summaryPath?.let(::java.io.File)
+                ?: java.io.File(methodsPath).parentFile?.resolve("summary.json")
+            val valueFlowTruncated = summaryFile?.takeIf { it.isFile }?.let { file ->
+                runCatching {
+                    val flow = json.parseToJsonElement(file.readText()).jsonObject["interprocedural_value_flow"]?.jsonObject
+                    flow?.get("edges_truncated")?.jsonPrimitive?.contentOrNull?.toBooleanStrictOrNull() != false
+                }.getOrDefault(true)
+            } ?: true
+            if (!valueFlowTruncated && valueEdgesPath != null && java.io.File(valueEdgesPath).isFile) {
+                BufferedReader(InputStreamReader(GZIPInputStream(FileInputStream(valueEdgesPath)), Charsets.UTF_8)).use { input ->
+                    input.lineSequence().forEach { line ->
+                        val obj = json.parseToJsonElement(line).jsonObject
+                        val kind = obj["kind"]?.jsonPrimitive?.contentOrNull ?: return@forEach
+                        val from = obj["from_method"]?.jsonPrimitive?.contentOrNull ?: return@forEach
+                        val to = obj["to_method"]?.jsonPrimitive?.contentOrNull ?: return@forEach
+                        if (from !in methods || to !in methods) return@forEach
+                        interproceduralNeighbors.getOrPut(from) { mutableSetOf() }.add(to)
+                        interproceduralNeighbors.getOrPut(to) { mutableSetOf() }.add(from)
+                        when (kind) {
+                            "argument" -> {
+                                interproceduralArgumentEdges[from] = (interproceduralArgumentEdges[from] ?: 0) + 1
+                                interproceduralArgumentEdges[to] = (interproceduralArgumentEdges[to] ?: 0) + 1
+                            }
+                            "return" -> {
+                                interproceduralReturnEdges[from] = (interproceduralReturnEdges[from] ?: 0) + 1
+                                interproceduralReturnEdges[to] = (interproceduralReturnEdges[to] ?: 0) + 1
+                            }
+                        }
+                    }
+                }
+            }
             val methodCountsByOwner = methods.keys.groupingBy { it.substringBefore("->") }.eachCount()
-            return StaticProgramGraph(callers, callees, readers, writers, methods, methodAnchors, methodCountsByOwner, classes, subclasses, implementors)
+            return StaticProgramGraph(
+                callers, callees, readers, writers, methods, methodAnchors,
+                interproceduralArgumentEdges, interproceduralReturnEdges, interproceduralNeighbors,
+                methodCountsByOwner, classes, subclasses, implementors
+            )
         }
     }
 }
