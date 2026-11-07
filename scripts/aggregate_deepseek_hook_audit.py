@@ -109,10 +109,10 @@ def main():
     pairs.sort(key=lambda x:(x["role"],x["from_version"],x["from"],-x["score"]))
     report=["# DeepSeek 通用 Hook 跨版本语义审计","",
       "> 本报告由 GitHub Actions 从 apps 仓库内的宿主 APK/APKM、日志和 SSE 证据包生成。静态候选不等于设备 Hook 已成功。","",
-      "## APK / DEX 总览","","| 版本标签 | 文件 | 组件数 | DEX 数 | 类数 | 方法数 | 候选方法数 |",
-      "|---|---|---:|---:|---:|---:|---:|"]
+      "## APK / DEX 总览","","| 版本标签 | 文件 | 组件数 | DEX 数 | 类数 | 方法数 | 调用边 | 字段读/写 | CFG 分支方法/分支数 | 候选方法数 |",
+      "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|"]
     for v,s in summaries.items():
-        report.append(f"| {v} | {s['source_file']} | {len(s['components'])} | {s['dex_count']} | {s['class_count']} | {s['method_count']} | {s['candidate_method_count']} |")
+        report.append(f"| {v} | {s['source_file']} | {len(s['components'])} | {s['dex_count']} | {s['class_count']} | {s['method_count']} | {s.get('call_edge_count',0)} | {s.get('field_read_count',0)}/{s.get('field_write_count',0)} | {s.get('methods_with_control_flow',0)}/{s.get('control_flow_branch_count',0)} | {s['candidate_method_count']} |")
     report += ["","## 组件身份核对","","| 版本 | 组件 | 包名 | versionCode | versionName | split | 身份完整度 | APK SHA-256 |",
       "|---|---|---|---|---|---|---|"]
     for v,s in summaries.items():
