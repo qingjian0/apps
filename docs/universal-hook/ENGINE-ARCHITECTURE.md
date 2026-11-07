@@ -445,3 +445,19 @@ and non-convergent analysis fail closed.
 - 将人工确认的 2.7.2 / 2.7.4 网络请求边界及 2.7.3 SSE 分派链作为正例；同角色但不同职责的方法作为负例，测量 precision/recall，而不是只看候选数量。
 - 检查 2.7.3 Manifest 标签冲突；在输入身份得到证实前继续隔离其跨版本匹配。
 - 保持 Kotlin Resolver 的独立证据族、角色必需证据和运行时授权门槛，不因静态匹配数量下降而放宽安装策略。
+
+
+## Interprocedural Value-Flow Ingestion Integrity
+
+The Kotlin semantic graph treats Python-emitted interprocedural value-flow rows as a complete dataset, not as a best-effort sample. Before any row can contribute to DATA_FLOW evidence, ingestion verifies:
+
+- The summary explicitly reports edges_truncated=false.
+- The compressed value-flow file exists and can be read.
+- The number of accepted rows equals stored_edge_count.
+- stored_edge_count equals the summary edge_count.
+- No row references a caller or callee method absent from the method index.
+- Unknown edge kinds or incomplete rows cause a count mismatch and fail closed.
+
+The semantic graph exposes expected, stored, loaded, skipped-endpoint, file-present, and complete counters in its ingest statistics. These distinguish a legitimately empty graph from a missing file, truncated source, or partially joined graph. A partial graph may be inspected diagnostically, but it must not generate DATA_FLOW evidence.
+
+Points-to remains a separate diagnostic channel. A complete value-flow edge index does not imply complete Points-to context expansion, and neither static result proves ART runtime object identity.
