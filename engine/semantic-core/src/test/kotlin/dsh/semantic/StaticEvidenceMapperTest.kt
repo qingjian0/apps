@@ -21,4 +21,15 @@ class StaticEvidenceMapperTest {
         val resolution = SemanticResolver().resolve(host, RolePolicy(candidate.role, minimumScore = 2.0), listOf(candidate))
         assertTrue(resolution.accepted)
     }
+    @Test fun rareAnchorsReceiveHigherSpecificityThanCommonAnchors() {
+        val host = HostFingerprint("com.deepseek.chat", 301, "future", "cert", "dex-new", "loader-new")
+        val record = StaticMethodRecord(
+            "Lq/a;", "m", "()V", emptyList(), "V", emptyList(), 8,
+            listOf(StaticRoleEvidence("prompt_pipeline", listOf("custom_instructions", "prompt")))
+        )
+        val candidate = StaticEvidenceMapper().map(host, record, mapOf("custom_instructions" to 1, "prompt" to 400)).single()
+        val weights = candidate.evidence.filter { it.family == EvidenceFamily.PROTOCOL_ANCHOR }.associate { it.key to it.weight }
+        assertTrue(weights.getValue("custom_instructions") > weights.getValue("prompt"))
+    }
+
 }
