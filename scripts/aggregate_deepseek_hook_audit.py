@@ -145,16 +145,8 @@ def mutual_best_matches(left_candidates, right_candidates, minimum_score=0.48, m
 
 
 def similarity(a,b):
-    A=feature_set(a); B=feature_set(b)
-    if not A or not B: return 0.0
-    j=len(A&B)/len(A|B)
-    ah=a.get("opcode_histogram",{}); bh=b.get("opcode_histogram",{})
-    keys=set(ah)|set(bh)
-    if keys:
-        den=sum(max(ah.get(k,0),bh.get(k,0)) for k in keys) or 1
-        op=sum(min(ah.get(k,0),bh.get(k,0)) for k in keys)/den
-    else: op=0.0
-    return round(0.78*j+0.22*op,4)
+    """Compatibility wrapper; keep every caller on the conservative semantic policy."""
+    return prepared_similarity(prepared_method(a), prepared_method(b))
 def probe_summary(repo):
     out={}
     for filename in ("dsprobe.log","deekseep_vision.log"):
