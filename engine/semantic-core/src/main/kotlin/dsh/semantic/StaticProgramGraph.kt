@@ -38,6 +38,9 @@ class StaticProgramGraph private constructor(
     private val interproceduralArgumentEdges: Map<String, Int>,
     private val interproceduralReturnEdges: Map<String, Int>,
     private val interproceduralNeighbors: Map<String, Set<String>>,
+    private val contextualReceiverCount: Int,
+    private val singletonContextReceiverCount: Int,
+    private val interproceduralPointsToLoaded: Boolean,
     private val methodCountsByOwner: Map<String, Int>,
     private val classes: Map<String, ClassGraphFacts>,
     private val subclasses: Map<String, Set<String>>,
@@ -132,6 +135,9 @@ class StaticProgramGraph private constructor(
         "interproceduralArgumentEdges" to (interproceduralArgumentEdges.values.sum() / 2),
         "interproceduralReturnEdges" to (interproceduralReturnEdges.values.sum() / 2),
         "interproceduralValueFlowMethods" to interproceduralNeighbors.size,
+        "interproceduralContextualReceivers" to contextualReceiverCount,
+        "interproceduralSingletonContextReceivers" to singletonContextReceiverCount,
+        "interproceduralPointsToLoaded" to if (interproceduralPointsToLoaded) 1 else 0,
         "classes" to classes.size,
         "interfaceImplementors" to implementors.values.sumOf { it.size }
     )
@@ -148,7 +154,8 @@ class StaticProgramGraph private constructor(
             edgesPath: String,
             classesPath: String,
             valueEdgesPath: String? = null,
-            summaryPath: String? = null
+            summaryPath: String? = null,
+            pointsToPath: String? = null
         ): StaticProgramGraph {
             val callers = mutableMapOf<String, MutableSet<String>>()
             val callees = mutableMapOf<String, MutableSet<String>>()
@@ -244,10 +251,58 @@ class StaticProgramGraph private constructor(
                     }
                 }
             }
+            var contextualReceiverCount = 0
+            var singletonContextReceiverCount = 0
+            var interproceduralPointsToLoaded = false
+            val pointsToSummary = summaryFile?.takeIf { it.isFile }?.let { file ->
+                runCatching {
+                    json.parseToJsonElement(file.readText()).jsonObject["interprocedural_points_to"]?.jsonObject
+                }.getOrNull()
+            }
+            val pointsToSummaryComplete = pointsToSummary?.let { summary ->
+                summary["records_truncated"]?.jsonPrimitive?.contentOrNull?.toBooleanStrictOrNull() == false &&
+                    summary["recursive_fixed_point"]?.jsonPrimitive?.contentOrNull?.toBooleanStrictOrNull() == false &&
+                    summary["runtime_identity_proven"]?.jsonPrimitive?.contentOrNull?.toBooleanStrictOrNull() == false
+            } == true
+            if (pointsToSummaryComplete && pointsToPath != null && java.io.File(pointsToPath).isFile) {
+                val loaded = runCatching {
+                    var receiverCount = 0
+                    var singletonCount = 0
+                    BufferedReader(InputStreamReader(GZIPInputStream(FileInputStream(pointsToPath)), Charsets.UTF_8)).use { input ->
+                        input.lineSequence().forEach { line ->
+                            val obj = json.parseToJsonElement(line).jsonObject
+                            val caller = obj["caller"]?.jsonPrimitive?.contentOrNull
+                                ?: error("missing points-to caller")
+                            val callee = obj["callee"]?.jsonPrimitive?.contentOrNull
+                                ?: error("missing points-to callee")
+                            val scope = obj["identity_scope"]?.jsonPrimitive?.contentOrNull
+                            val runtimeProven = obj["runtime_identity_proven"]?.jsonPrimitive?.contentOrNull
+                                ?.toBooleanStrictOrNull()
+                            if (caller !in methods || callee !in methods ||
+                                scope != "one-callsite-context" || runtimeProven != false) {
+                                error("invalid contextual points-to evidence row")
+                            }
+                            receiverCount++
+                            if (obj["identity_status"]?.jsonPrimitive?.contentOrNull == "singleton") {
+                                val identity = obj["identity"]?.jsonPrimitive?.contentOrNull
+                                if (identity.isNullOrBlank()) error("singleton points-to row missing identity")
+                                singletonCount++
+                            }
+                        }
+                    }
+                    receiverCount to singletonCount
+                }
+                loaded.onSuccess { counts ->
+                    contextualReceiverCount = counts.first
+                    singletonContextReceiverCount = counts.second
+                    interproceduralPointsToLoaded = true
+                }
+            }
             val methodCountsByOwner = methods.keys.groupingBy { it.substringBefore("->") }.eachCount()
             return StaticProgramGraph(
                 callers, callees, readers, writers, methods, methodAnchors,
                 interproceduralArgumentEdges, interproceduralReturnEdges, interproceduralNeighbors,
+                contextualReceiverCount, singletonContextReceiverCount, interproceduralPointsToLoaded,
                 methodCountsByOwner, classes, subclasses, implementors
             )
         }
