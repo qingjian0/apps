@@ -110,9 +110,20 @@ class CandidateProjectionTest(unittest.TestCase):
                 "opcode_histogram": {"const/4": 3}}),
         ]
         matches, diagnostics = mutual_best_matches(left, right)
-        self.assertEqual(2, len(matches))
+        self.assertEqual(1, len(matches))
         self.assertEqual(0, diagnostics["left_ambiguous"])
         self.assertEqual(0, diagnostics["right_ambiguous"])
+
+    def test_mutual_best_match_rejects_role_only_similarity(self):
+        left = prepared_method({"class": "La;", "name": "x", "descriptor": "()V",
+            "roles": [{"role": "request_route", "anchors": ["unknown-left"]}],
+            "strings": ["not-an-indexed-protocol-string"], "opcode_histogram": {"invoke-virtual": 4}})
+        right = prepared_method({"class": "Lb;", "name": "y", "descriptor": "()V",
+            "roles": [{"role": "request_route", "anchors": ["unknown-right"]}],
+            "strings": ["another-unindexed-string"], "opcode_histogram": {"invoke-virtual": 4}})
+        matches, diagnostics = mutual_best_matches([left], [right])
+        self.assertEqual([], matches)
+        self.assertEqual(1, diagnostics["no_shared_semantic_evidence"])
 
     def test_mutual_best_match_rejects_tied_ambiguous_candidates(self):
         source = prepared_method({"class": "La;", "name": "x", "descriptor": "()V",
