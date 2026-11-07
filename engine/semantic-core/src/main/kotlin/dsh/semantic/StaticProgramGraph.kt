@@ -42,6 +42,12 @@ class StaticProgramGraph private constructor(
     private val contextualReceiverCount: Int,
     private val singletonContextReceiverCount: Int,
     private val interproceduralPointsToLoaded: Boolean,
+    private val valueFlowExpectedEdgeCount: Int,
+    private val valueFlowStoredEdgeCount: Int,
+    private val valueFlowLoadedEdgeCount: Int,
+    private val valueFlowSkippedMissingMethods: Int,
+    private val valueFlowFilePresent: Boolean,
+    private val valueFlowComplete: Boolean,
     private val methodCountsByOwner: Map<String, Int>,
     private val classes: Map<String, ClassGraphFacts>,
     private val subclasses: Map<String, Set<String>>,
@@ -139,6 +145,12 @@ class StaticProgramGraph private constructor(
         "interproceduralContextualReceivers" to contextualReceiverCount,
         "interproceduralSingletonContextReceivers" to singletonContextReceiverCount,
         "interproceduralPointsToLoaded" to if (interproceduralPointsToLoaded) 1 else 0,
+        "interproceduralValueFlowExpectedEdges" to valueFlowExpectedEdgeCount,
+        "interproceduralValueFlowStoredEdges" to valueFlowStoredEdgeCount,
+        "interproceduralValueFlowLoadedEdges" to valueFlowLoadedEdgeCount,
+        "interproceduralValueFlowSkippedMissingMethods" to valueFlowSkippedMissingMethods,
+        "interproceduralValueFlowFilePresent" to if (valueFlowFilePresent) 1 else 0,
+        "interproceduralValueFlowComplete" to if (valueFlowComplete) 1 else 0,
         "classes" to classes.size,
         "interfaceImplementors" to implementors.values.sumOf { it.size }
     )
@@ -223,24 +235,30 @@ class StaticProgramGraph private constructor(
                     callers.getOrPut(to) { mutableSetOf() }.add(from)
                 }
             }
-            val summaryFile = summaryPath?.let { java.io.File(it) }
-                ?: java.io.File(methodsPath).parentFile?.resolve("summary.json")
-            val valueFlowTruncated = summaryFile?.takeIf { it.isFile }?.let { file ->
-                runCatching {
-                    val flow = json.parseToJsonElement(file.readText()).jsonObject["interprocedural_value_flow"]?.jsonObject
-                    flow?.get("edges_truncated")?.jsonPrimitive?.contentOrNull?.toBooleanStrictOrNull() != false
-                }.getOrDefault(true)
-            } ?: true
-            if (!valueFlowTruncated && valueEdgesPath != null && java.io.File(valueEdgesPath).isFile) {
-                BufferedReader(InputStreamReader(GZIPInputStream(FileInputStream(valueEdgesPath)), Charsets.UTF_8)).use { input ->
+            val summaryObject = summaryFile?.takeIf { it.isFile }?.let { file ->
+                runCatching { json.parseToJsonElement(file.readText()).jsonObject }.getOrNull()
+            }
+            val valueFlowSummary = summaryObject?.get("interprocedural_value_flow")?.jsonObject
+            val valueFlowTruncated = valueFlowSummary?.get("edges_truncated")
+                ?.jsonPrimitive?.contentOrNull?.toBooleanStrictOrNull() != false
+            val valueFlowExpectedEdgeCount = valueFlowSummary?.get("edge_count")
+                ?.jsonPrimitive?.intOrNull ?: 0
+            val valueFlowStoredEdgeCount = valueFlowSummary?.get("stored_edge_count")
+                ?.jsonPrimitive?.intOrNull ?: 0
+            val valueFlowFilePresent = valueEdgesPath != null && java.io.File(valueEdgesPath).isFile
+            var valueFlowLoadedEdgeCount = 0
+            var valueFlowSkippedMissingMethods = 0
+            if (!valueFlowTruncated && valueFlowFilePresent) {
+                BufferedReader(InputStreamReader(GZIPInputStream(FileInputStream(valueEdgesPath!!)), Charsets.UTF_8)).use { input ->
                     input.lineSequence().forEach { line ->
                         val obj = json.parseToJsonElement(line).jsonObject
                         val kind = obj["kind"]?.jsonPrimitive?.contentOrNull ?: return@forEach
                         val from = obj["from_method"]?.jsonPrimitive?.contentOrNull ?: return@forEach
                         val to = obj["to_method"]?.jsonPrimitive?.contentOrNull ?: return@forEach
-                        if (from !in methods || to !in methods) return@forEach
-                        interproceduralNeighbors.getOrPut(from) { mutableSetOf() }.add(to)
-                        interproceduralNeighbors.getOrPut(to) { mutableSetOf() }.add(from)
+                        if (from !in methods || to !in methods) {
+                            valueFlowSkippedMissingMethods++
+                            return@forEach
+                        }
                         when (kind) {
                             "argument" -> {
                                 interproceduralArgumentEdges[from] = (interproceduralArgumentEdges[from] ?: 0) + 1
@@ -250,18 +268,22 @@ class StaticProgramGraph private constructor(
                                 interproceduralReturnEdges[from] = (interproceduralReturnEdges[from] ?: 0) + 1
                                 interproceduralReturnEdges[to] = (interproceduralReturnEdges[to] ?: 0) + 1
                             }
+                            else -> return@forEach
                         }
+                        interproceduralNeighbors.getOrPut(from) { mutableSetOf() }.add(to)
+                        interproceduralNeighbors.getOrPut(to) { mutableSetOf() }.add(from)
+                        valueFlowLoadedEdgeCount++
                     }
                 }
             }
+            val valueFlowComplete = !valueFlowTruncated && valueFlowFilePresent &&
+                valueFlowLoadedEdgeCount == valueFlowStoredEdgeCount &&
+                valueFlowStoredEdgeCount == valueFlowExpectedEdgeCount &&
+                valueFlowSkippedMissingMethods == 0
             var contextualReceiverCount = 0
             var singletonContextReceiverCount = 0
             var interproceduralPointsToLoaded = false
-            val pointsToSummary = summaryFile?.takeIf { it.isFile }?.let { file ->
-                runCatching {
-                    json.parseToJsonElement(file.readText()).jsonObject["interprocedural_points_to"]?.jsonObject
-                }.getOrNull()
-            }
+            val pointsToSummary = summaryObject?.get("interprocedural_points_to")?.jsonObject
             val pointsToSummaryComplete = pointsToSummary?.let { summary ->
                 summary["records_truncated"]?.jsonPrimitive?.contentOrNull?.toBooleanStrictOrNull() == false &&
                     summary["context_expansion_complete"]?.jsonPrimitive?.contentOrNull?.toBooleanStrictOrNull() == true &&
@@ -307,6 +329,8 @@ class StaticProgramGraph private constructor(
                 callers, callees, readers, writers, methods, methodAnchors,
                 interproceduralArgumentEdges, interproceduralReturnEdges, interproceduralNeighbors,
                 contextualReceiverCount, singletonContextReceiverCount, interproceduralPointsToLoaded,
+                valueFlowExpectedEdgeCount, valueFlowStoredEdgeCount, valueFlowLoadedEdgeCount,
+                valueFlowSkippedMissingMethods, valueFlowFilePresent, valueFlowComplete,
                 methodCountsByOwner, classes, subclasses, implementors
             )
         }
