@@ -200,3 +200,37 @@ F. 使用未参与开发的新版本 APK 盲测。盲测报告记录自动定位
 - settings.toggle：632 → 346
 
 本轮结果说明弱锚点过滤显著压缩了噪声候选，但仍未解决调用图邻域中相似候选的消歧。下一阶段不应继续盲目加字符串，而应实现精确 CFG、寄存器/参数/返回值数据流、协程状态机恢复，并用人工确认的 2.7.3/2.7.5 SSE 调用链作为已知真值集，验证静态分析器能否恢复同一语义边界。所有候选仍须通过真实运行时行为证据后才能安装。
+
+
+## 13. 2026-11-07 Smali CFG 首轮落地与五版本验证（Run 42355753085）
+
+本轮将原先的 `branch_count/label_count/basic_block_estimate` 统计升级为可审计的指令索引级控制流图（CFG）摘要：
+
+1. 将 Smali 可执行指令映射为方法内指令索引；`.packed-switch`、`.sparse-switch`、`.array-data` 等 payload 伪指令不计入可执行指令序列。
+2. 以方法入口、条件/无条件跳转目标、分支后的顺序位置、switch case、异常处理器和 try 范围边界建立基本块 leader。
+3. 显式构建 conditional、goto、fallthrough、switch、switch-default 和 exception 边。
+4. 未解析的跳转标签、switch payload 或异常范围会记录在 `unresolved_targets`，并将 CFG 标记为不完整。
+5. CFG 明细边最多保存 256 条；若边列表被截断，`edges_truncated=true` 且 `complete=false`。不能因所有标签已解析就把被截断的图当作完整 CFG。
+6. 每个方法的 `control_flow.cfg` 输出指令数、基本块数、边数、未解析目标数、完整性和有界边列表。旧的 branch/label 计数只保留作诊断，不再冒充 CFG。
+
+Kotlin `StaticProgramGraph` 已读取 CFG 完整性和结构计数；只有 `complete=true` 且基本块数大于零时才生成 `CONTROL_FLOW` 证据。历史索引缺少 CFG 或 CFG 不完整时，不会由旧分支计数补造控制流证据。
+
+### 验证结果
+
+- Python Smali CFG 测试：12 项通过，覆盖条件跳转、goto、switch payload、未解析标签、异常边和超过 256 条边时 fail-closed。
+- Semantic Core CI Run `42355023519`：成功。
+- 五版本审计 Run `42355753085`：2.7.1、2.7.2、2.7.3、2.7.4 APKM、2.7.5 五个扫描任务、聚合、Kotlin Semantic Resolver 接入、报告回写和产物上传全部成功。
+- 审计报告回写提交：`477ab43f0000a487c19ef649f911e5b1836ce883`。
+
+本轮五版本静态 Resolver 首次各有一个角色通过静态解析门槛：
+- 2.7.1：`network.route` → `Lrv3;->g(Ldu1;Ljava/lang/Long;)Lb60;`
+- 2.7.2：`network.route` → `Ljw3;->g(Lwu1;Ljava/lang/Long;)Ly60;`
+- 2.7.3：`sse.dispatch` → `Lk11;->a(Lk11;Lgw8;Lif2;)Ljava/lang/Object;`
+- 2.7.4：`network.route` → `Ljy3;->g(Lnw1;Ljava/lang/Long;)Ld70;`
+- 2.7.5：`network.route` → `Lnw3;->e(Lyu1;Ljava/lang/Long;)Lb70;`
+
+其余 14 个角色/版本组合仍因 `ambiguous-candidates` 被拒绝。上述 `resolved` 只表示静态候选通过 SemanticResolver 的角色证据门槛，不表示 Hook 已授权或已安装。静态审计 CLI 不调用 HookCoordinator；HookCoordinator 仍要求完整运行时宿主身份，并要求候选同时包含 `HOST_IDENTITY` 与 `RUNTIME_BEHAVIOR` 证据。当前没有新增任何真实设备 Hook 成功声明。
+
+### 尚存限制与下一阶段
+
+该 CFG 是 Smali 层的保守结构图，不是 ART/Dex verifier，也不包含寄存器级 def-use、参数/返回值传播、对象别名、支配树或完整协程状态机恢复。下一阶段转向寄存器 use-def 与跨基本块 reaching-def 数据流，并用 2.7.3/2.7.5 已人工复核的 SSE 调用链建立真值集；CFG 不完整或数据流无法闭合时继续 fail-closed。
