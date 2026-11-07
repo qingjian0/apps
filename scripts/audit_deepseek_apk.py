@@ -562,11 +562,17 @@ def analyze_object_points_to(body_lines, cfg, owner, method_name, descriptor,
         return {"complete":False,"reason":"instruction-index-mismatch-or-unknown-opcode",
                 "field_receivers":[],"same_instance_groups":[]}
     predecessors={b["id"]:set() for b in blocks}
+    normal_predecessors={b["id"]:set() for b in blocks}
+    exception_predecessors={b["id"]:set() for b in blocks}
     successors={b["id"]:set() for b in blocks}
     for edge in cfg.get("edges",[]):
         if edge["from"] in predecessors and edge["to"] in predecessors:
             predecessors[edge["to"]].add(edge["from"])
             successors[edge["from"]].add(edge["to"])
+            if edge.get("kind")=="exception":
+                exception_predecessors[edge["to"]].add(edge["from"])
+            else:
+                normal_predecessors[edge["to"]].add(edge["from"])
     cyclic_blocks=set()
     for start in successors:
         pending=list(successors[start]); visited=set()
@@ -590,6 +596,10 @@ def analyze_object_points_to(body_lines, cfg, owner, method_name, descriptor,
     out_points={b["id"]:{} for b in blocks}
     in_unknown={b["id"]:set() for b in blocks}
     out_unknown={b["id"]:set() for b in blocks}
+    # An exception may leave a protected block before any later instruction runs.
+    # Preserve the union of every pre/post-instruction state for exceptional edges.
+    exceptional_out_points={b["id"]:{} for b in blocks}
+    exceptional_out_unknown={b["id"]:set() for b in blocks}
 
     def merge_maps(maps):
         merged=collections.defaultdict(set)
@@ -650,8 +660,10 @@ def analyze_object_points_to(body_lines, cfg, owner, method_name, descriptor,
         iterations+=1
         for block in blocks:
             bid=block["id"]
-            pred_points=[out_points[p] for p in predecessors[bid]]
-            pred_unknown=[out_unknown[p] for p in predecessors[bid]]
+            pred_points=[out_points[p] for p in normal_predecessors[bid]]
+            pred_points.extend(exceptional_out_points[p] for p in exception_predecessors[bid])
+            pred_unknown=[out_unknown[p] for p in normal_predecessors[bid]]
+            pred_unknown.extend(exceptional_out_unknown[p] for p in exception_predecessors[bid])
             new_in=merge_maps(pred_points)
             new_in_unknown=set().union(*pred_unknown) if pred_unknown else set()
             if bid==min(b["id"] for b in blocks):
@@ -659,14 +671,26 @@ def analyze_object_points_to(body_lines, cfg, owner, method_name, descriptor,
                     new_in.setdefault(reg,set()).update(values)
             current_points={reg:set(values) for reg,values in new_in.items()}
             current_unknown=set(new_in_unknown)
+            exceptional_states=[({reg:set(values) for reg,values in current_points.items()},
+                                 set(current_unknown))]
             for index in range(block["start"],block["end"]+1):
                 current_points,current_unknown=transfer(index,current_points,current_unknown)
+                # Include both sides of each instruction: a throwing instruction may
+                # expose its incoming state, while a completed one may expose its output.
+                exceptional_states.append(({reg:set(values) for reg,values in current_points.items()},
+                                           set(current_unknown)))
+            exceptional_points=merge_maps([state[0] for state in exceptional_states])
+            exceptional_unknown=set().union(*(state[1] for state in exceptional_states))
             if (new_in!=in_points[bid] or new_in_unknown!=in_unknown[bid]
-                    or current_points!=out_points[bid] or current_unknown!=out_unknown[bid]):
+                    or current_points!=out_points[bid] or current_unknown!=out_unknown[bid]
+                    or exceptional_points!=exceptional_out_points[bid]
+                    or exceptional_unknown!=exceptional_out_unknown[bid]):
                 in_points[bid]=new_in
                 in_unknown[bid]=new_in_unknown
                 out_points[bid]=current_points
                 out_unknown[bid]=current_unknown
+                exceptional_out_points[bid]=exceptional_points
+                exceptional_out_unknown[bid]=exceptional_unknown
                 changed=True
     if changed:
         return {"complete":False,"reason":"points-to-nonconvergence",
