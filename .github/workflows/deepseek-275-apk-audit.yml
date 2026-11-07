@@ -1,0 +1,122 @@
+name: DeepSeek 2.7.5 APK evidence audit
+
+on:
+  push:
+    branches:
+      - work/deepseek-275-apk-audit
+    paths:
+      - .github/workflows/deepseek-275-apk-audit.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Download APK and JADX
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 --retry-delay 2 https://raw.githubusercontent.com/qingjian0/apps/main/DeepSeek_2.7.5.apk -o DeepSeek_2.7.5.apk
+          curl -fL --retry 3 --retry-delay 2 https://github.com/skylot/jadx/releases/download/v1.5.6/jadx-1.5.6.zip -o jadx.zip
+          unzip -q jadx.zip -d jadx-dist
+          chmod +x jadx-dist/bin/jadx
+          sha256sum DeepSeek_2.7.5.apk > apk.sha256
+          unzip -Z1 DeepSeek_2.7.5.apk | grep -E '^classes[0-9]*\.dex$' > dex-files.txt
+          unzip -l DeepSeek_2.7.5.apk | grep -E 'classes[0-9]*\.dex$' > dex-inventory.txt
+      - name: Decompile and build evidence index
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p audit
+          set +e
+          jadx-dist/bin/jadx --no-res --threads-count 2 -d decompiled DeepSeek_2.7.5.apk > audit/jadx.stdout.log 2> audit/jadx.stderr.log
+          JADX_STATUS=$?
+          set -e
+          printf '%s\n' "$JADX_STATUS" > audit/jadx.exit-code
+          if [ ! -d decompiled/sources ]; then
+            echo "JADX did not produce source output" >&2
+            tail -100 audit/jadx.stderr.log >&2 || true
+            exit 1
+          fi
+          python3 - <<'PY'
+          import hashlib, pathlib, re, zipfile, json
+          apk = pathlib.Path("DeepSeek_2.7.5.apk")
+          root = pathlib.Path("decompiled/sources")
+          out = pathlib.Path("audit")
+          terms = {
+              "network": ["okhttp3", "retrofit2", "RequestBody", "ResponseBody", "Interceptor", "EventSource", "WebSocket", "HttpURLConnection", "Cronet", "ktor"],
+              "endpoint": ["api.deepseek.com", "chat/completions", "text/event-stream", "deepseek.com"],
+              "pow_challenge": ["challenge", "difficulty", "nonce", "proof", "pow", "captcha", "sha256", "MessageDigest"],
+              "async_stream": ["Continuation", "kotlinx.coroutines", "Flow<", "callbackFlow", "suspend ", "onResponse", "onFailure", "collect("],
+              "agent_tools": ["tool_calls", "function_call", "tool_choice", "agent", "tools"],
+          }
+          rows = []
+          java_files = list(root.rglob("*.java"))
+          for path in java_files:
+              try: data = path.read_text(encoding="utf-8", errors="replace")
+              except Exception: continue
+              hits = {}
+              for group, needles in terms.items():
+                  found = [n for n in needles if n.lower() in data.lower()]
+                  if found: hits[group] = found
+              if not hits: continue
+              decl = re.search(r"(?m)^\s*(?:(?:public|protected|private|abstract|final|static|synchronized)\s+)*(?:class|interface|enum|record)\s+([\w$]+)", data)
+              package = re.search(r"(?m)^package\s+([\w.]+)\s*;", data)
+              methods = []
+              for line in data.splitlines():
+                  m = re.match(r"\s*(?:public|protected|private)\s+(?:static\s+)?(?:final\s+)?[\w.$<>?, \[\]]+\s+([\w$]+)\s*\(", line)
+                  if m and len(methods) < 20: methods.append(m.group(1))
+              rows.append((sum(len(v) for v in hits.values()), str(path.relative_to(root)),
+                           package.group(1) if package else "", decl.group(1) if decl else "",
+                           hits, methods))
+          rows.sort(key=lambda x: (-x[0], x[1]))
+          with zipfile.ZipFile(apk) as z:
+              dex = [(i.filename, i.file_size) for i in z.infolist() if re.fullmatch(r"classes[0-9]*\.dex", i.filename)]
+          lines = [
+              "# DeepSeek 2.7.5 APK static evidence index", "",
+              f"- APK bytes: {apk.stat().st_size}",
+              f"- APK SHA-256: {hashlib.sha256(apk.read_bytes()).hexdigest()}",
+              f"- DEX files: {len(dex)}",
+              f"- JADX Java source files: {len(java_files)}",
+              f"- JADX exit code: {pathlib.Path('audit/jadx.exit-code').read_text().strip()}",
+              "- Scope: static DEX decompilation and symbol indexing only; no runtime behavior is asserted.", "",
+              "## DEX inventory", "",
+          ]
+          lines += [f"- {name}: {size:,} bytes" for name, size in dex]
+          lines += ["", "## Candidate classes", "",
+                    "Ranked by matches across network, endpoint, PoW/challenge, async/stream, and agent/tool terms.",
+                    "Names below are navigation candidates, not confirmed execution-chain roles.", ""]
+          for score, rel, pkg, cls, hits, methods in rows[:250]:
+              groups = "; ".join(f"{k}=[{', '.join(v)}]" for k,v in hits.items())
+              lines.append(f"- **{pkg}.{cls}** ({rel}; score={score}) — {groups}")
+              if methods: lines.append(f"  - Methods: {', '.join(methods)}")
+          (out / "report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+          (out / "candidate-index.json").write_text(json.dumps([
+              {"score":s,"path":p,"package":pkg,"class":cls,"matches":h,"methods":m}
+              for s,p,pkg,cls,h,m in rows[:500]
+          ], ensure_ascii=False, indent=2), encoding="utf-8")
+          print(f"Indexed {len(rows)} candidate classes")
+          PY
+      - name: Upload evidence report
+        uses: actions/upload-artifact@v4
+        with:
+          name: deepseek-275-static-evidence
+          path: |
+            audit/report.md
+            audit/candidate-index.json
+            audit/jadx.exit-code
+            audit/jadx.stderr.log
+            apk.sha256
+            dex-files.txt
+            dex-inventory.txt
+          if-no-files-found: error
+          retention-days: 14
