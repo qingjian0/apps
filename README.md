@@ -254,3 +254,83 @@ MacroState 的固定金融因子说明：即使领域对象和 Pipeline 看起�
 - 分析脚本：.github/workflows/deepseek-275-apk-audit.yml
 
 **下一阶段验收条件：** 通过 2.7.5 的显式诊断开关采集真实设备日志，确认 yu1 构造入口、nw3 请求调用、PoW 计算调用者、Challenge 请求头生成位置、Transport 返回类型及异步回调关系。只有这些证据闭环后，才开始实现 2.7.5 Native Adapter。
+
+
+### 8.6 请求 DTO 与 PoW 静态调用链（进一步核验）
+
+对关键类的反编译方法体进行交叉核验后，以下关系已经有直接静态代码证据，比 8.3 的初步路径更具体：
+
+**A. Challenge 请求**
+
+- wt1 的序列化 descriptor 为 ChatChallengeRequest，唯一字段是 target_path。
+- nw3.c(wt1) 创建 tz0 分支 12 的协程任务。
+- tz0 分支 12 执行 POST /api/v0/chat/create_pow_challenge，并以 wt1 作为序列化请求体。
+- 响应模型通过 zt1 包装 ts9；rs9 的 serializer descriptor 指向 ServerChatChallenge。
+
+因此，PoW Challenge 请求不是无参数探测，而是携带目标 API 路径的 ChatChallengeRequest。
+
+**B. PoW 计算与结果序列化**
+
+- ef0 是按请求目标路径管理 PoW 结果的缓存/计算入口。
+- ef0.b(c95) 通过 pb0 分支 5 请求 Challenge；pb0.D 创建 wt1(target_path)，调用 eo3.a.c(wt1)。
+- eo3.a 是 nw3 实例，因此该调用最终进入 nw3.c(wt1) 与 tz0 分支 12。
+- ef0.d(target_path, ts9) 在算法为 DeepSeekHashV1 时调用 PowCalculator.calculateDeepSeekHashV1Pow。
+- 计算结果封装为 hf0；ff0 的 serializer descriptor 指向 AuthedPowSolution。
+- ef0.c(c95) 按 target_path 查缓存、检查过期时间，并通过 hf0 serializer 将结果序列化为 JSON 字符串。
+- of2 是另一条 PoW 预取路径，受 pow_prefetch 与 pow_prefetch_count 配置控制；它同样使用 DeepSeekHashV1 与 PowCalculator。
+
+这意味着 PoW header 的值不是单独的裸 hash 数字，而是官方 AuthedPowSolution 序列化结果。不能用自行拼接的 hash 字符串替代。
+
+**C. Chat completion 请求体与路由**
+
+qy1 的 serializer descriptor 明确指向 ChatFullCompletionRequest，字段映射如下：
+
+| JSON 字段 | 说明 |
+|---|---|
+| chat_session_id | 会话 ID |
+| parent_message_id | 父消息 ID |
+| prompt | 提示内容 |
+| ref_file_ids | 关联文件 ID 列表 |
+| thinking_enabled | 深度思考开关 |
+| search_enabled | 搜索开关 |
+| audio_id | 音频 ID |
+| preempt | 请求控制标记 |
+| model_type | 模型类型 |
+| action | 动作类型 |
+| shumei_device_id | 设备标识 |
+
+qy1.k 是额外的 PoW 字符串，不属于上述 JSON body 字段。nw3.e(yu1, Long) 根据请求 DTO 类型选择路径和 serializer：
+
+| DTO 类型 | API 路径 | 对应超时配置 |
+|---|---|---|
+| qy1 | /api/v0/chat/completion | completion_request_timeout_ms |
+| rf2 | /api/v0/chat/regenerate | regenerate_request_timeout_ms |
+| jx1 | /api/v0/chat/continue | continue_request_timeout_ms |
+| yf2 | /api/v0/chat/resume_stream | resume_request_timeout_ms |
+| rx1 | /api/v0/chat/edit_message | edit_request_timeout_ms |
+
+nw3.e 将 DTO 设置为 POST body，按类型选择 serializer，并在 qy1.k 等 PoW 字符串非空时设置 X-DS-PoW-Response header。该方法返回 b70 包装器，并将请求执行委托给 l5 协程任务。
+
+**D. Challenge header 插件**
+
+oq1.c(gf5, sg5, String, String, String, ec3) 会复制 Ktor 请求构建器，设置 X-DS-Challenge-Response 与 X-DS-PoW-Response，并通过 Ktor client pipeline 继续执行；还存在 Debug Recaptcha Challenge 相关 header 分支。
+
+**E. 辅助路由**
+
+- tz0 分支 13：GET /api/v0/chat/history_messages，query 参数包括 chat_session_id、scenario、cache_version、cache_reset_at。
+- tz0 分支 15：POST /api/v0/chat/stop_stream，请求体为 ChatStopStreamRequest，字段 chat_session_id、message_id。
+- ChallengeResponse 的 serializer descriptor 指向 ChallengeResponse；其具体消费位置仍需结合运行时调用确认。
+
+**F. 尚未闭环的部分**
+
+l5.z(Object) 是请求执行协程的核心方法，但 JADX 在该方法上报告 StackOverflowError，未能恢复方法体。当前能确认 Ktor request builder、路由、body serializer、PoW header 和 challenge plugin；不能据此声称已经确认 response body、流式事件解析、Continuation 生命周期或取消语义。
+
+### 8.7 Native Adapter 实现决策
+
+当前已足以建立 2.7.5 的请求侧适配契约，但仍不足以完成可运行的 Native Adapter：
+
+1. 请求侧目标优先级：ChatFullCompletionRequest(qy1) → nw3.e → Ktor/l5。
+2. PoW 必须走官方链：ChatChallengeRequest(wt1) → nw3.c → ServerChatChallenge(ts9) → ef0/of2 → PowCalculator → AuthedPowSolution(hf0) → JSON header。
+3. 必须从宿主正式会话/设备上下文取得 chat_session_id、parent_message_id、shumei_device_id 等值；不得伪造。
+4. 响应侧需要单独确认 l5 协程实际执行、HttpResponse 读取、消息解析、流式回调和取消机制。
+5. 在上述响应链与真机行为验证前，Local API 保持 native_adapter_unavailable，不返回伪造成功结果。
