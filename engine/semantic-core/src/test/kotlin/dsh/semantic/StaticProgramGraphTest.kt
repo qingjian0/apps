@@ -23,6 +23,20 @@ class StaticProgramGraphTest {
         return path.toString()
     }
 
+    @Test fun methodRecordCallbackRunsOncePerIndexLine() {
+        val methods = gzipLines(listOf(
+            """{"class":"Lx/A;","name":"one","descriptor":"()V","field_reads":[],"field_writes":[]}""",
+            """{"class":"Lx/B;","name":"two","descriptor":"()V","field_reads":[],"field_writes":[]}"""
+        ))
+        val edges = gzipLines(emptyList())
+        val classes = gzipLines(emptyList())
+        val seen = mutableListOf<String>()
+        StaticProgramGraph.load(methods, edges, classes, onMethodRecord = { seen += it })
+        assertTrue(seen.size == 2)
+        assertTrue(seen.any { it.contains("\\\"name\\\":\\\"one\\\"") })
+        assertTrue(seen.any { it.contains("\\\"name\\\":\\\"two\\\"") })
+    }
+
     @Test fun incompleteCfgDoesNotBecomeControlFlowEvidence() {
         val methods = gzipLines(listOf(
             """{"class":"Lx/A;","name":"compose","descriptor":"()V","field_reads":[],"field_writes":[],"control_flow":{"branch_count":4,"label_count":5,"return_count":1,"throw_count":0,"cfg":{"block_count":6,"edge_count":7,"unresolved_target_count":1,"complete":false}}}"""
