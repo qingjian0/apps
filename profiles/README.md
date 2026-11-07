@@ -26,3 +26,4 @@ This directory stores evidence-backed, version-local profiles. A profile is not 
 ## Current profile
 
 - `deepseek-2.7.2-code289-cn.json`: dynamic request/transport/continuation observations correlated with the exact 2.7.2 DEX descriptors.
+- `deepseek-2.7.5.json`: static request, serializer, SSE, PoW and send-policy profile. It explicitly records that 2.7.5 has no runtime observer trace in this evidence set and that local Agent tool execution remains unconfirmed.
