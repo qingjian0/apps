@@ -67,7 +67,7 @@ jobs:
       - name: APKTool DEX/smali disassembly
         run: |
           set -euo pipefail
-          java -jar apktool.jar d -f -s -r -o "smali-$OUT" "$APK"
+          java -jar apktool.jar d -f -r -o "smali-$OUT" "$APK"
           (cd "smali-$OUT" && zip -qr "../audit/$OUT/all-smali.zip" .)
       - name: Build static evidence index
         run: |
@@ -103,6 +103,7 @@ jobs:
             dex=[{"name":x.filename,"bytes":x.file_size} for x in z.infolist() if re.fullmatch(r"classes[0-9]*\.dex",x.filename)]
             native=[{"name":x.filename,"bytes":x.file_size,"sha256":hashlib.sha256(z.read(x)).hexdigest()} for x in z.infolist() if x.filename.startswith("lib/") and x.filename.endswith(".so")]
           sources=list(src.rglob("*.java")); smali_files=list(sm.rglob("*.smali"))
+          if not smali_files: raise SystemExit("APKTool produced no smali files; refusing to publish an empty DEX disassembly")
           diag=(out/"jadx.stdout.log").read_text(errors="replace")+(out/"jadx.stderr.log").read_text(errors="replace")
           summary={"apk":apk.name,"bytes":apk.stat().st_size,"sha256":hashlib.sha256(apk.read_bytes()).hexdigest(),
           "dex":dex,"dex_count":len(dex),"jadx_exit":int((out/"jadx.exit-code").read_text().strip()),
