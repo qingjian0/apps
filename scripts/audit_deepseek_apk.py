@@ -49,6 +49,13 @@ def sha256(path):
         for b in iter(lambda:f.read(1024*1024),b""): h.update(b)
     return h.hexdigest()
 
+def write_jsonl_gzip(path, records):
+    """Write one independently parseable JSON record per physical line."""
+    with gzip.open(path, "wt", encoding="utf-8") as stream:
+        for record in records:
+            stream.write(json.dumps(record, separators=(",", ":"), ensure_ascii=True) + "\n")
+
+
 def dex_header(data):
     if len(data)<112 or not data.startswith(b"dex\n"): return None
     u=lambda off: struct.unpack_from("<I",data,off)[0]
@@ -1530,19 +1537,12 @@ def main():
     interprocedural_points_to=build_interprocedural_points_to_graph(all_methods)
     field_slot_index=build_field_slot_index(all_methods)
     # Keep the complete method inventory compressed in the repository; no source dump or raw logs are copied.
-    with gzip.open(out/"methods.jsonl.gz","wt",encoding="utf-8") as f:
-        for m in all_methods: f.write(json.dumps(m,separators=(",",":"),ensure_ascii=True)+"\n")
-    with gzip.open(out/"classes.jsonl.gz","wt",encoding="utf-8") as f:
-        for c in all_classes: f.write(json.dumps(c,separators=(",",":"),ensure_ascii=True)+"\n")
-    with gzip.open(out/"call-edges.jsonl.gz","wt",encoding="utf-8") as f:
-        for e in all_edges: f.write(json.dumps(e,separators=(",",":"),ensure_ascii=True)+"\n")
-    with gzip.open(out/"interprocedural-value-edges.jsonl.gz","wt",encoding="utf-8") as f:
-        for e in interprocedural["edges"]: f.write(json.dumps(e,separators=(",",":"),ensure_ascii=True)+"\n")
-    with gzip.open(out/"field-slot-index.jsonl.gz","wt",encoding="utf-8") as f:
-        for e in field_slot_index: f.write(json.dumps(e,separators=(",",":"),ensure_ascii=True)+"\n")
-    with gzip.open(out/"interprocedural-points-to.jsonl.gz","wt",encoding="utf-8") as f:
-        for e in interprocedural_points_to["contextual_receivers"]:
-            f.write(json.dumps(e,separators=(",",":"),ensure_ascii=True)+"\\n")
+    write_jsonl_gzip(out/"methods.jsonl.gz", all_methods)
+    write_jsonl_gzip(out/"classes.jsonl.gz", all_classes)
+    write_jsonl_gzip(out/"call-edges.jsonl.gz", all_edges)
+    write_jsonl_gzip(out/"interprocedural-value-edges.jsonl.gz", interprocedural["edges"])
+    write_jsonl_gzip(out/"field-slot-index.jsonl.gz", field_slot_index)
+    write_jsonl_gzip(out/"interprocedural-points-to.jsonl.gz", interprocedural_points_to["contextual_receivers"])
     candidates=[]
     for m in all_methods:
         roles=m.get("roles",[])
