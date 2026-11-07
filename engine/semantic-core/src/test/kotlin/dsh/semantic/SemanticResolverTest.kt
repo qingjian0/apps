@@ -129,4 +129,15 @@ class SemanticResolverTest {
         assertEquals("runtime-host-identity-incomplete", result.reason)
     }
 
+    @Test fun borderlineWinnerMarginFailsClosed() {
+        val weaker = candidate("b", listOf(
+            Evidence(EvidenceFamily.PROTOCOL_ANCHOR, "prompt-template-schema", 0.85),
+            Evidence(EvidenceFamily.TYPE_SHAPE, "prompt-dto-input", 0.8),
+            Evidence(EvidenceFamily.DATA_FLOW, "dto-to-request-field", 0.9)
+        ))
+        val result = SemanticResolver().resolve(host, RolePolicy(role), listOf(candidate("a", goodEvidence), weaker))
+        assertFalse(result.accepted)
+        assertEquals("ambiguous-candidates", result.rejection)
+    }
+
 }
