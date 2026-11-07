@@ -546,6 +546,27 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertFalse(terminal[0]["runtime_identity_proven"])
         self.assertEqual("bounded-call-string-context", terminal[0]["identity_scope"])
 
+    def test_interprocedural_points_to_cuts_recursive_contexts_fail_closed(self):
+        body = [
+            "    invoke-static {p0}, Lx/Recursive;->step(Lx/Thing;)V",
+            "    return-void",
+        ]
+        cfg = AUDIT.build_smali_cfg(body)
+        invokes = AUDIT.extract_invoke_sites(body)
+        pts = AUDIT.analyze_object_points_to(
+            body, cfg, "Lx/Recursive;", "step", "(Lx/Thing;)V",
+            "static", [], invokes)
+        method = {
+            "class": "Lx/Recursive;", "name": "step",
+            "descriptor": "(Lx/Thing;)V", "component": "base",
+            "invoke_sites": invokes, "invoke_sites_truncated": False,
+            "invoke_sites_incomplete": False, "object_points_to": pts,
+        }
+        graph = AUDIT.build_interprocedural_points_to_graph([method])
+        self.assertEqual(1, graph["summary"]["recursive_contexts_cut"])
+        self.assertFalse(graph["summary"]["context_expansion_complete"])
+        self.assertFalse(graph["summary"]["recursive_fixed_point"])
+
     def test_interprocedural_points_to_keeps_distinct_callsite_contexts_separate(self):
         caller_body = [
             "    new-instance v0, Lx/Thing;",
