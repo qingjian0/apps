@@ -141,6 +141,8 @@ jobs:
             echo "No audit changes to commit"
           else
             git commit -m "Publish multi-version DeepSeek Hook audit evidence"
+            git fetch origin work/deepseek-universal-hook-audit
+            git rebase origin/work/deepseek-universal-hook-audit
             git push origin HEAD:work/deepseek-universal-hook-audit
           fi
       - name: Upload consolidated report
