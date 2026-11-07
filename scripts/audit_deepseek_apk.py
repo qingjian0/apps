@@ -534,7 +534,7 @@ def object_parameter_registers_for_method(access, descriptor):
 
 
 def analyze_object_points_to(body_lines, cfg, owner, method_name, descriptor,
-                             access, field_access_sites):
+                             access, field_access_sites, invoke_sites=()):
     """Conservative intraprocedural points-to for parameters, allocations and move-object.
 
     Unsupported object-producing instructions become unknown. Only a singleton,
@@ -698,12 +698,50 @@ def analyze_object_points_to(body_lines, cfg, owner, method_name, descriptor,
 
     field_by_instruction={site["instruction"]:site for site in field_access_sites
                           if site.get("object_register")}
+    invoke_by_instruction={site["instruction"]:site for site in invoke_sites}
     receiver_facts=[]
+    invoke_argument_facts=[]
     for block in blocks:
         bid=block["id"]
         points={reg:set(values) for reg,values in in_points[bid].items()}
         unknown=set(in_unknown[bid])
         for index in range(block["start"],block["end"]+1):
+            invoke_site=invoke_by_instruction.get(index)
+            if invoke_site:
+                parsed=parse_method_descriptor(invoke_site.get("descriptor",""))
+                actual=list(invoke_site.get("registers",[]))
+                is_static=invoke_site.get("opcode","").startswith("invoke-static")
+                formal_word=0
+                actual_word=0
+                object_arguments=[]
+                if not is_static:
+                    object_arguments.append((actual[0] if actual else None,"p0","receiver"))
+                    actual_word=1
+                    formal_word=1
+                if parsed:
+                    for parameter_type in parsed["parameters"]:
+                        width=2 if parameter_type in ("J","D") else 1
+                        if parameter_type.startswith(("L","[")):
+                            actual_reg=actual[actual_word] if actual_word<len(actual) else None
+                            object_arguments.append((actual_reg,"p{}".format(formal_word),"argument"))
+                        actual_word+=width
+                        formal_word+=width
+                aligned=parsed is not None and actual_word==len(actual)
+                for actual_reg,formal_reg,argument_kind in object_arguments:
+                    identities=sorted(points.get(actual_reg,set())) if actual_reg else []
+                    is_unknown=(actual_reg in unknown) if actual_reg else True
+                    status=("singleton" if len(identities)==1 and not is_unknown else
+                            "unknown" if is_unknown else
+                            "multiple" if len(identities)>1 else "unresolved")
+                    invoke_argument_facts.append({
+                        "call_instruction":index,"call_line":invoke_site.get("line"),
+                        "owner":invoke_site.get("owner"),"name":invoke_site.get("name"),
+                        "descriptor":invoke_site.get("descriptor"),
+                        "formal_register":formal_reg,"actual_register":actual_reg,
+                        "argument_kind":argument_kind,"points_to":identities,
+                        "unknown":is_unknown,"identity_status":status,
+                        "mapping_complete":aligned
+                    })
             site=field_by_instruction.get(index)
             if site:
                 reg=site["object_register"]
@@ -732,6 +770,9 @@ def analyze_object_points_to(body_lines, cfg, owner, method_name, descriptor,
     return {"complete":True,"reason":None,"iterations":iterations,
             "cyclic_allocation_site_count":cyclic_allocation_count,
             "field_receivers":receiver_facts,
+            "invoke_arguments":invoke_argument_facts,
+            "invoke_argument_count":len(invoke_argument_facts),
+            "invoke_argument_incomplete_count":sum(not x["mapping_complete"] for x in invoke_argument_facts),
             "same_instance_groups":same_instance_groups,
             "singleton_receiver_count":sum(x["identity_status"]=="singleton" for x in receiver_facts),
             "unknown_receiver_count":sum(x["identity_status"]=="unknown" for x in receiver_facts),
@@ -861,6 +902,122 @@ def build_interprocedural_value_graph(methods):
             "edges_truncated":total_edge_count>200000}}
 
 
+def build_interprocedural_points_to_graph(methods):
+    """Project object identities through one exact call-site context into callee receivers.
+
+    This is a bounded one-callsite-context projection, not a recursive whole-program
+    points-to fixed point. It never upgrades unknown/multiple inputs to singleton.
+    """
+    by_signature=collections.defaultdict(list)
+    for method in methods:
+        key=method["class"]+"->"+method["name"]+method["descriptor"]
+        method["_points_to_key"]=key
+        by_signature[key].append(method)
+    call_contexts=[]
+    contextual_receivers=[]
+    resolved=0
+    unresolved=0
+    ambiguous=0
+    incomplete=0
+    singleton_context_receivers=0
+    def contextualize(identity,callee_key,formal_map,context_id):
+        prefix="param:{}:".format(callee_key)
+        if identity.startswith(prefix):
+            formal=identity[len(prefix):]
+            actual=formal_map.get(formal)
+            if not actual or actual.get("unknown"):
+                return [],True
+            return list(actual.get("points_to",[])),False
+        if identity.startswith("alloc:{}#".format(callee_key)):
+            return ["context:{}:{}".format(context_id,identity)],False
+        return [identity],False
+    for caller in methods:
+        caller_key=caller["_points_to_key"]
+        caller_pts=caller.get("object_points_to",{})
+        if (caller.get("invoke_sites_truncated") or caller.get("invoke_sites_incomplete")
+                or not caller_pts.get("complete")):
+            if caller.get("invoke_sites"):
+                incomplete+=len(caller.get("invoke_sites",[]))
+            continue
+        args_by_instruction=collections.defaultdict(list)
+        for item in caller_pts.get("invoke_arguments",[]):
+            args_by_instruction[item.get("call_instruction")].append(item)
+        for site in caller.get("invoke_sites",[]):
+            target=site["owner"]+"->"+site["name"]+site["descriptor"]
+            choices=by_signature.get(target,[])
+            same_component=[m for m in choices if m.get("component")==caller.get("component")]
+            if len(same_component)==1:
+                callee=same_component[0]
+            elif len(choices)==1:
+                callee=choices[0]
+            elif len(choices)>1:
+                ambiguous+=1
+                continue
+            else:
+                unresolved+=1
+                continue
+            callee_key=callee["_points_to_key"]
+            callee_pts=callee.get("object_points_to",{})
+            if not callee_pts.get("complete"):
+                incomplete+=1
+                continue
+            actuals=args_by_instruction.get(site["instruction"],[])
+            if not actuals or any(not x.get("mapping_complete") for x in actuals):
+                incomplete+=1
+                continue
+            formal_map={x["formal_register"]:x for x in actuals}
+            context_id="{}@{}".format(caller_key,site["instruction"])
+            call_contexts.append({
+                "context_id":context_id,"caller":caller_key,"callee":callee_key,
+                "call_instruction":site["instruction"],"call_line":site["line"],
+                "arguments":[{
+                    "formal_register":x["formal_register"],
+                    "actual_register":x["actual_register"],
+                    "argument_kind":x["argument_kind"],
+                    "points_to":x["points_to"],"unknown":x["unknown"],
+                    "identity_status":x["identity_status"]
+                } for x in actuals]
+            })
+            resolved+=1
+            for fact in callee_pts.get("field_receivers",[]):
+                identities=[]
+                has_unknown=bool(fact.get("unknown"))
+                for identity in fact.get("points_to",[]):
+                    projected,unknown=contextualize(identity,callee_key,formal_map,context_id)
+                    identities.extend(projected)
+                    has_unknown=has_unknown or unknown
+                identities=sorted(set(identities))
+                status=("unknown" if has_unknown else
+                        "singleton" if len(identities)==1 else
+                        "multiple" if len(identities)>1 else "unresolved")
+                contextual_receivers.append({
+                    "context_id":context_id,"caller":caller_key,"callee":callee_key,
+                    "call_instruction":site["instruction"],
+                    "receiver_instruction":fact.get("instruction"),
+                    "field":fact.get("field"),"access":fact.get("access"),
+                    "points_to":identities,"unknown":has_unknown,
+                    "identity_status":status,
+                    "identity":identities[0] if status=="singleton" else None,
+                    "identity_scope":"one-callsite-context",
+                    "runtime_identity_proven":False
+                })
+                if status=="singleton":
+                    singleton_context_receivers+=1
+    for method in methods:
+        method.pop("_points_to_key",None)
+    return {
+        "call_contexts":call_contexts,
+        "contextual_receivers":contextual_receivers,
+        "summary":{
+            "resolved_call_contexts":resolved,"unresolved_call_sites":unresolved,
+            "ambiguous_call_sites":ambiguous,"incomplete_call_sites":incomplete,
+            "contextual_receiver_count":len(contextual_receivers),
+            "singleton_context_receiver_count":singleton_context_receivers,
+            "recursive_fixed_point":False,"runtime_identity_proven":False
+        }
+    }
+
+
 def build_field_slot_index(methods):
     """Group field reads/writes by exact DEX field descriptor, without claiming object identity."""
     groups=collections.defaultdict(lambda:{"field":"","writers":[],"readers":[]})
@@ -947,7 +1104,8 @@ def analyze_smali(root):
                     current["field_access_sites_incomplete"]=len(field_sites)!=field_opcode_count
                     current["object_points_to"]=analyze_object_points_to(
                         current["body_lines"],cfg,current["class"],current["name"],
-                        current["descriptor"],current["access"],current.get("field_access_sites",[]))
+                        current["descriptor"],current["access"],current.get("field_access_sites",[]),
+                        current.get("invoke_sites",[]))
                     receiver_by_instruction={x["instruction"]:x for x in
                         current["object_points_to"].get("field_receivers",[])}
                     for field_site in current.get("field_access_sites",[]):
@@ -1068,6 +1226,7 @@ def main():
     if not all_classes or not all_methods:
         raise SystemExit(f"No DEX methods recovered from {src.name}; apktool exit status and input package layout require investigation")
     interprocedural=build_interprocedural_value_graph(all_methods)
+    interprocedural_points_to=build_interprocedural_points_to_graph(all_methods)
     field_slot_index=build_field_slot_index(all_methods)
     # Keep the complete method inventory compressed in the repository; no source dump or raw logs are copied.
     with gzip.open(out/"methods.jsonl.gz","wt",encoding="utf-8") as f:
@@ -1080,6 +1239,9 @@ def main():
         for e in interprocedural["edges"]: f.write(json.dumps(e,separators=(",",":"),ensure_ascii=True)+"\n")
     with gzip.open(out/"field-slot-index.jsonl.gz","wt",encoding="utf-8") as f:
         for e in field_slot_index: f.write(json.dumps(e,separators=(",",":"),ensure_ascii=True)+"\n")
+    with gzip.open(out/"interprocedural-points-to.jsonl.gz","wt",encoding="utf-8") as f:
+        for e in interprocedural_points_to["contextual_receivers"]:
+            f.write(json.dumps(e,separators=(",",":"),ensure_ascii=True)+"\\n")
     candidates=[]
     for m in all_methods:
         roles=m.get("roles",[])
@@ -1121,6 +1283,7 @@ def main():
       "cyclic_allocation_site_count":sum(m.get("object_points_to",{}).get("cyclic_allocation_site_count",0) for m in all_methods),
       "field_instance_identity_scope":"intraprocedural-singleton-points-to-per-method-activation",
       "interprocedural_value_flow":interprocedural["summary"],
+      "interprocedural_points_to":interprocedural_points_to["summary"],
       "candidate_method_count":len(candidates),
       "native_libraries":native,"tool_limits":{"JADX":"best-effort; inspect exit status and APKTool smali evidence",
       "Hook":"static candidate discovery only; no device Hook is claimed"}}
