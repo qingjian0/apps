@@ -97,6 +97,11 @@
   "field_write_count": 61032,
   "methods_with_control_flow": 24387,
   "control_flow_branch_count": 221348,
+  "methods_with_complete_register_dataflow": 60286,
+  "register_dataflow_definition_count": 1054722,
+  "register_dataflow_use_count": 1963658,
+  "register_dataflow_ambiguous_use_count": 863764,
+  "register_dataflow_unresolved_use_count": 380507,
   "candidate_method_count": 1886,
   "native_libraries": [
     {

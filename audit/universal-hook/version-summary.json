@@ -98,6 +98,11 @@
     "field_write_count": 70534,
     "methods_with_control_flow": 27309,
     "control_flow_branch_count": 250308,
+    "methods_with_complete_register_dataflow": 66152,
+    "register_dataflow_definition_count": 1168998,
+    "register_dataflow_use_count": 2157200,
+    "register_dataflow_ambiguous_use_count": 933533,
+    "register_dataflow_unresolved_use_count": 428425,
     "candidate_method_count": 2233,
     "native_libraries": [
       {
@@ -301,6 +306,11 @@
     "field_write_count": 71761,
     "methods_with_control_flow": 27804,
     "control_flow_branch_count": 256989,
+    "methods_with_complete_register_dataflow": 67078,
+    "register_dataflow_definition_count": 1194742,
+    "register_dataflow_use_count": 2202947,
+    "register_dataflow_ambiguous_use_count": 952200,
+    "register_dataflow_unresolved_use_count": 438501,
     "candidate_method_count": 2263,
     "native_libraries": [
       {
@@ -504,6 +514,11 @@
     "field_write_count": 61032,
     "methods_with_control_flow": 24387,
     "control_flow_branch_count": 221348,
+    "methods_with_complete_register_dataflow": 60286,
+    "register_dataflow_definition_count": 1054722,
+    "register_dataflow_use_count": 1963658,
+    "register_dataflow_ambiguous_use_count": 863764,
+    "register_dataflow_unresolved_use_count": 380507,
     "candidate_method_count": 1886,
     "native_libraries": [
       {
@@ -1533,6 +1548,11 @@
     "field_write_count": 72875,
     "methods_with_control_flow": 28351,
     "control_flow_branch_count": 261392,
+    "methods_with_complete_register_dataflow": 68371,
+    "register_dataflow_definition_count": 1214473,
+    "register_dataflow_use_count": 2238736,
+    "register_dataflow_ambiguous_use_count": 966388,
+    "register_dataflow_unresolved_use_count": 448026,
     "candidate_method_count": 2283,
     "native_libraries": [
       {
@@ -1736,6 +1756,11 @@
     "field_write_count": 71813,
     "methods_with_control_flow": 27803,
     "control_flow_branch_count": 257263,
+    "methods_with_complete_register_dataflow": 67076,
+    "register_dataflow_definition_count": 1195425,
+    "register_dataflow_use_count": 2203930,
+    "register_dataflow_ambiguous_use_count": 952329,
+    "register_dataflow_unresolved_use_count": 439190,
     "candidate_method_count": 2262,
     "native_libraries": [
       {
