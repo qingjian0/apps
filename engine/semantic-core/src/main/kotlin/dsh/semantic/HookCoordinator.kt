@@ -12,7 +12,7 @@ class HookCoordinator(private val backend: HookBackend) {
     fun install(host: HostFingerprint, policy: RolePolicy, resolution: Resolution): InstallResult {
         if (!resolution.accepted || resolution.selected == null) return InstallResult(policy.role, InstallStatus.REJECTED, resolution.rejection ?: "unverified-resolution")
         val candidate = resolution.selected
-        if (candidate.role != policy.role || candidate.host != host || !host.isUsableForHooking()) return InstallResult(policy.role, InstallStatus.REJECTED, "host-or-role-mismatch")
+        if (candidate.role != policy.role || candidate.host != host) return InstallResult(policy.role, InstallStatus.REJECTED, "host-or-role-mismatch")
         if (!host.hasCompleteRuntimeIdentity()) return InstallResult(policy.role, InstallStatus.REJECTED, "runtime-host-identity-incomplete")
         val evidenceFamilies = candidate.evidence.map { it.family }.toSet()
         if (EvidenceFamily.HOST_IDENTITY !in evidenceFamilies || EvidenceFamily.RUNTIME_BEHAVIOR !in evidenceFamilies)
