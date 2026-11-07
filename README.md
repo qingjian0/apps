@@ -9,6 +9,19 @@
 >
 > 本文是基于当前仓库文件与日志的分析归档，不把混淆类名臆测成业务语义，也不把未检查的 APK 二进制说成已完成反编译。
 
+## 新一代 Runtime Semantic Hook Engine
+
+本项目的最终方向升级为跨版本运行时语义 Hook 引擎，不再以固定混淆类名/方法名映射作为通用性基础。工程设计和验收要求见 [引擎架构文档](docs/universal-hook/ENGINE-ARCHITECTURE.md)。
+
+当前已在本分支新增独立 Kotlin/JVM Semantic Core 原型：
+- 宿主指纹约束（仅允许目标包名进入 Hook 解析）；
+- 多证据族聚合，重复字符串不能虚增置信度；
+- 候选歧义、证据不足、负面证据时 fail-closed；
+- 角色级幂等 HookCoordinator 和可注入 HookBackend；
+- 独立 GitHub Actions 单元测试工作流。
+
+**当前限制：** 这是引擎核心原型，不是已完成的 DEX 自动语义发现器，也没有接入 LSPosed Android Backend。Agent、提示词、本地 API 等全功能域已列入覆盖目标，但必须逐域完成静态证据、运行时验证、桥接和回归测试后才能标记完成。详情：[全功能覆盖矩阵](docs/universal-hook/README.md) · [Kotlin Semantic Core](engine/semantic-core/)。
+
 ## 1. 仓库材料盘点
 
 本仓库当前保留五个宿主版本输入（2.7.1 APK、2.7.2 APK、2.7.3 APK、2.7.4 APKM、2.7.5 APK）、两份运行日志和一份 SSE/Hook 证据包。2.7.3 / 2.7.5 已有静态证据；2.7.1 / 2.7.4 纳入本轮统一重审。2.7.2 APK `deepseek-2-7-2.apk` 已上传，需与 code289-cn 动态日志核对构建身份。
