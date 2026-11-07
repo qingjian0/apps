@@ -13,7 +13,7 @@
 
 本项目的最终方向升级为跨版本运行时语义 Hook 引擎，不再以固定混淆类名/方法名映射作为通用性基础。工程设计和验收要求见 [引擎架构文档](docs/universal-hook/ENGINE-ARCHITECTURE.md)。
 
-当前已在本分支新增独立 Kotlin/JVM Semantic Core 原型：
+当前已在本分支新增独立 Kotlin/JVM Semantic Core 原型（GitHub Actions 编译与单元测试已通过）：
 - 宿主指纹约束（仅允许目标包名进入 Hook 解析）；
 - 多证据族聚合，重复字符串不能虚增置信度；
 - 候选歧义、证据不足、负面证据时 fail-closed；
