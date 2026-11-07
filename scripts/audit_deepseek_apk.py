@@ -1074,6 +1074,7 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4):
             "max_call_depth":max_call_depth,
             "recursive_contexts_cut":recursive_contexts_cut,
             "depth_contexts_cut":depth_contexts_cut,
+            "context_expansion_complete":(not records_truncated and recursive_contexts_cut==0 and depth_contexts_cut==0),
             "recursive_fixed_point":False,"runtime_identity_proven":False
         }
     }
