@@ -1093,6 +1093,7 @@ def main():
       "field_receiver_unknown_count":sum(m.get("object_points_to",{}).get("unknown_receiver_count",0) for m in all_methods),
       "field_receiver_unresolved_count":sum(m.get("object_points_to",{}).get("unresolved_receiver_count",0) for m in all_methods),
       "same_instance_field_group_count":sum(len(m.get("object_points_to",{}).get("same_instance_groups",[])) for m in all_methods),
+      "cyclic_allocation_site_count":sum(m.get("object_points_to",{}).get("cyclic_allocation_site_count",0) for m in all_methods),
       "field_instance_identity_scope":"intraprocedural-singleton-points-to-only",
       "interprocedural_value_flow":interprocedural["summary"],
       "candidate_method_count":len(candidates),
