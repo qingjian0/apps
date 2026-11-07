@@ -44,7 +44,9 @@ def prepared_method(method):
     return (method,feature_set(method),method.get("opcode_histogram",{}))
 
 def prepared_similarity(left,right):
-    A=left[1]; B=right[1]
+    # Role labels partition the search space; they are not discriminative similarity evidence.
+    A={item for item in left[1] if not item.startswith("role:")}
+    B={item for item in right[1] if not item.startswith("role:")}
     if not A or not B: return 0.0
     j=len(A&B)/len(A|B)
     ah=left[2]; bh=right[2]
