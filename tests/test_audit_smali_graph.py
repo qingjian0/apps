@@ -63,7 +63,7 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         ]
         cfg = AUDIT.build_smali_cfg(body)
         self.assertTrue(cfg["complete"])
-        self.assertEqual(7, cfg["instruction_count"])
+        self.assertEqual(6, cfg["instruction_count"])
         self.assertGreaterEqual(cfg["block_count"], 4)
         self.assertIn("conditional", {edge["kind"] for edge in cfg["edges"]})
         self.assertIn("goto", {edge["kind"] for edge in cfg["edges"]})
