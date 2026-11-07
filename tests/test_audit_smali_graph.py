@@ -117,6 +117,30 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertTrue(cfg["complete"])
         self.assertIn("exception", {edge["kind"] for edge in cfg["edges"]})
 
+    def test_register_use_def_tracks_move_field_and_invoke_registers(self):
+        facts = AUDIT.analyze_register_use_def([
+            "    const/4 v0, 0x1",
+            "    move v1, v0",
+            "    iget-object v2, p1, Lx/State;->value:Ljava/lang/String;",
+            "    iput-object v2, p1, Lx/State;->result:Ljava/lang/String;",
+            "    invoke-static {v1, v2}, Lx/Worker;->run(II)V",
+            "    return-void",
+        ])
+        self.assertTrue(facts["complete"])
+        self.assertIn("v0", facts["written_registers"])
+        self.assertIn("v1", facts["written_registers"])
+        self.assertIn("v2", facts["written_registers"])
+        self.assertIn("v0", facts["read_registers"])
+        self.assertIn("v1", facts["read_registers"])
+        self.assertIn("v2", facts["read_registers"])
+        self.assertIn("p1", facts["read_registers"])
+
+    def test_unknown_register_opcode_marks_use_def_incomplete(self):
+        facts = AUDIT.analyze_register_use_def(["    invoke-custom {v0}, call_site@0"])
+        self.assertFalse(facts["complete"])
+        self.assertEqual(1, facts["unknown_opcode_count"])
+        self.assertEqual("invoke-custom", facts["unknown_opcodes"][0]["opcode"])
+
     def test_redaction_marker_cannot_trigger_prompt_anchor(self):
         redacted = AUDIT.safe_strings('    const-string v0, "prompt body must not persist"')
         self.assertEqual(["<redacted-content>"], redacted)
