@@ -277,6 +277,76 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertEqual(1, sites[0]["result_instruction"])
         self.assertEqual("v4", sites[0]["result_register"])
 
+    def test_object_points_to_tracks_allocation_and_move_alias(self):
+        body = [
+            "    new-instance v0, Lx/State;",
+            "    move-object v1, v0",
+            "    iput-object v2, v0, Lx/State;->value:Ljava/lang/String;",
+            "    iget-object v3, v1, Lx/State;->value:Ljava/lang/String;",
+            "    return-void",
+        ]
+        cfg = AUDIT.build_smali_cfg(body)
+        sites = AUDIT.extract_field_access_sites(body)
+        facts = AUDIT.analyze_object_points_to(
+            body, cfg, "Lx/Owner;", "run", "()V", "public static", sites)
+        self.assertTrue(facts["complete"])
+        self.assertEqual(2, facts["singleton_receiver_count"])
+        self.assertEqual(1, len(facts["same_instance_groups"]))
+        self.assertTrue(facts["same_instance_groups"][0]["confirmed_same_instance"])
+        self.assertEqual(
+            facts["field_receivers"][0]["identity"],
+            facts["field_receivers"][1]["identity"],
+        )
+
+    def test_object_points_to_does_not_merge_distinct_allocations(self):
+        body = [
+            "    new-instance v0, Lx/State;",
+            "    new-instance v1, Lx/State;",
+            "    iput-object v2, v0, Lx/State;->value:Ljava/lang/String;",
+            "    iget-object v3, v1, Lx/State;->value:Ljava/lang/String;",
+            "    return-void",
+        ]
+        cfg = AUDIT.build_smali_cfg(body)
+        sites = AUDIT.extract_field_access_sites(body)
+        facts = AUDIT.analyze_object_points_to(
+            body, cfg, "Lx/Owner;", "run", "()V", "public static", sites)
+        self.assertTrue(facts["complete"])
+        self.assertEqual(2, facts["singleton_receiver_count"])
+        self.assertEqual([], facts["same_instance_groups"])
+        self.assertNotEqual(
+            facts["field_receivers"][0]["identity"],
+            facts["field_receivers"][1]["identity"],
+        )
+
+    def test_object_points_to_tracks_reference_parameters(self):
+        body = [
+            "    move-object v0, p1",
+            "    iput-object v2, v0, Lx/State;->value:Ljava/lang/String;",
+            "    iget-object v3, p1, Lx/State;->value:Ljava/lang/String;",
+            "    return-void",
+        ]
+        cfg = AUDIT.build_smali_cfg(body)
+        sites = AUDIT.extract_field_access_sites(body)
+        facts = AUDIT.analyze_object_points_to(
+            body, cfg, "Lx/Owner;", "run", "(Lx/State;)V", "public static", sites)
+        self.assertTrue(facts["complete"])
+        self.assertEqual(1, len(facts["same_instance_groups"]))
+        self.assertEqual("singleton", facts["field_receivers"][0]["identity_status"])
+
+    def test_object_points_to_marks_unsupported_object_source_unknown(self):
+        body = [
+            "    iget-object v0, p0, Lx/Owner;->state:Lx/State;",
+            "    iget-object v1, v0, Lx/State;->value:Ljava/lang/String;",
+            "    return-void",
+        ]
+        cfg = AUDIT.build_smali_cfg(body)
+        sites = AUDIT.extract_field_access_sites(body)
+        facts = AUDIT.analyze_object_points_to(
+            body, cfg, "Lx/Owner;", "run", "()V", "public", sites)
+        self.assertTrue(facts["complete"])
+        self.assertEqual("unknown", facts["field_receivers"][1]["identity_status"])
+        self.assertEqual(1, facts["unknown_receiver_count"])
+
     def test_field_access_site_preserves_slot_and_instance_register(self):
         body = [
             "    iget-object v0, p1, Lx/State;->value:Ljava/lang/String;",
