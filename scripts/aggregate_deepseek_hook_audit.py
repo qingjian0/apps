@@ -47,7 +47,7 @@ def prepared_similarity(left,right):
     # Role labels partition the search space; they are not discriminative similarity evidence.
     A={item for item in left[1] if not item.startswith("role:")}
     B={item for item in right[1] if not item.startswith("role:")}
-    if not A or not B: return 0.0
+    if not A or not B or not (A & B): return 0.0
     j=len(A&B)/len(A|B)
     ah=left[2]; bh=right[2]
     keys=set(ah)|set(bh)
