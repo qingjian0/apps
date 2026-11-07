@@ -84,6 +84,7 @@ def mutual_best_matches(left_candidates, right_candidates, minimum_score=0.48, m
         [semantic_score(left, right) for right in right_candidates]
         for left in left_candidates
     ]
+    no_shared_semantic_evidence = sum(1 for row in scores if not any(value > 0.0 for value in row))
 
     def best_and_margin(values):
         ranked = sorted(values, reverse=True)
