@@ -83,13 +83,15 @@ jobs:
             --jadx "$PWD/jadx-dist/bin/jadx" \
             --apktool "$PWD/apktool.jar"
       - name: Validate generated evidence
+        env:
+          AUDIT_VERSION: ${{ matrix.version }}
         run: |
           set -euo pipefail
           python3 -m json.tool "audit/${{ matrix.version }}/summary.json" >/dev/null
           python3 -m json.tool "audit/${{ matrix.version }}/hook-candidates.json" >/dev/null
           python3 - <<'PY'
-          import json, pathlib
-          p = pathlib.Path("audit/${{ matrix.version }}/summary.json")
+          import json, pathlib, os
+          p = pathlib.Path("audit") / os.environ["AUDIT_VERSION"] / "summary.json"
           s = json.loads(p.read_text())
           assert s["dex_count"] > 0 and s["class_count"] > 0 and s["method_count"] > 0, "empty DEX analysis"
           manifests = [x.get("manifest", {}) for x in s.get("component_metadata", [])]
