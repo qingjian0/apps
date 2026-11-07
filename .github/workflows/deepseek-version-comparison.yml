@@ -2,11 +2,14 @@ name: DeepSeek version comparison audit
 
 on:
   push:
-    branches: [main, work/deepseek-version-comparison-audit]
+    branches: [main, work/deepseek-version-comparison-audit, work/deepseek-272-static-audit]
     paths:
       - .github/workflows/deepseek-version-comparison.yml
       - DeepSeek_2.7.5.apk
       - "deepseek 273.apk"
+      - profiles/deepseek-2.7.3.json
+      - profiles/deepseek-2.7.5.json
+      - tools/validate_semantic_profile.py
   workflow_dispatch:
 
 permissions:
@@ -148,11 +151,28 @@ jobs:
     needs: audit
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
           pattern: deepseek-audit-*
           path: evidence
           merge-multiple: true
+      - name: Validate 2.7.3 and 2.7.5 semantic profiles against Smali
+        run: |
+          set -euo pipefail
+          mkdir -p smali comparison
+          unzip -q evidence/2.7.3/all-smali.zip -d smali/2.7.3
+          unzip -q evidence/2.7.5/all-smali.zip -d smali/2.7.5
+          python3 tools/validate_semantic_profile.py \
+            --profile profiles/deepseek-2.7.3.json \
+            --summary evidence/2.7.3/summary.json \
+            --smali-root smali/2.7.3 \
+            --output comparison/profile-validation-2.7.3.json
+          python3 tools/validate_semantic_profile.py \
+            --profile profiles/deepseek-2.7.5.json \
+            --summary evidence/2.7.5/summary.json \
+            --smali-root smali/2.7.5 \
+            --output comparison/profile-validation-2.7.5.json
       - name: Build version delta report
         run: |
           set -euo pipefail
@@ -192,6 +212,7 @@ jobs:
           name: deepseek-273-275-comparison
           path: |
             comparison-report.md
+            comparison/
             evidence/
           if-no-files-found: error
           retention-days: 14
