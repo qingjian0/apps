@@ -5,7 +5,7 @@ value class RoleId(val value: String) {
     init { require(value.matches(Regex("[a-z][a-z0-9_.-]{1,95}"))) }
 }
 
-enum class EvidenceFamily { PROTOCOL_ANCHOR, TYPE_SHAPE, CALL_GRAPH, CONTROL_FLOW, DATA_FLOW, FRAMEWORK_INTERACTION, RUNTIME_BEHAVIOR, HOST_IDENTITY }
+enum class EvidenceFamily { PROTOCOL_ANCHOR, TYPE_SHAPE, CALL_GRAPH, CONTROL_FLOW, BYTECODE_SHAPE, DATA_FLOW, FRAMEWORK_INTERACTION, RUNTIME_BEHAVIOR, HOST_IDENTITY }
 
 data class HostFingerprint(val packageName: String, val versionCode: Long?, val versionName: String?, val signingDigest: String?, val dexDigest: String, val classLoaderId: String) {
     fun isUsableForHooking() = packageName == "com.deepseek.chat" && dexDigest.isNotBlank() && classLoaderId.isNotBlank()
