@@ -30,6 +30,7 @@ class StaticProgramGraph private constructor(
     private val readers: Map<String, Set<String>>,
     private val writers: Map<String, Set<String>>,
     private val methods: Map<String, MethodGraphFacts>,
+    private val methodAnchors: Map<String, Set<String>>,
     private val methodCountsByOwner: Map<String, Int>,
     private val classes: Map<String, ClassGraphFacts>,
     private val subclasses: Map<String, Set<String>>,
@@ -45,6 +46,11 @@ class StaticProgramGraph private constructor(
         val frameworkCalls = outgoing.count { target -> FRAMEWORK_PREFIXES.any { target.startsWith(it) } }
         val linkedReads = facts?.fieldReads.orEmpty().sumOf { field -> writers[field].orEmpty().count { it != id } }
         val linkedWrites = facts?.fieldWrites.orEmpty().sumOf { field -> readers[field].orEmpty().count { it != id } }
+        val rareAnchors = candidate.evidence.filter { it.family == EvidenceFamily.PROTOCOL_ANCHOR && it.weight >= 0.8 }.map { it.key }.toSet()
+        val graphNeighbors = incoming + outgoing
+        val neighborAnchorHits = graphNeighbors.flatMap { methodAnchors[it].orEmpty() }.filter { it in rareAnchors }.distinct()
+        val fieldNeighbors = facts?.fieldReads.orEmpty().flatMap { writers[it].orEmpty() } + facts?.fieldWrites.orEmpty().flatMap { readers[it].orEmpty() }
+        val fieldAnchorHits = fieldNeighbors.filter { it != id }.flatMap { methodAnchors[it].orEmpty() }.filter { it in rareAnchors }.distinct()
         val evidence = candidate.evidence.filterNot {
             it.family == EvidenceFamily.CALL_GRAPH ||
                 it.family == EvidenceFamily.DATA_FLOW ||
@@ -65,17 +71,19 @@ class StaticProgramGraph private constructor(
             )
         }
         if (incoming.isNotEmpty() || outgoing.isNotEmpty()) {
-            val topology = "incoming=" + incoming.size + ";outgoing=" + outgoing.size + ";framework-outgoing=" + frameworkCalls
-            val weight = (0.42 + minOf(0.48, (incoming.size + outgoing.size).coerceAtMost(24) * 0.02) +
-                if (frameworkCalls > 0) 0.08 else 0.0).coerceAtMost(0.98)
+            val topology = "incoming=" + incoming.size + ";outgoing=" + outgoing.size + ";framework-outgoing=" + frameworkCalls +
+                ";neighbor-rare-anchor-hits=" + neighborAnchorHits.size + ";anchors=" + neighborAnchorHits.sorted().joinToString(",")
+            val weight = (0.42 + minOf(0.36, (incoming.size + outgoing.size).coerceAtMost(18) * 0.02) +
+                if (frameworkCalls > 0) 0.06 else 0.0 + minOf(0.14, neighborAnchorHits.size * 0.07)).coerceAtMost(0.98)
             evidence += Evidence(EvidenceFamily.CALL_GRAPH, topology, weight)
         }
         val linkedFields = linkedReads + linkedWrites
         if (linkedFields > 0) {
             evidence += Evidence(
                 EvidenceFamily.DATA_FLOW,
-                "cross-method-field-links=" + linkedFields + ";read-links=" + linkedReads + ";write-links=" + linkedWrites,
-                (0.52 + minOf(0.43, linkedFields.coerceAtMost(9) * 0.047)).coerceAtMost(0.95)
+                "cross-method-field-links=" + linkedFields + ";read-links=" + linkedReads + ";write-links=" + linkedWrites +
+                    ";field-neighbor-rare-anchor-hits=" + fieldAnchorHits.size + ";anchors=" + fieldAnchorHits.sorted().joinToString(","),
+                (0.52 + minOf(0.32, linkedFields.coerceAtMost(7) * 0.045) + minOf(0.11, fieldAnchorHits.size * 0.055)).coerceAtMost(0.95)
             )
         }
         if (facts != null && facts.branchCount + facts.labelCount > 0) {
@@ -114,6 +122,7 @@ class StaticProgramGraph private constructor(
             val readers = mutableMapOf<String, MutableSet<String>>()
             val writers = mutableMapOf<String, MutableSet<String>>()
             val methods = mutableMapOf<String, MethodGraphFacts>()
+            val methodAnchors = mutableMapOf<String, MutableSet<String>>()
             val classes = mutableMapOf<String, ClassGraphFacts>()
             val subclasses = mutableMapOf<String, MutableSet<String>>()
             val implementors = mutableMapOf<String, MutableSet<String>>()
@@ -125,6 +134,11 @@ class StaticProgramGraph private constructor(
                     val name = obj["name"]?.jsonPrimitive?.contentOrNull ?: return@forEach
                     val descriptor = obj["descriptor"]?.jsonPrimitive?.contentOrNull ?: return@forEach
                     val id = owner + "->" + name + descriptor
+                    obj["roles"]?.jsonArray?.forEach { role ->
+                        role.jsonObject["anchors"]?.jsonArray?.mapNotNull { it.jsonPrimitive.contentOrNull }?.forEach { anchor ->
+                            methodAnchors.getOrPut(id) { mutableSetOf() }.add(anchor)
+                        }
+                    }
                     val readFields = obj["field_reads"]?.jsonArray?.mapNotNull { it.jsonPrimitive.contentOrNull }?.toSet().orEmpty()
                     val writeFields = obj["field_writes"]?.jsonArray?.mapNotNull { it.jsonPrimitive.contentOrNull }?.toSet().orEmpty()
                     val cfg = obj["control_flow"]?.jsonObject
@@ -160,7 +174,7 @@ class StaticProgramGraph private constructor(
                 }
             }
             val methodCountsByOwner = methods.keys.groupingBy { it.substringBefore("->") }.eachCount()
-            return StaticProgramGraph(callers, callees, readers, writers, methods, methodCountsByOwner, classes, subclasses, implementors)
+            return StaticProgramGraph(callers, callees, readers, writers, methods, methodAnchors, methodCountsByOwner, classes, subclasses, implementors)
         }
     }
 }
