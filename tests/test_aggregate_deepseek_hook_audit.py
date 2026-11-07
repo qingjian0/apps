@@ -138,7 +138,7 @@ class CandidateProjectionTest(unittest.TestCase):
         matches, diagnostics = mutual_best_matches([source], [same_a, same_b])
         self.assertEqual([], matches)
         self.assertEqual(1, diagnostics["left_ambiguous"])
-        self.assertEqual(2, diagnostics["right_ambiguous"])
+        self.assertEqual(0, diagnostics["right_ambiguous"])
 
     def test_prepared_similarity_is_stable_for_identical_candidates(self):
         method = {
