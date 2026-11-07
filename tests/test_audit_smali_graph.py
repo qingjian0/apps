@@ -2,6 +2,7 @@ import importlib.util
 import pathlib
 import tempfile
 import unittest
+from unittest.mock import patch
 
 SCRIPT = pathlib.Path(__file__).resolve().parents[1] / "scripts" / "audit_deepseek_apk.py"
 SPEC = importlib.util.spec_from_file_location("audit_deepseek_apk", SCRIPT)
@@ -452,6 +453,37 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertEqual("entry:p0", argument["to_parameter"])
         returned = next(x for x in graph["edges"] if x["kind"] == "return")
         self.assertEqual("d1:v2", returned["to_definition"])
+
+    def test_interprocedural_value_edge_limit_is_explicit_and_reported(self):
+        caller = {
+            "class": "Lx/Caller;", "name": "call", "descriptor": "()V", "component": "base",
+            "register_dataflow": {
+                "complete": True,
+                "uses": [{"instruction": 0, "register": "v1", "reaching_definitions": ["d0:v1"]}],
+                "definitions": [],
+            },
+            "invoke_sites": [{
+                "instruction": 0, "line": 10, "opcode": "invoke-static",
+                "owner": "Lx/Worker;", "name": "echo",
+                "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+                "registers": ["v1"], "result_instruction": None, "result_register": None,
+            }],
+        }
+        callee = {
+            "class": "Lx/Worker;", "name": "echo",
+            "descriptor": "(Ljava/lang/String;)Ljava/lang/String;", "component": "base",
+            "register_dataflow": {
+                "complete": True,
+                "definitions": [{"id": "entry:p0", "register": "p0", "kind": "parameter"}],
+                "uses": [],
+            },
+            "invoke_sites": [],
+        }
+        with patch.object(AUDIT, "MAX_INTERPROCEDURAL_VALUE_EDGES", 0):
+            graph = AUDIT.build_interprocedural_value_graph([caller, callee])
+        self.assertEqual(1, graph["summary"]["edge_count"])
+        self.assertEqual(0, graph["summary"]["stored_edge_count"])
+        self.assertTrue(graph["summary"]["edges_truncated"])
 
     def test_interprocedural_graph_rejects_incomplete_method_dataflow(self):
         caller = {
