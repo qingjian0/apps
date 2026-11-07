@@ -34,6 +34,7 @@ class FeatureEventSanitizer {
         val token = Regex("[A-Za-z0-9_.:-]{1,96}")
         return when (field) {
             SafeEventField.ENABLED, SafeEventField.STREAMING -> value == "true" || value == "false"
+            SafeEventField.SOURCE_LABEL -> value in setOf("system_default", "user_custom_instruction", "agent_instruction", "conversation_context", "developer_template", "tool_schema", "unknown")
             SafeEventField.CHARACTER_COUNT_BUCKET -> value in setOf("0", "1-32", "33-128", "129-512", "513-2048", "2049+")
             SafeEventField.HTTP_STATUS_CLASS -> value in setOf("1xx", "2xx", "3xx", "4xx", "5xx")
             SafeEventField.SESSION_PSEUDONYM, SafeEventField.TEMPLATE_HASH -> value.matches(Regex("[a-fA-F0-9]{16,96}"))
