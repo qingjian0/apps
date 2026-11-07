@@ -356,11 +356,11 @@ nw3.c / ChatChallengeRequest
 
 ### 8.3 当前仍不能下结论的部分
 
-- 2.7.5 的 l5.z 网络执行器和 ot1.z 底层 SSE 收集方法仍有 JADX 反编译失败；可以确认它们的调用位置和接口关系，但不能把未反编译方法体补写成事实。
+2.7.5 的 l5.z 与 ot1.z 是多用途协程状态机方法：l5 的 e=8 分支由 nw3.e 创建并用于请求执行路径；ot1 的 e=3 分支由 pv1.l 创建并用于 Flow 收集。它们不是原始 SSE 行解析器。原始 SSE 解析器已由 smali 确认为 vs1.z；2.7.3 对应解析器为 jz0.A。
 - 原生 PoW 库已确认 JNI 导出符号、Rust SHA3/Keccak 相关依赖和 Keccak 计算路径；精确的 digest 变体、nonce 搜索条件和输入字节拼接仍需更深的原生反汇编。
 - ToolOpen、ToolFind、Search 等片段的数据模型已确认；完整工具执行发生在服务端还是某个未识别的本地子系统，尚未被当前 APK 静态证据完全证明。
 - 2.7.5 真实设备运行、Hook 可用性和请求/响应时序尚未验证。
-- 2.7.3 APK 尚未完成同等级反编译，因此不能给出完整跨版本映射。
+- 2.7.3 APK 已完成同等级 JADX 与 smali 静态采集；跨版本语义映射见第 24 节。
 
 ## 9. 下一轮逆向与 Hook 验证顺序
 
@@ -424,7 +424,7 @@ nw3.c / ChatChallengeRequest
 | Agent 工具结果片段 | 已完成静态审计 | ToolOpen / ToolFind / Search 等模型已定位 |
 | 本地 Agent 工具执行闭环 | 未证实 | 未找到足以证明本地执行的完整调用链 |
 | 2.7.5 设备运行验证 | 未完成 | 尚无本版本真实设备 Hook 运行记录 |
-| 2.7.3 静态反编译与版本映射 | 未完成 | APK 已在仓库，待单独审计 |
+| 2.7.3 静态反编译与版本映射 | 已完成 | 3 个 DEX、12,319 个 Java 源文件、13,311 个 smali 文件；JADX 304 项错误 |
 
 本轮没有把 JADX 的部分反编译结果包装成完整成功，也没有把静态调用链包装成设备运行验证。
 
@@ -637,17 +637,15 @@ callback-exit 的返回对象类型分布：
 
 ### B. SSE 与网络执行器
 
-- 从 DEX/smali 还原 l5.z 和 ot1.z。
-- 追踪 Ktor HttpClient response 到 il4 Flow 的转换。
-- 还原 SSE event 行解析、data 解码、DeltaCommand 应用、异常分类、取消传播和 auto-resume 的重试边界。
-- 对照动态事件验证 ready、finish、toast、hint、title、update_file、close 等事件是否按静态分派执行。
+- 已从 smali 还原 2.7.3 / 2.7.5 的 Ktor 响应处理、ByteReadChannel SSE 行解析、超时、事件封装和下游分派。
+- l5.z / ot1.z 的职责已纠正：它们是请求执行与 Flow 收集的多用途协程状态机，不是 SSE parser。
+- 剩余工作转为设备端验证：真实响应状态、心跳超时、取消传播和断线恢复时序。
 
 ### C. 原生 PoW
 
-- 从 JNI 导出函数继续追踪 librscrypto.so 内部调用。
-- 还原 Keccak/SHA3 变体、挑战和盐的拼接顺序、nonce 搜索及 difficulty 判定。
-- 在 arm64 设备上验证 nativeCalculateDeepSeekHashV1Pow 的输入输出和耗时。
-- 不用模拟值替代真实 PoW，不伪造 X-DS-PoW-Response。
+- 已静态追踪 JNI 导出、核心候选搜索函数和 Keccak-family 置换路径；2.7.3 / 2.7.5 的原生库二进制完全相同。
+- 精确输入拼接、比较谓词和标准算法变体仍未完全证明。
+- 设备端输入输出、耗时与真实服务端 challenge 验证仍待执行；不使用模拟值或伪造 PoW header。
 
 ### D. Agent / 工具数据流
 
@@ -657,9 +655,9 @@ callback-exit 的返回对象类型分布：
 
 ### E. 2.7.3 对照审计
 
-- 对 deepseek 273.apk 运行同一静态采集工作流。
-- 对比 API 路由、请求模型、Serializer、SSE event、PoW 算法、Hook 入口和原生库。
-- 输出跨版本差异表，不按混淆类名猜测对应关系。
+- 已完成 deepseek 273.apk 与 DeepSeek_2.7.5.apk 的并行 JADX / APKTool smali 审计。
+- 已完成 API 路由、请求模型、SSE parser、事件分派、自动恢复、PoW 和原生库差异表，见第 24～26 节。
+- 所有类映射均按语义、调用点和描述符建立，不按混淆类名猜测。
 
 ## 14. 自动验证与分析质量门槛
 
@@ -851,7 +849,7 @@ SSE envelope 由 bia 表示，包含事件名称和数据内容。DeltaCommand �
 
 iv1 记录 sse_request、sse_created、sse_ready、sse_first_delta、sse_finished、sse_disconnected、sse_auto_resume 等生命周期节点。pv1.l 对取消、连接异常和业务异常分别处理；rr2.h 承担自动恢复流编排。
 
-底层 ot1.z 和网络执行器 l5.z 尚未被 JADX 完整还原，因此当前结论覆盖事件分派和调用关系，不覆盖底层 SSE 字节/行解析的每个实现细节。
+smali 级分析已补齐底层 SSE 字节/行读取。2.7.5 的 vs1.z 才是原始解析器；ot1.z 是 pv1.l 使用的 Flow collector 状态机，l5.z 的 e=8 分支则由 nw3.e 创建用于请求执行。2.7.3 对应链为 e0(e=1) → jz0(e=0) → g5(e=5) → ix / k11.a。
 
 ## 20. Agent / 工具片段：已确认的数据模型与未确认的执行端
 
@@ -890,3 +888,229 @@ sse_auto_scroll_one_screen_v2 是流式消息滚动体验配置，不是 SSE 协
 - 2.7.5 的 zn3 是空接口，y60 是另一处协程 continuation。
 
 因此跨版本对齐必须基于完整描述符、接口/父类、调用点、字符串常量和动态行为共同确认，不能只按混淆类名映射。
+
+## 23. SSE 底层字节流与行解析：DEX/smali 已还原
+
+本节依据两版 APK 的 APKTool smali，而不是仅依赖 JADX 生成的 Java 伪代码。
+
+### 23.1 2.7.5 真实传输解析链
+
+~~~text
+nw3.e(yu1, Long)
+  → b70（Flow wrapper）
+  → Ktor request execution
+  → g0.z（synthetic coroutine branch e=1，HTTP response handler）
+  → vs1.z（branch e=0，SSE parser）
+  → Ktor ByteReadChannel（kw0）
+  → qp0（line-read coroutine）
+  → bia(eventName, data)
+  → t5.a（branch e=7）
+  → ev1(bia)
+  → r3.c(fv1)
+  → DeltaCommand / named-event dispatch
+~~~
+
+响应处理器 g0 的成功分支从响应头读取 x-ds-sse-heartbeat-timeout-secs，创建 cv1 心跳/连接状态事件，再创建 vs1(e=0) 解析 Flow，通过 b70 与 t5(e=7) 收集并把 bia 转换成 ev1。
+
+非成功响应分支会读取响应体、解析结构化错误对象并包装为 dv1(gt9)，不会把错误响应当作正常 SSE Delta。
+
+### 23.2 2.7.3 对应链
+
+~~~text
+hx2.g(u01, Long)
+  → z40（Flow wrapper）
+  → e0.A（synthetic coroutine branch e=1，HTTP response handler）
+  → jz0.A（branch e=0，SSE parser）
+  → Ktor ByteReadChannel（zq0）
+  → fl0（line-read coroutine）
+  → gw8(eventName, data)
+  → g5.a（branch e=5）
+  → a11(gw8)
+  → ix
+  → k11.a(k11, gw8, Continuation)
+  → DeltaCommand / named-event dispatch
+~~~
+
+2.7.3 的成功响应分支创建 y01 心跳/连接状态事件、jz0(e=0) 解析 Flow 和 g5(e=5) 适配器；错误响应分支生成结构化错误结果。
+
+### 23.3 SSE 行解析规则
+
+| 解析职责 | 2.7.3 | 2.7.5 |
+|---|---|---|
+| Parser coroutine | jz0.A，e=0 | vs1.z，e=0 |
+| Ktor ByteReadChannel 类型 | zq0 | kw0 |
+| 行读取协程 | fl0 | qp0 |
+| timeout wrapper | p75.P | m07.R |
+| 事件数据对象 | gw8 | bia |
+| 下游事件包装 | a11 | ev1 |
+| 连接/心跳事件 | y01 | cv1 |
+| 错误响应包装 | z01 | dv1(gt9) |
+
+解析步骤：
+
+1. 从 Ktor response body 获取 ByteReadChannel。
+2. 读取 x-ds-sse-heartbeat-timeout-secs，按十进制解析；缺失或无法解析时默认 10 秒。
+3. 将秒数乘以 1000，作为每次异步读取行的超时。
+4. 在协程仍 active 且 channel 未关闭时持续读取。
+5. 行以 event: 开头时，保存事件名。
+6. 行以 data: 开头时，立即构造事件名/数据对象并发送到下游，然后清空当前事件名。
+7. 正常结束或异常退出时关闭 ByteReadChannel。
+
+**协议实现边界：**
+- 解析器明确处理 event: 与 data: 两种行。
+- 未发现 id:、retry: 的处理。
+- 未发现多行 data: 合并；每条 data: 行会立即触发一次下游发送。
+- 未发现注释行处理逻辑，非 event/data 行会被忽略。
+- 两版 DEX 均未发现 text/event-stream 或 readUTF8Line 字面量；行读取通过混淆后的 Ktor ByteReadChannel helper 完成。
+- 这说明它是面向当前服务端格式的定制解析路径，不应宣称完整覆盖 SSE 标准的所有字段和多行规则。
+
+### 23.4 事件分派
+
+2.7.3 的 k11.a 接收 gw8；2.7.5 的 r3.c 接收 fv1，其中 ev1 包装 bia，cv1 表示心跳/连接状态。
+
+两版均能确认：
+- event name 为 null：进入 DeltaCommand 默认增量路径。
+- ready：解析 ChatCompletionReadyEventData。
+- finish：处理完成事件。
+- toast、hint、title。
+- update_session、update_file、update_parent_message。
+- close、check_client_update、auto_tts_capability。
+
+因此，SSE 数据通路已经从 HTTP response、ByteReadChannel、行解析、事件封装追踪到业务事件分派。剩余的主要缺口是设备端时序验证，而不是静态 parser 入口未知。
+
+## 24. DeepSeek 2.7.3 与 2.7.5 跨版本语义映射
+
+### 24.1 APK 与反编译规模
+
+| 指标 | 2.7.3 | 2.7.5 |
+|---|---:|---:|
+| APK | deepseek 273.apk | DeepSeek_2.7.5.apk |
+| APK bytes | 14,211,169 | 22,210,268 |
+| APK SHA-256 | a6d025c14c98118a5a67849e04aaef6f3c9c13aaf0fa62caaee0e47091374ea3 | ddc52ef868b991fd33e634de834a3e2c022b0cd7ff9e854f4f141996aaeadb70 |
+| DEX 数量 | 3 | 3 |
+| JADX Java 文件 | 12,319 | 13,940 |
+| APKTool smali 文件 | 13,311 | 15,364 |
+| JADX exit code | 3 | 3 |
+| JADX errors | 304 | 344 |
+| 原生库数量 | 11 | 16 |
+
+JADX 两版均以 exit code 3 结束，但源码输出和 smali 反汇编均成功。JADX 错误方法必须继续以 smali 为准，不能把生成的 Java 错误 stub 当作真实实现。
+
+### 24.2 关键调用角色映射
+
+| 角色 | 2.7.3 | 2.7.5 |
+|---|---|---|
+| 请求路由/序列化入口 | hx2.g(u01, Long) → z40 | nw3.e(yu1, Long) → b70 |
+| HTTP response handler | e0.A，e=1 | g0.z，e=1 |
+| SSE parser | jz0.A，e=0 | vs1.z，e=0 |
+| SSE adapter | g5.a，e=5 | t5.a，e=7 |
+| SSE event dispatcher | k11.a(k11, gw8, Continuation) | r3.c(fv1, Continuation) |
+| Auto-resume | qu1.h | rr2.h |
+| SSE lifecycle telemetry | e11.f(lr8) | iv1.c(fda) |
+| PoW algorithm selector | ap9.c(n88, Continuation) | of2.k(ts9, Continuation) |
+
+Auto-resume 两版均在 DEX 中包含 executeAutoResumeStreamFlow 的 Kotlin 函数元数据签名；类名和协程状态机类型不同，但语义入口可以对应。
+
+### 24.3 API 与协议变化
+
+两版均能确认以下请求路由：
+- POST /api/v0/chat/completion
+- POST /api/v0/chat/regenerate
+- POST /api/v0/chat/continue
+- POST /api/v0/chat/edit_message
+- POST /api/v0/chat/resume_stream
+- POST /api/v0/chat/create_pow_challenge
+- POST /api/v0/chat/stop_stream
+- GET /api/v0/chat/history_messages
+
+两版主请求路由均会在存在 PoW 响应时附加 X-DS-PoW-Response。
+
+**2.7.5 新增/变化的挑战头证据：**
+- 2.7.3 的全部 smali 中未找到 X-DS-Challenge-Response。
+- 2.7.5 在 oq1.c ChallengePlugin 中同时设置 X-DS-Challenge-Response 与 X-DS-PoW-Response。
+- 2.7.5 还出现 X-Debug-Recaptcha-Challenge 等相关 header 路径。
+- 这证明 2.7.5 的挑战请求头体系发生变化；不能把 2.7.3 的挑战 header 行为直接套用到 2.7.5。
+
+### 24.4 原生库差异
+
+- 2.7.3 有 11 个 arm64-v8a 原生库；2.7.5 有 16 个。
+- 2.7.5 新增 libimage_processing_util_jni.so、libliteavsdk.so、libsurface_util_jni.so、libtxffmpeg.so、libtxsoundtouch.so。
+- libEncryptorP.so、libapminsighta.so、libapminsightb.so、libsmsdk.so 在相同路径下发生变化。
+- 两版均没有移除旧路径原生库。
+- 两版 librscrypto.so 都是 336,568 bytes，SHA-256 完全相同：4571b9bcf08d5f070a47a495bdcd4c77f4a088feee560ed11701ca93c7b56053。
+
+### 24.5 混淆类名不能跨版本直连
+
+实际发现同名类在两个版本中承担完全不同职责：
+
+- 2.7.3 的 vs1 是 ChatSessionUpdateTitleResponseBizData Serializer；2.7.5 的 vs1 是 SSE ByteReadChannel parser。
+- 2.7.3 的 nw3 不是请求路由类；2.7.5 的 nw3.e 是请求路由/序列化入口。
+- 2.7.3 的 rr2 是 lock-free queue；2.7.5 的 rr2.h 是 executeAutoResumeStreamFlow。
+- 2.7.5 的 l5 与 ot1 也不能仅凭方法名 z 认定为 parser 或 transport；必须先确认合成协程实例的 e 分支和创建点。
+
+跨版本映射必须基于完整描述符、接口、调用点、函数元数据、协议字符串和行为共同确认。
+
+## 25. PoW 原生算法：两版二进制一致，内部路径进一步收敛
+
+### 25.1 跨版本一致性
+
+2.7.3 与 2.7.5 的 PowCalculator Java native API 相同：
+
+~~~java
+nativeCalculateDeepSeekHashV1Pow(String base, String challenge, long difficulty)
+~~~
+
+两版 APK 的 librscrypto.so：
+- 大小：336,568 bytes
+- SHA-256：4571b9bcf08d5f070a47a495bdcd4c77f4a088feee560ed11701ca93c7b56053
+
+因此 PoW 的 native binary 没有随 2.7.3 → 2.7.5 改变；差异主要在 Java 层 Challenge/PoW 方案封装和 header 管理。
+
+### 25.2 AArch64 反汇编观察
+
+- JNI export：Java_com_deepseek_crypto_PowCalculator_nativeCalculateDeepSeekHashV1Pow
+- JNI symbol offset：0x18e40
+- 符号长度：484 bytes
+- JNI wrapper 调用内部候选计算路径，核心 helper 位于 0x19bc0。
+- 置换 helper 位于 0x1a7e8，操作 25 个 64-bit lane 的 Keccak-family 状态。
+- 可见 0x88（136 bytes）块/rate 处理、候选计数器格式化和 32-byte 比较路径。
+- 内部置换调用使用参数 23；在没有完全恢复其参数语义前，不把它直接命名为标准 SHA3-256 或标准 Keccak-256。
+
+### 25.3 仍未证明的细节
+
+- challenge 与 salt 的精确输入拼接顺序。
+- 候选计数器在 preimage 中的精确编码和位置。
+- 32-byte 比较究竟是完整相等、前缀比较还是中间转换后的判定。
+- difficulty 的准确数值语义及最大搜索边界。
+- 设备端真实输入输出与服务端验证结果。
+
+当前结论是 Keccak-family PoW 候选搜索路径已识别，不能宣称精确算法公式已完全还原。
+
+## 26. 双版本自动审计与证据产物
+
+### 26.1 自动化工作流
+
+- 分支：work/deepseek-version-comparison-audit
+- 工作流：<https://github.com/qingjian0/apps/blob/work/deepseek-version-comparison-audit/.github/workflows/deepseek-version-comparison.yml>
+- 工作流采用 matrix 并行审计 2.7.3 / 2.7.5，再合并生成比较报告。
+- 每个版本分别生成 APK SHA-256、DEX inventory、JADX 源码、APKTool smali、symbol hits、native library hash。
+- 自动验证要求 smali 数量非零、JSON 可解析、报告和 smali archive 非空。
+- 产物保留期 14 天。
+
+### 26.2 本轮证据包
+
+- 双版本比较工作流运行和产物：<https://github.com/qingjian0/apps/actions>
+- 目标 APK 与摘要见第 24 节。
+- 精简的 SSE/Hook/PoW 关键类证据包：deepseek-sse-hook-evidence.zip（本轮交付附件）。
+- 完整 smali archive 包含 2.7.3 的 13,311 个和 2.7.5 的 15,364 个 smali 文件。
+
+### 26.3 最终验证边界
+
+- 双版本静态采集和跨版本语义映射：已完成。
+- SSE ByteReadChannel 行解析与事件分派静态链：已完成。
+- PoW JNI/native binary 对比：已完成到置换/候选路径级别。
+- 精确 PoW 数学公式：未完成。
+- 真实设备 Hook 安装、触发、网络时序和断线恢复：未完成。
+- Agent 本地工具执行闭环：仍未证实。
+
+本轮交付是可复核的静态证据，不代表目标设备上所有 Hook 已经可用。
