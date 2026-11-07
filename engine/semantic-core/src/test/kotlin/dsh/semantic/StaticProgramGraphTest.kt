@@ -94,10 +94,10 @@ class StaticProgramGraphTest {
             """{"descriptor":"Lx/Caller;","super":"Ljava/lang/Object;","interfaces":[]}"""
         ))
         val pointsTo = gzipLines(listOf(
-            """{"caller":"$caller","callee":"$target","identity_scope":"one-callsite-context","identity_status":"singleton","identity":"alloc:caller#0:Lx/Thing;","runtime_identity_proven":false}"""
+            """{"caller":"$caller","callee":"$target","identity_scope":"bounded-call-string-context","identity_status":"singleton","identity":"alloc:caller#0:Lx/Thing;","runtime_identity_proven":false}"""
         ))
         val completeSummary = textFile(
-            """{"interprocedural_points_to":{"records_truncated":false,"recursive_fixed_point":false,"runtime_identity_proven":false}}"""
+            """{"interprocedural_points_to":{"records_truncated":false,"context_expansion_complete":true,"recursive_fixed_point":false,"runtime_identity_proven":false}}"""
         )
         val host = HostFingerprint("com.deepseek.chat", 300, "future", "cert", "dex-300", "loader")
         val candidate = SemanticCandidate(
@@ -118,7 +118,7 @@ class StaticProgramGraphTest {
         assertFalse(enriched.evidence.any { it.family == EvidenceFamily.DATA_FLOW })
 
         val truncatedSummary = textFile(
-            """{"interprocedural_points_to":{"records_truncated":true,"recursive_fixed_point":false,"runtime_identity_proven":false}}"""
+            """{"interprocedural_points_to":{"records_truncated":true,"context_expansion_complete":false,"recursive_fixed_point":false,"runtime_identity_proven":false}}"""
         )
         val truncatedGraph = StaticProgramGraph.load(
             methods, edges, classes, summaryPath = truncatedSummary, pointsToPath = pointsTo
@@ -127,7 +127,7 @@ class StaticProgramGraphTest {
         assertTrue(truncatedGraph.graphStats()["interproceduralContextualReceivers"] == 0)
 
         val runtimeClaimSummary = textFile(
-            """{"interprocedural_points_to":{"records_truncated":false,"recursive_fixed_point":false,"runtime_identity_proven":true}}"""
+            """{"interprocedural_points_to":{"records_truncated":false,"context_expansion_complete":true,"recursive_fixed_point":false,"runtime_identity_proven":true}}"""
         )
         val runtimeClaimGraph = StaticProgramGraph.load(
             methods, edges, classes, summaryPath = runtimeClaimSummary, pointsToPath = pointsTo
