@@ -235,7 +235,7 @@ def build_smali_cfg(body_lines):
     return {"instruction_count":count,"block_count":len(blocks),"edge_count":len(edge_list),
         "unresolved_target_count":len(unresolved),"unresolved_targets":sorted(set(unresolved))[:32],
         "complete":not unresolved and len(edge_list)<=256,"edges":edge_list[:256],"edges_truncated":len(edge_list)>256,
-        "blocks_truncated":False}
+        "blocks":blocks,"blocks_truncated":False}
 
 
 def analyze_register_use_def(body_lines):
@@ -346,14 +346,15 @@ def analyze_register_dataflow(body_lines, cfg):
             current.add(ident); all_defs_by_register[reg].add(ident)
         defs_by_instruction[ins["index"]]=current
     gen={b["id"]:set() for b in blocks}; kill={b["id"]:set() for b in blocks}
+    last_definition={}
     for ins in executable:
-        gen[block_by_instruction[ins["index"]]].update(defs_by_instruction[ins["index"]])
-    for block in blocks:
-        bid=block["id"]
-        written={d["register"] for d in definitions
-                 if block_by_instruction[d["instruction"]]==bid}
-        for reg in written:
-            kill[bid].update(all_defs_by_register[reg]-gen[bid])
+        bid=block_by_instruction[ins["index"]]
+        for ident in defs_by_instruction[ins["index"]]:
+            reg=ident.split(":",1)[1]
+            last_definition[(bid,reg)]=ident
+    for (bid,reg),ident in last_definition.items():
+        gen[bid].add(ident)
+        kill[bid].update(all_defs_by_register[reg]-{ident})
     incoming={b["id"]:set() for b in blocks}
     outgoing={b["id"]:set(gen[b["id"]]) for b in blocks}
     changed=True; iterations=0
