@@ -201,6 +201,20 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertEqual("resolved", use["resolution"])
         self.assertEqual(["d0:v0"], use["reaching_definitions"])
 
+    def test_reaching_definitions_kill_prior_definition_in_same_block(self):
+        body = [
+            "    const/4 v0, 0x1",
+            "    const/4 v0, 0x2",
+            "    move v1, v0",
+            "    return v1",
+        ]
+        cfg = AUDIT.build_smali_cfg(body)
+        facts = AUDIT.analyze_register_dataflow(body, cfg)
+        self.assertTrue(facts["complete"])
+        use = next(x for x in facts["uses"] if x["register"] == "v0")
+        self.assertEqual("resolved", use["resolution"])
+        self.assertEqual(["d1:v0"], use["reaching_definitions"])
+
     def test_reaching_definitions_preserve_branch_ambiguity(self):
         body = [
             "    if-eqz v1, :else",
