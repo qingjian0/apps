@@ -13,6 +13,10 @@ class HookCoordinator(private val backend: HookBackend) {
         if (!resolution.accepted || resolution.selected == null) return InstallResult(policy.role, InstallStatus.REJECTED, resolution.rejection ?: "unverified-resolution")
         val candidate = resolution.selected
         if (candidate.role != policy.role || candidate.host != host || !host.isUsableForHooking()) return InstallResult(policy.role, InstallStatus.REJECTED, "host-or-role-mismatch")
+        if (!host.hasCompleteRuntimeIdentity()) return InstallResult(policy.role, InstallStatus.REJECTED, "runtime-host-identity-incomplete")
+        val evidenceFamilies = candidate.evidence.map { it.family }.toSet()
+        if (EvidenceFamily.HOST_IDENTITY !in evidenceFamilies || EvidenceFamily.RUNTIME_BEHAVIOR !in evidenceFamilies)
+            return InstallResult(policy.role, InstallStatus.REJECTED, "runtime-evidence-required")
         val key = listOf(host.packageName, host.dexDigest, host.classLoaderId, policy.role.value, candidate.method.stableIdentity).joinToString("|")
         synchronized(lock) {
             if (key in installed) return InstallResult(policy.role, InstallStatus.ALREADY_INSTALLED)
