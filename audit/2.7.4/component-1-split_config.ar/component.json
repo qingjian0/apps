@@ -5,14 +5,23 @@
   "manifest": {
     "package": "com.deepseek.chat",
     "split": "config.ar",
-    "version_code": null,
+    "version_code": "294",
     "version_code_major": null,
     "version_name": null,
     "root_attributes": {
       "{http://schemas.android.com/apk/res/android}splitTypes": "",
       "package": "com.deepseek.chat",
       "split": "config.ar"
-    }
+    },
+    "binary_manifest": {
+      "aapt_exit": 0,
+      "package": "com.deepseek.chat",
+      "version_code": "294",
+      "version_name": null,
+      "split": "config.ar"
+    },
+    "signing_sha256": null,
+    "apksigner_exit": 0
   },
   "apktool_exit": 0,
   "jadx_exit": 0,

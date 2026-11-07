@@ -14,16 +14,24 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": null,
-        "version_code": null,
+        "version_code": "295",
         "version_code_major": null,
-        "version_name": null,
+        "version_name": "2.7.5",
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}compileSdkVersion": "37",
           "{http://schemas.android.com/apk/res/android}compileSdkVersionCodename": "17",
           "package": "com.deepseek.chat",
           "platformBuildVersionCode": "37",
           "platformBuildVersionName": "17"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "295",
+          "version_name": "2.7.5"
+        },
+        "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 3,

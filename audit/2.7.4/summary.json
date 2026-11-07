@@ -41,9 +41,9 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": null,
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
-        "version_name": null,
+        "version_name": "2.7.4",
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}compileSdkVersion": "37",
           "{http://schemas.android.com/apk/res/android}compileSdkVersionCodename": "17",
@@ -52,7 +52,15 @@
           "package": "com.deepseek.chat",
           "platformBuildVersionCode": "37",
           "platformBuildVersionName": "17"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": "2.7.4"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 3,
@@ -66,14 +74,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.ar",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "",
           "package": "com.deepseek.chat",
           "split": "config.ar"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.ar"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,
@@ -95,7 +112,16 @@
           "{http://schemas.android.com/apk/res/android}splitTypes": "base__abi",
           "package": "com.deepseek.chat",
           "split": "config.arm64_v8a"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.arm64_v8a"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 2,
@@ -109,14 +135,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.de",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "",
           "package": "com.deepseek.chat",
           "split": "config.de"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.de"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,
@@ -130,14 +165,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.es",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "",
           "package": "com.deepseek.chat",
           "split": "config.es"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.es"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,
@@ -151,14 +195,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.et",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "",
           "package": "com.deepseek.chat",
           "split": "config.et"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.et"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,
@@ -172,14 +225,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.fi",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "",
           "package": "com.deepseek.chat",
           "split": "config.fi"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.fi"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,
@@ -193,14 +255,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.fr",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "",
           "package": "com.deepseek.chat",
           "split": "config.fr"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.fr"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,
@@ -214,14 +285,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.hi",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "",
           "package": "com.deepseek.chat",
           "split": "config.hi"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.hi"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,
@@ -235,14 +315,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.hu",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "",
           "package": "com.deepseek.chat",
           "split": "config.hu"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.hu"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,
@@ -256,14 +345,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.in",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "",
           "package": "com.deepseek.chat",
           "split": "config.in"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.in"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,
@@ -277,14 +375,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.it",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "",
           "package": "com.deepseek.chat",
           "split": "config.it"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.it"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,
@@ -298,14 +405,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.ja",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "",
           "package": "com.deepseek.chat",
           "split": "config.ja"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.ja"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,
@@ -319,14 +435,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.xxhdpi",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "base__density",
           "package": "com.deepseek.chat",
           "split": "config.xxhdpi"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.xxhdpi"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,
@@ -340,14 +465,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.ko",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "",
           "package": "com.deepseek.chat",
           "split": "config.ko"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.ko"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,
@@ -361,14 +495,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.ms",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "",
           "package": "com.deepseek.chat",
           "split": "config.ms"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.ms"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,
@@ -382,14 +525,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.nl",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "",
           "package": "com.deepseek.chat",
           "split": "config.nl"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.nl"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,
@@ -403,14 +555,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.pl",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "",
           "package": "com.deepseek.chat",
           "split": "config.pl"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.pl"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,
@@ -424,14 +585,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.pt",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "",
           "package": "com.deepseek.chat",
           "split": "config.pt"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.pt"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,
@@ -445,14 +615,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.ru",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "",
           "package": "com.deepseek.chat",
           "split": "config.ru"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.ru"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,
@@ -466,14 +645,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.sv",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "",
           "package": "com.deepseek.chat",
           "split": "config.sv"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.sv"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,
@@ -487,14 +675,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.th",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "",
           "package": "com.deepseek.chat",
           "split": "config.th"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.th"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,
@@ -508,14 +705,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.tr",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "",
           "package": "com.deepseek.chat",
           "split": "config.tr"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.tr"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,
@@ -529,14 +735,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.uk",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "",
           "package": "com.deepseek.chat",
           "split": "config.uk"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.uk"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,
@@ -550,14 +765,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.vi",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "",
           "package": "com.deepseek.chat",
           "split": "config.vi"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.vi"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,
@@ -571,14 +795,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.xxxhdpi",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "base__density",
           "package": "com.deepseek.chat",
           "split": "config.xxxhdpi"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.xxxhdpi"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,
@@ -592,14 +825,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.zh",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "",
           "package": "com.deepseek.chat",
           "split": "config.zh"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.zh"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,
@@ -613,14 +855,23 @@
       "manifest": {
         "package": "com.deepseek.chat",
         "split": "config.hdpi",
-        "version_code": null,
+        "version_code": "294",
         "version_code_major": null,
         "version_name": null,
         "root_attributes": {
           "{http://schemas.android.com/apk/res/android}splitTypes": "base__density",
           "package": "com.deepseek.chat",
           "split": "config.hdpi"
-        }
+        },
+        "binary_manifest": {
+          "aapt_exit": 0,
+          "package": "com.deepseek.chat",
+          "version_code": "294",
+          "version_name": null,
+          "split": "config.hdpi"
+        },
+        "signing_sha256": null,
+        "apksigner_exit": 0
       },
       "apktool_exit": 0,
       "jadx_exit": 0,

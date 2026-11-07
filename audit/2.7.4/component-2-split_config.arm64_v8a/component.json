@@ -13,7 +13,16 @@
       "{http://schemas.android.com/apk/res/android}splitTypes": "base__abi",
       "package": "com.deepseek.chat",
       "split": "config.arm64_v8a"
-    }
+    },
+    "binary_manifest": {
+      "aapt_exit": 0,
+      "package": "com.deepseek.chat",
+      "version_code": "294",
+      "version_name": null,
+      "split": "config.arm64_v8a"
+    },
+    "signing_sha256": null,
+    "apksigner_exit": 0
   },
   "apktool_exit": 0,
   "jadx_exit": 2,
