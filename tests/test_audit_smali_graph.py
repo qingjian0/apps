@@ -546,6 +546,95 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertFalse(terminal[0]["runtime_identity_proven"])
         self.assertEqual("bounded-call-string-context", terminal[0]["identity_scope"])
 
+    def test_interprocedural_points_to_propagates_factory_return_to_next_callsite(self):
+        def method(owner, name, descriptor, body, access="static"):
+            cfg = AUDIT.build_smali_cfg(body)
+            invokes = AUDIT.extract_invoke_sites(body)
+            fields = AUDIT.extract_field_access_sites(body)
+            pts = AUDIT.analyze_object_points_to(
+                body, cfg, owner, name, descriptor, access, fields, invokes)
+            return {
+                "class": owner, "name": name, "descriptor": descriptor,
+                "component": "base", "invoke_sites": invokes,
+                "invoke_sites_truncated": False, "invoke_sites_incomplete": False,
+                "object_points_to": pts,
+                "control_flow": {
+                    "branch_count": 0, "return_count": sum(
+                        1 for line in body
+                        if AUDIT.OP_RE.match(line) and AUDIT.OP_RE.match(line).group(1).startswith("return")
+                    ), "cfg": cfg,
+                },
+            }
+        caller = method("Lx/Caller;", "run", "()V", [
+            "    invoke-static {}, Lx/Factory;->make()Lx/Thing;",
+            "    move-result-object v0",
+            "    invoke-static {v0}, Lx/Sink;->consume(Lx/Thing;)V",
+            "    return-void",
+        ])
+        factory = method("Lx/Factory;", "make", "()Lx/Thing;", [
+            "    new-instance v0, Lx/Thing;",
+            "    return-object v0",
+        ])
+        sink = method("Lx/Sink;", "consume", "(Lx/Thing;)V", [
+            "    iget-object v0, p0, Lx/Thing;->value:Ljava/lang/Object;",
+            "    return-void",
+        ])
+        graph = AUDIT.build_interprocedural_points_to_graph([caller, factory, sink])
+        receiver = next(
+            row for row in graph["contextual_receivers"]
+            if row["callee"] == "Lx/Sink;->consume(Lx/Thing;)V"
+        )
+        self.assertEqual("singleton", receiver["identity_status"])
+        self.assertTrue(receiver["identity"].startswith("context:"))
+        factory_call = next(
+            row for row in graph["call_contexts"]
+            if row["callee"] == "Lx/Factory;->make()Lx/Thing;"
+        )
+        self.assertEqual("singleton", factory_call["return_value"]["identity_status"])
+        self.assertEqual(1, graph["summary"]["return_identity_propagations"])
+
+    def test_interprocedural_points_to_does_not_upgrade_unknown_factory_return(self):
+        def method(owner, name, descriptor, body):
+            cfg = AUDIT.build_smali_cfg(body)
+            invokes = AUDIT.extract_invoke_sites(body)
+            fields = AUDIT.extract_field_access_sites(body)
+            pts = AUDIT.analyze_object_points_to(
+                body, cfg, owner, name, descriptor, "static", fields, invokes)
+            return {
+                "class": owner, "name": name, "descriptor": descriptor,
+                "component": "base", "invoke_sites": invokes,
+                "invoke_sites_truncated": False, "invoke_sites_incomplete": False,
+                "object_points_to": pts,
+                "control_flow": {
+                    "branch_count": 0, "return_count": sum(
+                        1 for line in body
+                        if AUDIT.OP_RE.match(line) and AUDIT.OP_RE.match(line).group(1).startswith("return")
+                    ), "cfg": cfg,
+                },
+            }
+        caller = method("Lx/Caller;", "run", "()V", [
+            "    invoke-static {}, Lx/Factory;->make()Lx/Thing;",
+            "    move-result-object v0",
+            "    invoke-static {v0}, Lx/Sink;->consume(Lx/Thing;)V",
+            "    return-void",
+        ])
+        factory = method("Lx/Factory;", "make", "()Lx/Thing;", [
+            "    sget-object v0, Lx/Factory;->cached:Lx/Thing;",
+            "    return-object v0",
+        ])
+        sink = method("Lx/Sink;", "consume", "(Lx/Thing;)V", [
+            "    iget-object v0, p0, Lx/Thing;->value:Ljava/lang/Object;",
+            "    return-void",
+        ])
+        graph = AUDIT.build_interprocedural_points_to_graph([caller, factory, sink])
+        receiver = next(
+            row for row in graph["contextual_receivers"]
+            if row["callee"] == "Lx/Sink;->consume(Lx/Thing;)V"
+        )
+        self.assertEqual("unknown", receiver["identity_status"])
+        self.assertEqual(0, graph["summary"]["return_identity_propagations"])
+        self.assertGreaterEqual(graph["summary"]["return_identity_unknown_count"], 1)
+
     def test_interprocedural_points_to_cuts_recursive_contexts_fail_closed(self):
         body = [
             "    invoke-static {p0}, Lx/Recursive;->step(Lx/Thing;)V",
