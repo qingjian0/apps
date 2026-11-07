@@ -3,7 +3,7 @@ package dsh.semantic
 /** Evidence-diverse, ambiguity-intolerant resolver. It never installs hooks itself. */
 class SemanticResolver {
     fun resolve(host: HostFingerprint, policy: RolePolicy, candidates: List<SemanticCandidate>): Resolution {
-        if (!host.isUsableForHooking()) return rejected(policy.role, "untrusted-or-incomplete-host")
+        if (!host.isRecognizedTargetHost()) return rejected(policy.role, "untrusted-or-incomplete-host")
         val matching = candidates.filter { it.role == policy.role && it.host == host && it.method.isWellFormed() }
         if (matching.isEmpty()) return rejected(policy.role, "no-well-formed-host-matched-candidates")
         val ranked = matching.map { candidate ->
