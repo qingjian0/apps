@@ -18,6 +18,17 @@ ANCHORS = {
     "serialization": ("kotlinx.serialization", "SerialDescriptor", "serializer", "SerializersModule"),
     "agent_tool": ("ToolOpenFragment", "ToolFindFragment", "SearchFragment", "tool_calls", "tool_use", "MCP"),
     "session": ("conversation_id", "session_id", "message_id", "history_messages", "resume_stream"),
+    "prompt_pipeline": ("system_prompt", "systemPrompt", "custom_instructions", "customInstructions", "prompt_template", "promptTemplate", "instruction", "role_prompt", "context_window", "prompt"),
+    "agent_planning": ("agent", "Agent", "plan", "planner", "task_step", "tool_calls", "tool_call", "tool_use", "function_call"),
+    "tool_registry_execution": ("ToolRegistry", "ToolExecutor", "ToolCall", "ToolResult", "Mcp", "MCP", "SearchFragment", "ToolOpenFragment", "ToolFindFragment"),
+    "local_api_gateway": ("127.0.0.1", "0.0.0.0", "/v1/chat/completions", "/v1/models", "LocalApi", "LocalApiServer", "HttpServer", "ktor-server"),
+    "multimodal_image": ("image_url", "image/jpeg", "image/png", "ImagePart", "ImageContent", "vision"),
+    "multimodal_audio": ("audio", "audio/mpeg", "audio/wav", "speech", "transcription", "text-to-speech", "tts"),
+    "attachment_file": ("multipart/form-data", "application/pdf", "content://", "FileProvider", "Attachment", "upload"),
+    "search_web": ("SearchFragment", "search_query", "web_search", "citation", "sources", "reference"),
+    "storage_sync": ("RoomDatabase", "DataStore", "SharedPreferences", "conversation_history", "sync"),
+    "account_capability": ("subscription", "quota", "model_capability", "feature_flag", "remote_config"),
+    "ui_settings": ("Settings", "Preference", "ViewModel", "NavController", "Compose"),
 }
 SENSITIVE = re.compile(r"(?i)(authorization|bearer\s+|cookie|api[_-]?key|access[_-]?token|refresh[_-]?token|password|prompt|message[_-]?content)")
 METHOD_RE = re.compile(r"^\.method\s+(.+?)\s+([^\s(]+)(\([^)]*\).+)$")
