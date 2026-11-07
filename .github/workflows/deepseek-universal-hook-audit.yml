@@ -9,6 +9,7 @@ on:
       - scripts/aggregate_deepseek_hook_audit.py
       - DeepSeek_2.7.5.apk
       - deepseek271.apk
+      - deepseek-2-7-2.apk
       - "deepseek 273.apk"
       - com.deepseek.chat_2.7.4-294_1arch_3dpi_23lang_8b3ec3b6e7e5bfc2253e9c86dfc4c4e7_apkmirror.com.apkm
       - dsprobe.log
@@ -30,6 +31,8 @@ jobs:
         include:
           - version: "2.7.1"
             input: deepseek271.apk
+          - version: "2.7.2"
+            input: deepseek-2-7-2.apk
           - version: "2.7.3"
             input: "deepseek 273.apk"
           - version: "2.7.4"
@@ -100,7 +103,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p audit
-          for version in 2.7.1 2.7.3 2.7.4 2.7.5; do
+          for version in 2.7.1 2.7.2 2.7.3 2.7.4 2.7.5; do
             artifact="deepseek-universal-${version}"
             test -d "incoming/$artifact"
             mkdir -p "audit/$version"
@@ -118,7 +121,7 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add audit/2.7.1 audit/2.7.3 audit/2.7.4 audit/2.7.5 audit/universal-hook
+          git add audit/2.7.1 audit/2.7.2 audit/2.7.3 audit/2.7.4 audit/2.7.5 audit/universal-hook
           if git diff --cached --quiet; then
             echo "No audit changes to commit"
           else
