@@ -234,7 +234,7 @@ def build_smali_cfg(body_lines):
     edge_list=[{"from":a,"to":b,"kind":kind} for a,b,kind in sorted(edges)]
     return {"instruction_count":count,"block_count":len(blocks),"edge_count":len(edge_list),
         "unresolved_target_count":len(unresolved),"unresolved_targets":sorted(set(unresolved))[:32],
-        "complete":not unresolved,"edges":edge_list[:256],"edges_truncated":len(edge_list)>256,
+        "complete":not unresolved and len(edge_list)<=256,"edges":edge_list[:256],"edges_truncated":len(edge_list)>256,
         "blocks_truncated":False}
 
 
