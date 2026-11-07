@@ -136,10 +136,22 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertIn("p1", facts["read_registers"])
 
     def test_unknown_register_opcode_marks_use_def_incomplete(self):
-        facts = AUDIT.analyze_register_use_def(["    invoke-custom {v0}, call_site@0"])
+        facts = AUDIT.analyze_register_use_def(["    foo-op v0, v1"])
         self.assertFalse(facts["complete"])
         self.assertEqual(1, facts["unknown_opcode_count"])
         self.assertEqual("invoke-custom", facts["unknown_opcodes"][0]["opcode"])
+
+    def test_register_ranges_and_two_address_reads_are_expanded(self):
+        facts = AUDIT.analyze_register_use_def([
+            "    invoke-static/range {v2 .. v5}, Lx/Worker;->run()V",
+            "    add-int/2addr v2, v3",
+        ])
+        self.assertTrue(facts["complete"])
+        invoke = facts["instructions"][0]
+        self.assertEqual(["v2", "v3", "v4", "v5"], invoke["reads"])
+        arithmetic = facts["instructions"][1]
+        self.assertIn("v2", arithmetic["reads"])
+        self.assertEqual(["v2"], arithmetic["writes"])
 
     def test_redaction_marker_cannot_trigger_prompt_anchor(self):
         redacted = AUDIT.safe_strings('    const-string v0, "prompt body must not persist"')
