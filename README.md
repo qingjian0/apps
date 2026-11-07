@@ -1118,3 +1118,69 @@ nativeCalculateDeepSeekHashV1Pow(String base, String challenge, long difficulty)
 - Agent 本地工具执行闭环：仍未证实。
 
 本轮交付是可复核的静态证据，不代表目标设备上所有 Hook 已经可用。
+
+
+## 27. 2.7.3 / 2.7.5 版本化 Hook Profile
+
+以下入口由静态 DEX/smali 证据建立。它们是 Hook 候选，不代表已经在 LSPosed 设备上验证成功。
+
+| 语义入口 | 2.7.3 | 2.7.5 | 建议 |
+|---|---|---|---|
+| 请求路由/序列化 | hx2.g(u01, Long) → z40 | nw3.e(yu1, Long) → b70 | P1；观察请求对象类型、路由和 Serializer 选择 |
+| HTTP response handler | e0.A，实例分支 e=1 | g0.z，实例分支 e=1 | P2；只观察状态码、响应类别和分支 |
+| SSE 行解析 | jz0.A，实例分支 e=0 | vs1.z，实例分支 e=0 | P3；只观察 event/data 行边界与耗时，不记录正文 |
+| SSE event adapter | g5.a，分支 e=5 | t5.a，分支 e=7 | P3；一般不作为首选 Hook |
+| 业务事件分派 | k11.a(k11, gw8, Continuation) | r3.c(fv1, Continuation) | P1；观察事件类型和状态迁移 |
+| Auto-resume | qu1.h | rr2.h | P2；观察重试触发、结束原因和重复事件 |
+| SSE lifecycle | e11.f(lr8) | iv1.c(fda) | P2；用于生命周期闭合与重复事件检测 |
+| PoW 方案选择 | ap9.c(n88, Continuation) | of2.k(ts9, Continuation) | P2；观察算法分支，不修改结果 |
+| Challenge header | 未发现同名 header 实现 | oq1.c，ChallengePlugin | 仅 2.7.5；观察 header 是否由插件生成，不伪造值 |
+
+### 27.1 Hook 选择原则
+
+1. 首选请求路由入口与业务事件分派入口，它们比协程状态机内部指令更接近稳定语义边界。
+2. 对 e0.A / g0.z、jz0.A / vs1.z 等合成协程方法，必须检查实例 e 字段；同一个方法体承载多个协程状态机分支，不能无条件拦截。
+3. l5.z / ot1.z 不应被当作 SSE parser Hook 点；它们的 e 分支和创建点已经证明其职责不同。
+4. fl0 / qp0 属于底层行读取辅助类，只有排查行读取超时或取消问题时才考虑临时探针。
+5. PoW JNI 默认只读观测。不得替换挑战、伪造 nonce、跳过难度校验或修改 X-DS-PoW-Response。
+6. 2.7.3 和 2.7.5 必须使用独立 profile。版本识别失败时维持只读，不尝试猜测映射。
+
+### 27.2 低敏诊断字段
+
+建议仅采集：
+- APK version / versionCode / DEX profile id。
+- Hook 类、方法和完整 descriptor。
+- Hook 安装结果、安装次数、线程名和耗时。
+- HTTP status、路由类别、响应类型。
+- SSE event name、事件序号、数据字节长度、读取耗时。
+- Continuation / Flow 的完成、取消、异常类别。
+- Auto-resume 次数、触发原因和结束原因。
+
+禁止采集 prompt、完整响应正文、Authorization、Cookie、API key、挑战原文、salt、nonce 和完整请求头。
+
+## 28. 设备端验证矩阵与完成标准
+
+静态链路已还原；真实 Hook 仍需在目标设备完成以下验证：
+
+| 测试场景 | 重点观察 | 通过标准 |
+|---|---|---|
+| 冷启动 / 版本识别 | package version、versionCode、profile | 正确选择 2.7.3 或 2.7.5；未知版本只读 |
+| 普通聊天请求 | hx2.g / nw3.e | 一次用户发送只建立一个预期请求流 |
+| 成功响应与首个 Delta | e0/jz0 或 g0/vs1 | response → parser → event dispatcher 顺序闭合 |
+| 完成事件 | finish / close | 状态终结一次，不重复完成 |
+| 心跳超时 | x-ds-sse-heartbeat-timeout-secs | 默认 10 秒；服务端 header 可覆盖；超时后按设计结束 |
+| 非 2xx 响应 | e0 / g0 错误分支 | 结构化错误进入错误对象，不误当作 Delta |
+| 断线与自动恢复 | qu1.h / rr2.h | 恢复触发可追踪，不重复追加已确认消息 |
+| 用户取消 | Flow / Continuation cancel | 取消向上游传播，连接与资源关闭 |
+| 并行流 | allow_parallel_streams | 多流任务彼此隔离，事件不串线 |
+| 打断并发送 | interrupt_and_send_enabled | 旧流按策略终止，新请求只创建一次 |
+| PoW challenge | ap9 / of2 / JNI | 真实 challenge 输入输出一致，不跳过校验 |
+| 重复 lifecycle | Hook installer | 同一 Hook 不重复安装，单点失败不阻断其他独立 Hook |
+
+**设备验收通过条件：**
+- 版本 profile 与 APK 身份一致。
+- 每个 Hook 精确匹配完整 descriptor 和分支条件。
+- Hook 安装幂等；单个可选 Hook 失败不会导致全部功能 Hook 重复安装。
+- 请求、SSE 事件、完成、取消和 auto-resume 的状态链闭合。
+- 无敏感数据进入日志。
+- 未完成设备测试前，不将任何候选标记为“生产可用”。
