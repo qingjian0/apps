@@ -19,14 +19,14 @@ ANCHORS = {
     "agent_tool": ("ToolOpenFragment", "ToolFindFragment", "SearchFragment", "tool_calls", "tool_use", "MCP"),
     "session": ("conversation_id", "session_id", "message_id", "history_messages", "resume_stream"),
 }
-SENSITIVE = re.compile(r"(?i)(authorization|bearer\\s+|cookie|api[_-]?key|access[_-]?token|refresh[_-]?token|password|prompt|message[_-]?content)")
-METHOD_RE = re.compile(r"^\\.method\\s+(.+?)\\s+([^\\s(]+)(\\([^)]*\\).+)$")
-CLASS_RE = re.compile(r"^\\.class\\s+.*?\\s+(L[^;]+;)")
-SUPER_RE = re.compile(r"^\\.super\\s+(L[^;]+;)")
-IMPL_RE = re.compile(r"^\\.implements\\s+(L[^;]+;)")
-INVOKE_RE = re.compile(r"\\binvoke-[\\w/-]+\\s+\\{[^}]*\\},?\\s*(L[^;]+;)->([^ (]+)(\\([^)]*\\).+)")
-OP_RE = re.compile(r"^\\s*([a-z][a-z0-9_/-]+)(?:\\s|$)")
-STR_RE = re.compile(r'const-string(?:/jumbo)?\\s+[^,]+,\\s+"((?:\\\\.|[^"])*)"')
+SENSITIVE = re.compile(r"(?i)(authorization|bearer\s+|cookie|api[_-]?key|access[_-]?token|refresh[_-]?token|password|prompt|message[_-]?content)")
+METHOD_RE = re.compile(r"^\.method\s+(.+?)\s+([^\s(]+)(\([^)]*\).+)$")
+CLASS_RE = re.compile(r"^\.class\s+.*?\s+(L[^;]+;)")
+SUPER_RE = re.compile(r"^\.super\s+(L[^;]+;)")
+IMPL_RE = re.compile(r"^\.implements\s+(L[^;]+;)")
+INVOKE_RE = re.compile(r"\binvoke-[\w/-]+\s+\{[^}]*\},?\s*(L[^;]+;)->([^ (]+)(\([^)]*\).+)")
+OP_RE = re.compile(r"^\s*([a-z][a-z0-9_/-]+)(?:\s|$)")
+STR_RE = re.compile(r'const-string(?:/jumbo)?\s+[^,]+,\s+"((?:\\.|[^"])*)"')
 
 def sha256(path):
     h=hashlib.sha256()
@@ -35,9 +35,9 @@ def sha256(path):
     return h.hexdigest()
 
 def dex_header(data):
-    if len(data)<112 or not data.startswith(b"dex\\n"): return None
+    if len(data)<112 or not data.startswith(b"dex\n"): return None
     u=lambda off: struct.unpack_from("<I",data,off)[0]
-    return {"magic":data[:8].decode("latin1").replace("\\0",""),"bytes":len(data),
+    return {"magic":data[:8].decode("latin1").replace("\0",""),"bytes":len(data),
             "header_file_size":u(32),"string_ids":u(56),"type_ids":u(64),"proto_ids":u(72),
             "field_ids":u(80),"method_ids":u(88),"class_defs":u(96),
             "file_size_matches":u(32)==len(data),"adler32_header":u(8)}
@@ -139,7 +139,7 @@ def main():
         comp=apk.stem
         comp_out=out/comp; comp_out.mkdir(parents=True,exist_ok=True)
         with zipfile.ZipFile(apk) as z:
-            dex_entries=[x for x in z.infolist() if re.fullmatch(r"classes[0-9]*\\.dex",pathlib.PurePosixPath(x.filename).name)]
+            dex_entries=[x for x in z.infolist() if re.fullmatch(r"classes[0-9]*\.dex",pathlib.PurePosixPath(x.filename).name)]
             for item in dex_entries:
                 raw=z.read(item)
                 dh=dex_header(raw) or {"invalid_dex":True}
@@ -164,11 +164,11 @@ def main():
              "java_files":java_count,"dex_count":len(dex_entries)},indent=2))
     # Keep the complete method inventory compressed in the repository; no source dump or raw logs are copied.
     with gzip.open(out/"methods.jsonl.gz","wt",encoding="utf-8") as f:
-        for m in all_methods: f.write(json.dumps(m,separators=(",",":"),ensure_ascii=False)+"\\n")
+        for m in all_methods: f.write(json.dumps(m,separators=(",",":"),ensure_ascii=False)+"\n")
     with gzip.open(out/"classes.jsonl.gz","wt",encoding="utf-8") as f:
-        for c in all_classes: f.write(json.dumps(c,separators=(",",":"),ensure_ascii=False)+"\\n")
+        for c in all_classes: f.write(json.dumps(c,separators=(",",":"),ensure_ascii=False)+"\n")
     with gzip.open(out/"call-edges.jsonl.gz","wt",encoding="utf-8") as f:
-        for e in all_edges: f.write(json.dumps(e,separators=(",",":"),ensure_ascii=False)+"\\n")
+        for e in all_edges: f.write(json.dumps(e,separators=(",",":"),ensure_ascii=False)+"\n")
     candidates=[]
     for m in all_methods:
         roles=m.get("roles",[])
@@ -186,7 +186,7 @@ def main():
       "Hook":"static candidate discovery only; no device Hook is claimed"}}
     (out/"summary.json").write_text(json.dumps(summary,indent=2,ensure_ascii=False))
     (out/"hook-candidates.json").write_text(json.dumps(candidates,indent=2,ensure_ascii=False))
-    (out/"candidate-methods.csv").write_text("version,component,class,method,descriptor,score,roles,file,line\\n"+"".join(
-      ",".join(json.dumps(v,ensure_ascii=False) for v in [a.version,c["component"],c["class"],c["name"],c["descriptor"],c["score"],"|".join(x["role"] for x in c["roles"]),c["file"],c["line"]])+"\\n" for c in candidates))
+    (out/"candidate-methods.csv").write_text("version,component,class,method,descriptor,score,roles,file,line\n"+"".join(
+      ",".join(json.dumps(v,ensure_ascii=False) for v in [a.version,c["component"],c["class"],c["name"],c["descriptor"],c["score"],"|".join(x["role"] for x in c["roles"]),c["file"],c["line"]])+"\n" for c in candidates))
     print(json.dumps({k:summary[k] for k in ("version_label","source_sha256","dex_count","class_count","method_count","call_edge_count","candidate_method_count")},ensure_ascii=False))
 if __name__=="__main__": main()
