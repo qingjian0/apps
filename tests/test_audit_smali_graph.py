@@ -55,6 +55,19 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertEqual(["<redacted-content>"], redacted)
         self.assertNotIn("prompt", redacted[0].lower())
 
+    def test_binary_badging_metadata_parser(self):
+        output = "package: name='com.deepseek.chat' versionCode='294' versionName='2.7.4' split='config.arm64_v8a'\n"
+        parsed = AUDIT.parse_aapt_badging(output)
+        self.assertEqual("com.deepseek.chat", parsed["package"])
+        self.assertEqual("294", parsed["version_code"])
+        self.assertEqual("2.7.4", parsed["version_name"])
+        self.assertEqual("config.arm64_v8a", parsed["split"])
+
+    def test_badging_parser_records_missing_version_as_unknown(self):
+        parsed = AUDIT.parse_aapt_badging("package: name='com.deepseek.chat'\n")
+        self.assertEqual("com.deepseek.chat", parsed["package"])
+        self.assertNotIn("version_code", parsed)
+
 
 if __name__ == "__main__":
     unittest.main()
