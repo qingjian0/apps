@@ -620,7 +620,9 @@ def analyze_smali(root):
                     if m:
                         current={"class":desc or "", "name":m.group(2), "descriptor":m.group(3),
                                  "access":m.group(1), "file":str(file.relative_to(root)),
-                                 "line":line_no, "strings":[], "invokes":[], "opcodes":collections.Counter(),
+                                 "line":line_no, "strings":[], "invokes":[], "invoke_sites":[],
+                                 "parameter_registers":parameter_registers_for_method(m.group(1),m.group(3)),
+                                 "field_access_sites":[], "opcodes":collections.Counter(),
                                  "field_reads":[], "field_writes":[], "branch_count":0, "label_count":0,
                                  "return_count":0, "throw_count":0, "body_lines":[]}
                         in_method=True
@@ -642,7 +644,10 @@ def analyze_smali(root):
                     current["control_flow"]={"branch_count":current["branch_count"],"label_count":current["label_count"],
                         "return_count":current["return_count"],"throw_count":current["throw_count"],
                         "basic_block_estimate":cfg["block_count"],"cfg":cfg}
-                    current["register_dataflow"]=analyze_register_dataflow(current["body_lines"],cfg)
+                    current["register_dataflow"]=analyze_register_dataflow(
+                        current["body_lines"],cfg,current["parameter_registers"])
+                    current["invoke_sites"]=extract_invoke_sites(current["body_lines"])[:512]
+                    current["field_access_sites"]=extract_field_access_sites(current["body_lines"])[:512]
                     current["invokes"]=sorted(set(current["invokes"]))[:120]
                     current["strings"]=sorted(set(current["strings"]))[:100]
                     current.pop("body_lines",None)
