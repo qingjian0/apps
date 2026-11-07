@@ -384,7 +384,10 @@ def analyze_register_dataflow(body_lines, cfg, parameter_registers=()):
     for ins in executable:
         bid=block_by_instruction[ins["index"]]; reaching=set(incoming[bid])
         for index in range(blocks[bid]["start"],ins["index"]):
-            reaching.difference_update(defs_by_instruction[index])
+            # A new definition kills every older definition of the same register,
+            # including method-entry parameters and definitions from predecessors.
+            for written_register in executable[index]["writes"]:
+                reaching.difference_update(all_defs_by_register[written_register])
             reaching.update(defs_by_instruction[index])
         for reg in ins["reads"]:
             matches=sorted(d for d in reaching if d.endswith(":"+reg))
