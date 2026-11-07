@@ -235,7 +235,7 @@ class StaticProgramGraph private constructor(
                     callers.getOrPut(to) { mutableSetOf() }.add(from)
                 }
             }
-            val summaryObject = summaryFile?.takeIf { it.isFile }?.let { file ->
+            val summaryObject = summaryPath?.let { java.io.File(it) }?.takeIf { it.isFile }?.let { file ->
                 runCatching { json.parseToJsonElement(file.readText()).jsonObject }.getOrNull()
             }
             val valueFlowSummary = summaryObject?.get("interprocedural_value_flow")?.jsonObject
