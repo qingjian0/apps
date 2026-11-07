@@ -113,13 +113,13 @@ def main():
       "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|"]
     for v,s in summaries.items():
         report.append(f"| {v} | {s['source_file']} | {len(s['components'])} | {s['dex_count']} | {s['class_count']} | {s['method_count']} | {s.get('call_edge_count',0)} | {s.get('field_read_count',0)}/{s.get('field_write_count',0)} | {s.get('methods_with_control_flow',0)}/{s.get('control_flow_branch_count',0)} | {s['candidate_method_count']} |")
-    report += ["","## 组件身份核对","","| 版本 | 组件 | 包名 | versionCode | versionName | split | 身份完整度 | APK SHA-256 |",
+    report += ["","## 组件身份核对","","| 版本 | 组件 | 包名 | versionCode | versionName | split | 签名证书 SHA-256 | 身份完整度 | APK SHA-256 |",
       "|---|---|---|---|---|---|---|"]
     for v,s in summaries.items():
         for comp in s.get("component_metadata",[]):
             ident=comp.get("manifest",{})
-            identity_status = "package+version+hash" if ident.get("version_code") and ident.get("version_name") else "package+hash (version attrs absent)"
-            report.append(f"| {v} | {comp.get('apk','')} | {ident.get('package','')} | {ident.get('version_code','')} | {ident.get('version_name','')} | {ident.get('split','')} | {identity_status} | `{comp.get('sha256','')}` |")
+            identity_status = "package+version+signer+hash" if ident.get("version_code") and ident.get("version_name") and ident.get("signing_sha256") else ("package+version+hash" if ident.get("version_code") and ident.get("version_name") else ("package+signer+hash" if ident.get("signing_sha256") else "package+hash (version/signer attrs absent)"))
+            report.append(f"| {v} | {comp.get('apk','')} | {ident.get('package','')} | {ident.get('version_code','')} | {ident.get('version_name','')} | {ident.get('split','')} | `{ident.get('signing_sha256','')}` | {identity_status} | `{comp.get('sha256','')}` |")
     report += ["","## 语义候选匹配","","匹配分数由语义锚点、稳定框架/API 调用族和规范化 opcode 分布组成；候选截取前先按锚点数量、稳定 API 调用量和方法体规模排序。分数仅用于排序，必须回看源码/Smali 和调用者/被调用者证据。","",
       "| 角色 | 来源版本 | 来源方法 | 目标版本 | 候选方法 | 相似度 |","|---|---|---|---|---|---:|"]
     for x in pairs[:1000]:
