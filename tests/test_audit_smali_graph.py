@@ -1183,5 +1183,71 @@ class InterproceduralExceptionReturnTest(unittest.TestCase):
         self.assertEqual(0, graph["summary"]["return_identity_propagations"])
 
 
+class CallerControlFlowReturnBoundaryTest(unittest.TestCase):
+    def test_caller_branch_after_move_result_blocks_return_identity_projection(self):
+        def method(owner, name, descriptor, body):
+            cfg = AUDIT.build_smali_cfg(body)
+            invokes = AUDIT.extract_invoke_sites(body)
+            fields = AUDIT.extract_field_access_sites(body)
+            pts = AUDIT.analyze_object_points_to(
+                body, cfg, owner, name, descriptor, "static", fields, invokes)
+            return {
+                "class": owner, "name": name, "descriptor": descriptor,
+                "component": "base", "invoke_sites": invokes,
+                "invoke_sites_truncated": False, "invoke_sites_incomplete": False,
+                "object_points_to": pts,
+                "control_flow": {
+                    "branch_count": sum(
+                        1 for line in body if AUDIT.BRANCH_RE.match(line)
+                    ),
+                    "return_count": sum(
+                        1 for line in body
+                        if AUDIT.OP_RE.match(line)
+                        and AUDIT.OP_RE.match(line).group(1).startswith("return")
+                    ),
+                    "cfg": cfg,
+                },
+            }
+
+        caller = method("Lx/Caller;", "run", "()V", [
+            "    invoke-static {}, Lx/Factory;->make()Lx/Thing;",
+            "    move-result-object v0",
+            "    if-eqz v1, :alternate",
+            "    goto :join",
+            "    :alternate",
+            "    const/4 v2, 0x0",
+            "    :join",
+            "    invoke-static {v0}, Lx/Sink;->consume(Lx/Thing;)V",
+            "    return-void",
+        ])
+        factory = method("Lx/Factory;", "make", "()Lx/Thing;", [
+            "    new-instance v0, Lx/Thing;",
+            "    return-object v0",
+        ])
+        sink = method("Lx/Sink;", "consume", "(Lx/Thing;)V", [
+            "    iget-object v0, p0, Lx/Thing;->value:Ljava/lang/Object;",
+            "    return-void",
+        ])
+
+        self.assertGreater(caller["control_flow"]["branch_count"], 0)
+        graph = AUDIT.build_interprocedural_points_to_graph([caller, factory, sink])
+        factory_call = next(
+            row for row in graph["call_contexts"]
+            if row["callee"] == "Lx/Factory;->make()Lx/Thing;"
+        )
+        self.assertEqual("singleton", factory_call["return_value"]["identity_status"])
+        self.assertEqual(0, graph["summary"]["return_identity_propagations"])
+        sink_call = next(
+            row for row in graph["call_contexts"]
+            if row["callee"] == "Lx/Sink;->consume(Lx/Thing;)V"
+        )
+        self.assertEqual("unknown", sink_call["arguments"][0]["identity_status"])
+        sink_receiver = next(
+            row for row in graph["contextual_receivers"]
+            if row["callee"] == "Lx/Sink;->consume(Lx/Thing;)V"
+        )
+        self.assertEqual("unknown", sink_receiver["identity_status"])
+
+
 if __name__ == "__main__":
     unittest.main()
