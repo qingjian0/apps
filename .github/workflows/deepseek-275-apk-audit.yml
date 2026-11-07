@@ -39,7 +39,7 @@ jobs:
           set -uo pipefail
           mkdir -p audit
           set +e
-          jadx-dist/bin/jadx --no-res --threads-count 2 -d decompiled DeepSeek_2.7.5.apk > audit/jadx.stdout.log 2> audit/jadx.stderr.log
+          jadx-dist/bin/jadx --show-bad-code --no-res --threads-count 2 -d decompiled DeepSeek_2.7.5.apk > audit/jadx.stdout.log 2> audit/jadx.stderr.log
           JADX_STATUS=$?
           set -e
           printf '%s\n' "$JADX_STATUS" > audit/jadx.exit-code
