@@ -30,6 +30,7 @@ class StaticProgramGraph private constructor(
     private val readers: Map<String, Set<String>>,
     private val writers: Map<String, Set<String>>,
     private val methods: Map<String, MethodGraphFacts>,
+    private val methodCountsByOwner: Map<String, Int>,
     private val classes: Map<String, ClassGraphFacts>,
     private val subclasses: Map<String, Set<String>>,
     private val implementors: Map<String, Set<String>>
@@ -40,7 +41,7 @@ class StaticProgramGraph private constructor(
         val outgoing = callees[id].orEmpty()
         val facts = methods[id]
         val typeFacts = classes[candidate.method.ownerDescriptor]
-        val ownerMethods = methods.keys.count { it.startsWith(candidate.method.ownerDescriptor + "->") }
+        val ownerMethods = methodCountsByOwner[candidate.method.ownerDescriptor] ?: 0
         val frameworkCalls = outgoing.count { target -> FRAMEWORK_PREFIXES.any { target.startsWith(it) } }
         val linkedReads = facts?.fieldReads.orEmpty().sumOf { field -> writers[field].orEmpty().count { it != id } }
         val linkedWrites = facts?.fieldWrites.orEmpty().sumOf { field -> readers[field].orEmpty().count { it != id } }
@@ -158,7 +159,8 @@ class StaticProgramGraph private constructor(
                     callers.getOrPut(to) { mutableSetOf() }.add(from)
                 }
             }
-            return StaticProgramGraph(callers, callees, readers, writers, methods, classes, subclasses, implementors)
+            val methodCountsByOwner = methods.keys.groupingBy { it.substringBefore("->") }.eachCount()
+            return StaticProgramGraph(callers, callees, readers, writers, methods, methodCountsByOwner, classes, subclasses, implementors)
         }
     }
 }
