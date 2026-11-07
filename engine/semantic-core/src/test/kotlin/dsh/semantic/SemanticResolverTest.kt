@@ -150,4 +150,22 @@ class SemanticResolverTest {
         assertTrue(result.rejection!!.startsWith("forbidden-negative-evidence"))
     }
 
+    @Test fun productionPoliciesRequireRoleSpecificIndependentEvidence() {
+        val promptPolicy = RolePolicy.forRole(RoleId("prompt.compose"))
+        assertTrue(promptPolicy.minimumEvidenceFamilies >= 4)
+        assertTrue(promptPolicy.requiredFamilies.containsAll(setOf(
+            EvidenceFamily.PROTOCOL_ANCHOR, EvidenceFamily.CALL_GRAPH,
+            EvidenceFamily.TYPE_SHAPE, EvidenceFamily.DATA_FLOW
+        )))
+        val ssePolicy = RolePolicy.forRole(RoleId("sse.parse"))
+        assertTrue(EvidenceFamily.CONTROL_FLOW in ssePolicy.requiredFamilies)
+    }
+
+    @Test fun productionRolePolicyRejectsCandidateMissingRequiredDataFlow() {
+        val productionPolicy = RolePolicy.forRole(role)
+        val result = SemanticResolver().resolve(host, productionPolicy, listOf(candidate("a", goodEvidence)))
+        assertFalse(result.accepted)
+        assertEquals("required-evidence-family-missing", result.rejection)
+    }
+
 }
