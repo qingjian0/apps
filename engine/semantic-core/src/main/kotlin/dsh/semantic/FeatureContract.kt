@@ -24,7 +24,7 @@ class FeatureEventSanitizer {
     fun sanitize(contract: FeatureContract, supplied: Map<SafeEventField, String>): SafeFeatureEvent? {
         if (!supplied.keys.containsAll(contract.requiredFields)) return null
         val accepted = supplied.filterKeys { it in contract.allowedFields }
-            .filterValues { value -> value.length <= 160 && value.none { it == '\\n' || it == '\\r' } }
+            .filterValues { value -> value.length <= 160 && value.none { it == '\n' || it == '\r' } }
         if (!accepted.keys.containsAll(contract.requiredFields)) return null
         return SafeFeatureEvent(contract.role, accepted)
     }
