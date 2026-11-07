@@ -374,5 +374,36 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         ))
 
 
+    def test_invoke_range_site_expands_register_words(self):
+        body = [
+            "    invoke-static/range {v4 .. v7}, Lx/Worker;->consume(JLjava/lang/String;)V",
+            "    return-void",
+        ]
+        sites = AUDIT.extract_invoke_sites(body)
+        self.assertEqual(["v4", "v5", "v6", "v7"], sites[0]["registers"])
+
+    def test_interprocedural_resolution_requires_exact_full_descriptor(self):
+        caller = {
+            "class": "Lx/Caller;", "name": "call", "descriptor": "()V",
+            "register_dataflow": {"complete": True, "uses": []},
+            "invoke_sites": [{
+                "instruction": 0, "line": 1, "opcode": "invoke-static",
+                "owner": "Lx/Worker;", "name": "echo",
+                "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+                "registers": ["v0"], "result_instruction": None, "result_register": None,
+            }],
+        }
+        overload = {
+            "class": "Lx/Worker;", "name": "echo",
+            "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+            "register_dataflow": {"complete": True, "uses": [], "definitions": []},
+            "invoke_sites": [],
+        }
+        graph = AUDIT.build_interprocedural_value_graph([caller, overload])
+        self.assertEqual(1, graph["summary"]["unresolved_call_sites"])
+        self.assertEqual(0, graph["summary"]["resolved_call_sites"])
+        self.assertEqual([], graph["edges"])
+
+
 if __name__ == "__main__":
     unittest.main()
