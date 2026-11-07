@@ -13,6 +13,7 @@ class SemanticResolverTest {
     private fun candidate(name: String, evidence: List<Evidence>, hostOverride: HostFingerprint = host) = SemanticCandidate(
         role, MethodShape("Lx/y;", name, "()V", emptyList(), "V"), hostOverride, evidence
     )
+    private fun runtimeConfirmed(resolution: Resolution): Resolution = resolution.copy(selected = resolution.selected?.let { candidate -> candidate.copy(evidence = candidate.evidence + listOf(Evidence(EvidenceFamily.HOST_IDENTITY, "package+version+signature+dex+loader", 1.0), Evidence(EvidenceFamily.RUNTIME_BEHAVIOR, "triggered-in-target-operation", 1.0))) })
     private val goodEvidence = listOf(
         Evidence(EvidenceFamily.PROTOCOL_ANCHOR, "prompt-template-schema", 0.9),
         Evidence(EvidenceFamily.TYPE_SHAPE, "prompt-dto-input", 0.8),
@@ -73,8 +74,8 @@ class SemanticResolverTest {
         val failedCandidate = candidate("bad", goodEvidence).copy(role = failedRole)
         val workingCandidate = candidate("good", goodEvidence).copy(role = workingRole)
         val resolver = SemanticResolver()
-        val failedResolution = resolver.resolve(host, RolePolicy(failedRole), listOf(failedCandidate))
-        val workingResolution = resolver.resolve(host, RolePolicy(workingRole), listOf(workingCandidate))
+        val failedResolution = runtimeConfirmed(resolver.resolve(host, RolePolicy(failedRole), listOf(failedCandidate)))
+        val workingResolution = runtimeConfirmed(resolver.resolve(host, RolePolicy(workingRole), listOf(workingCandidate)))
         val backend = object : HookBackend {
             override fun install(method: MethodShape, role: RoleId): HookHandle {
                 if (role == failedRole) throw IllegalStateException("simulated failure")
@@ -96,7 +97,7 @@ class SemanticResolverTest {
             }
         }
         val resolver = SemanticResolver()
-        val resolution = resolver.resolve(host, policy, listOf(candidate("a", goodEvidence)))
+        val resolution = runtimeConfirmed(resolver.resolve(host, policy, listOf(candidate("a", goodEvidence))))
         val coordinator = HookCoordinator(backend)
         assertEquals(InstallStatus.INSTALLED, coordinator.install(host, policy, resolution).status)
         assertEquals(InstallStatus.ALREADY_INSTALLED, coordinator.install(host, policy, resolution).status)
@@ -105,4 +106,27 @@ class SemanticResolverTest {
         assertEquals(emptyList(), coordinator.uninstallAll())
         assertEquals(0, coordinator.installedCount())
     }
+    @Test fun staticOnlyResolutionCannotInstallHook() {
+        val resolution = SemanticResolver().resolve(host, policy, listOf(candidate("a", goodEvidence)))
+        val backend = object : HookBackend {
+            override fun install(method: MethodShape, role: RoleId): HookHandle =
+                object : HookHandle { override fun uninstall() {} }
+        }
+        val result = HookCoordinator(backend).install(host, policy, resolution)
+        assertEquals(InstallStatus.REJECTED, result.status)
+        assertEquals("runtime-evidence-required", result.reason)
+    }
+
+    @Test fun incompleteRuntimeIdentityCannotInstallHookEvenWithRuntimeMarkers() {
+        val incomplete = host.copy(signingDigest = null)
+        val resolution = runtimeConfirmed(SemanticResolver().resolve(incomplete, policy, listOf(candidate("a", goodEvidence, incomplete))))
+        val backend = object : HookBackend {
+            override fun install(method: MethodShape, role: RoleId): HookHandle =
+                object : HookHandle { override fun uninstall() {} }
+        }
+        val result = HookCoordinator(backend).install(incomplete, policy, resolution)
+        assertEquals(InstallStatus.REJECTED, result.status)
+        assertEquals("runtime-host-identity-incomplete", result.reason)
+    }
+
 }
