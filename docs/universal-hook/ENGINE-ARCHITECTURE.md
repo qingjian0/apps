@@ -384,3 +384,10 @@ and non-convergent analysis fail closed.
 - caller/callee Points-to 不完整、调用点清单截断、参数 word 对齐失败、目标缺失或歧义时，不生成可用于 Receiver 的上下文事实；unknown/multiple 不会升级为 singleton。
 
 **严格边界：** 当前是 one-callsite-context 的直接投影，不是递归/全程序 Points-to 固定点；不传播跨多层调用链的上下文，不处理对象返回值的跨调用 Points-to、反射/动态 dispatch、JNI/Native、数组元素和协程恢复。输出的 singleton 仅表示静态证据在该调用点上下文内唯一，不表示 ART 运行时身份已验证，也不授权 Hook。后续需增加多调用点隔离、递归/循环调用收敛、返回值身份传播、Kotlin 消费门槛和五版本真实 APK 回归。
+
+
+### Kotlin Semantic Core 诊断接入
+
+`StaticAuditCli` 现在可选读取 `interprocedural-points-to.jsonl.gz`。只有当 summary 明确标记 `records_truncated=false`、`recursive_fixed_point=false`、`runtime_identity_proven=false)，且每条记录的 method identity、`one-callsite-context` scope 与非运行时证明标记均通过校验时，才计入 Kotlin graph diagnostics。
+
+该索引只增加 `interproceduralContextualReceivers`、`interproceduralSingletonContextReceivers` 和 `interproceduralPointsToLoaded` 统计，不产生 `DATA_FLOW` 证据、不增加 Resolver 分数，也不改变 HookCoordinator 授权。截断、缺失、格式异常或 schema 不匹配时整体不加载。新增 Kotlin 测试验证完整索引只进入诊断统计、截断索引 fail-closed，且静态 Points-to 不会单独升级为 DATA_FLOW。
