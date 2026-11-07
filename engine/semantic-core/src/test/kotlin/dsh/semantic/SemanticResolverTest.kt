@@ -172,4 +172,48 @@ class SemanticResolverTest {
         assertEquals("required-evidence-family-missing", result.rejection)
     }
 
+    @Test fun higherScoringCandidateMissingRequiredFamilyDoesNotShadowEligibleCandidate() {
+        val productionPolicy = RolePolicy.forRole(role)
+        val incompleteHighScore = candidate("a", listOf(
+            Evidence(EvidenceFamily.PROTOCOL_ANCHOR, "custom-instructions", 1.0),
+            Evidence(EvidenceFamily.TYPE_SHAPE, "prompt-dto", 1.0),
+            Evidence(EvidenceFamily.CALL_GRAPH, "prompt-to-request", 1.0),
+            Evidence(EvidenceFamily.CONTROL_FLOW, "branch-shape", 1.0)
+        ))
+        val eligibleLowerScore = candidate("b", listOf(
+            Evidence(EvidenceFamily.PROTOCOL_ANCHOR, "custom-instructions", 0.7),
+            Evidence(EvidenceFamily.TYPE_SHAPE, "prompt-dto", 0.7),
+            Evidence(EvidenceFamily.CALL_GRAPH, "prompt-to-request", 0.7),
+            Evidence(EvidenceFamily.DATA_FLOW, "prompt-field-to-request", 0.7)
+        ))
+        val result = SemanticResolver().resolve(host, productionPolicy, listOf(incompleteHighScore, eligibleLowerScore))
+        assertTrue(result.accepted)
+        assertEquals("b", result.selected?.method?.name)
+    }
+
+    @Test fun forbiddenHighScoreCandidateDoesNotShadowEligibleCandidate() {
+        val forbidden = candidate("a", goodEvidence + listOf(
+            Evidence(EvidenceFamily.CALL_GRAPH, "request-edge", 1.0)
+        )).copy(negativeEvidence = setOf("third-party-sdk-owner"))
+        val valid = candidate("b", goodEvidence + listOf(
+            Evidence(EvidenceFamily.CALL_GRAPH, "request-edge", 0.8)
+        ))
+        val result = SemanticResolver().resolve(host, RolePolicy(role, minimumEvidenceFamilies = 3), listOf(forbidden, valid))
+        assertTrue(result.accepted)
+        assertEquals("b", result.selected?.method?.name)
+    }
+
+    @Test fun multipleStrongAnchorsImproveScoreWithoutIncreasingEvidenceFamilyCount() {
+        val one = candidate("a", goodEvidence)
+        val several = candidate("b", goodEvidence + listOf(
+            Evidence(EvidenceFamily.PROTOCOL_ANCHOR, "custom-instructions", 0.8),
+            Evidence(EvidenceFamily.PROTOCOL_ANCHOR, "system-prompt-schema", 0.75)
+        ))
+        val resolver = SemanticResolver()
+        val oneResult = resolver.resolve(host, policy, listOf(one))
+        val severalResult = resolver.resolve(host, policy, listOf(several))
+        assertTrue(severalResult.score > oneResult.score)
+        assertEquals(oneResult.evidenceFamilies.size, severalResult.evidenceFamilies.size)
+    }
+
 }
