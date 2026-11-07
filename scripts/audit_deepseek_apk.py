@@ -77,12 +77,19 @@ def aapt_badging(aapt, apk, log_path):
     pathlib.Path(log_path).write_text(p.stdout,errors="replace")
     return parse_aapt_badging(p.stdout,p.returncode)
 
+def parse_signing_certificates(output, exit_code=0):
+    digests = []
+    pattern = r"Signer(?: #\d+)?(?: \(minSdkVersion=[^)]+\))? certificate SHA-256 digest:\s*([0-9a-fA-F]{64})"
+    for value in re.findall(pattern, output):
+        normalized = value.lower()
+        if normalized not in digests: digests.append(normalized)
+    return {"apksigner_exit":exit_code,"signing_sha256":digests[0] if digests else None,"signing_sha256s":digests}
+
 def signing_certificate(apksigner, apk, log_path):
     if not apksigner: return {}
     p=subprocess.run([apksigner,"verify","--print-certs",str(apk)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,errors="replace")
     pathlib.Path(log_path).write_text(p.stdout,errors="replace")
-    m=re.search(r"Signer #\d+ certificate SHA-256 digest:\s*([0-9a-fA-F]{64})",p.stdout)
-    return {"apksigner_exit":p.returncode,"signing_sha256":m.group(1).lower() if m else None}
+    return parse_signing_certificates(p.stdout,p.returncode)
 
 
 def safe_strings(line):
