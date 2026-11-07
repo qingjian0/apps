@@ -67,6 +67,26 @@ class SemanticResolverTest {
         assertTrue(result.rejection!!.startsWith("forbidden-negative-evidence"))
     }
 
+    @Test fun backendFailureForOneRoleDoesNotBlockAnotherRole() {
+        val failedRole = RoleId("prompt.compose")
+        val workingRole = RoleId("agent.plan")
+        val failedCandidate = candidate("bad", goodEvidence).copy(role = failedRole)
+        val workingCandidate = candidate("good", goodEvidence).copy(role = workingRole)
+        val resolver = SemanticResolver()
+        val failedResolution = resolver.resolve(host, RolePolicy(failedRole), listOf(failedCandidate))
+        val workingResolution = resolver.resolve(host, RolePolicy(workingRole), listOf(workingCandidate))
+        val backend = object : HookBackend {
+            override fun install(method: MethodShape, role: RoleId): HookHandle {
+                if (role == failedRole) throw IllegalStateException("simulated failure")
+                return object : HookHandle { override fun uninstall() {} }
+            }
+        }
+        val coordinator = HookCoordinator(backend)
+        assertEquals(InstallStatus.FAILED, coordinator.install(host, RolePolicy(failedRole), failedResolution).status)
+        assertEquals(InstallStatus.INSTALLED, coordinator.install(host, RolePolicy(workingRole), workingResolution).status)
+        assertEquals(1, coordinator.installedCount())
+    }
+
     @Test fun coordinatorIsIdempotentAndRoleIsolated() {
         var installs = 0
         val backend = object : HookBackend {
