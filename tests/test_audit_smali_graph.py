@@ -601,6 +601,61 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertEqual("singleton", direct_receiver["identity_status"])
         self.assertEqual(receiver["identity"], direct_receiver["identity"])
 
+    def test_interprocedural_points_to_composes_wrapper_return_summaries(self):
+        def method(owner, name, descriptor, body):
+            cfg = AUDIT.build_smali_cfg(body)
+            invokes = AUDIT.extract_invoke_sites(body)
+            fields = AUDIT.extract_field_access_sites(body)
+            pts = AUDIT.analyze_object_points_to(
+                body, cfg, owner, name, descriptor, "static", fields, invokes)
+            return {
+                "class": owner, "name": name, "descriptor": descriptor,
+                "component": "base", "invoke_sites": invokes,
+                "invoke_sites_truncated": False, "invoke_sites_incomplete": False,
+                "object_points_to": pts,
+                "control_flow": {
+                    "branch_count": 0, "return_count": sum(
+                        1 for line in body
+                        if AUDIT.OP_RE.match(line) and AUDIT.OP_RE.match(line).group(1).startswith("return")
+                    ), "cfg": cfg,
+                },
+            }
+        caller = method("Lx/Caller;", "run", "()V", [
+            "    invoke-static {}, Lx/Wrapper;->make()Lx/Thing;",
+            "    move-result-object v0",
+            "    invoke-static {v0}, Lx/Sink;->consume(Lx/Thing;)V",
+            "    return-void",
+        ])
+        wrapper = method("Lx/Wrapper;", "make", "()Lx/Thing;", [
+            "    invoke-static {}, Lx/Factory;->make()Lx/Thing;",
+            "    move-result-object v0",
+            "    return-object v0",
+        ])
+        factory = method("Lx/Factory;", "make", "()Lx/Thing;", [
+            "    new-instance v0, Lx/Thing;",
+            "    return-object v0",
+        ])
+        sink = method("Lx/Sink;", "consume", "(Lx/Thing;)V", [
+            "    iget-object v0, p0, Lx/Thing;->value:Ljava/lang/Object;",
+            "    return-void",
+        ])
+        graph = AUDIT.build_interprocedural_points_to_graph(
+            [caller, wrapper, factory, sink], max_call_depth=4)
+        receiver = next(
+            row for row in graph["contextual_receivers"]
+            if row["callee"] == "Lx/Sink;->consume(Lx/Thing;)V"
+        )
+        self.assertEqual("singleton", receiver["identity_status"])
+        self.assertTrue(receiver["identity"].startswith("context:"))
+        wrapper_call = next(
+            row for row in graph["call_contexts"]
+            if row["caller"] == "Lx/Caller;->run()V"
+            and row["callee"] == "Lx/Wrapper;->make()Lx/Thing;"
+        )
+        self.assertEqual("singleton", wrapper_call["return_value"]["identity_status"])
+        self.assertGreaterEqual(graph["summary"]["return_summary_compositions"], 1)
+        self.assertTrue(graph["summary"]["context_expansion_complete"])
+
     def test_interprocedural_points_to_propagates_returned_formal_identity(self):
         def method(owner, name, descriptor, body):
             cfg = AUDIT.build_smali_cfg(body)
