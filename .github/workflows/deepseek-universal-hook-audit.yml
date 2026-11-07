@@ -139,6 +139,24 @@ jobs:
           python3 -m json.tool audit/universal-hook/semantic-method-matches.json >/dev/null
           python3 -m json.tool audit/universal-hook/probe-log-summary.json >/dev/null
           python3 -m json.tool audit/universal-hook/evidence-zip-inventory.json >/dev/null
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.14.3'
+      - name: Resolve semantic candidates from real five-version indexes
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=()
+          for version in 2.7.1 2.7.2 2.7.3 2.7.4 2.7.5; do
+            dex_digest="$(python3 -c 'import hashlib,json,sys; s=json.load(open(sys.argv[1])); d="".join(sorted(x["sha256"] for x in s["dex"])); print(hashlib.sha256(d.encode()).hexdigest())' "audit/$version/summary.json")"
+            args+=("audit/$version/methods.jsonl.gz" "$version" "$dex_digest")
+          done
+          gradle --no-daemon -p engine/semantic-core ingestAudit --args="${args[*]}" | tee audit/universal-hook/semantic-ingest-summary.txt
+          test -s audit/universal-hook/semantic-ingest-summary.txt
       - name: Commit audit results back to this repository branch
         env:
           GH_TOKEN: ${{ github.token }}
