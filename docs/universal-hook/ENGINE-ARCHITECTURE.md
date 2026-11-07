@@ -170,6 +170,7 @@ F. 使用未参与开发的新版本 APK 盲测。盲测报告记录自动定位
 - 身份核验增强：扫描器现调用 `aapt dump badging` 提取二进制 Manifest 的 package/versionCode/versionName/split，并调用 `apksigner verify --print-certs` 记录签名证书 SHA-256；Ubuntu runner 首次未找到预装 build-tools，已改为 apt 安装 `aapt`/`apksigner`。新审计 Run `42347209753` 需验证安装与输出。
 - 本轮新增的 Local API 边界、静态候选禁止安装、运行时身份缺失禁止安装、近似并列拒绝测试，等待最新 Semantic Core CI 结果。
 - 已有核心原型：Kotlin/JVM SemanticResolver（独立证据族、候选歧义和 fail-closed）、角色级幂等 HookCoordinator、HookBackend 抽象、元数据 FeatureContract、StaticAuditJsonReader/StaticEvidenceMapper/StaticAuditCli、RuntimeBehaviorVerifier，以及 StaticProgramGraph（调用者/被调用者索引、跨方法字段读写关联、控制流形态统计、类继承与接口实现关系）。
-- 最新五版本真实数据接入曾全部拒绝 19 个角色，原因是候选锚点过宽、歧义过高；这是正确的 fail-closed 结果，不是 Hook 解析成功。当前已增加锚点稀有度加权、调用图和字段流证据，并为 Smali 字段/控制流解析新增回归测试，等待新一轮 CI 验证。
+- 身份增强后的五版本静态接入 Run `42347209753` 对每个版本均得到 0/17 个角色可接受，所有候选均因歧义被拒绝；首轮发现的宿主 Local API 假阳性已移除。这是当前 fail-closed 结果，不是 Hook 解析成功。
+- 语义证据继续收紧：默认至少四个独立证据族；平台框架/第三方 SDK owner 带负面证据并被默认策略禁止；调用图和跨方法字段流现在传播稀有语义锚点，以区别“方法自身命中字符串”与“上下游共同体现同一语义”。对应测试正在运行。
 - 当前 CFG 仅是分支/标签/返回/异常的结构摘要与基本块数量估计，不是完整基本块图；当前字段流是基于字段读写的跨方法静态关联，不等于完整污点分析；类型图目前覆盖父类/接口/实现者，尚未覆盖泛型签名、注解、反射和运行时动态类型。
 - 尚未实现：完整 DEX/CFG/Dataflow 引擎、从 APK 自动生成运行时证据的语义发现器、LSPosed Android Backend、Prompt/Agent/Tools/Conversation/Multimodal/Storage/Settings 全功能桥接、模块侧 Local API Gateway、未知版本盲测、真机验证。
