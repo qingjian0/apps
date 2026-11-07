@@ -87,7 +87,7 @@ def main():
         candidates[v]=list(read_jsonl_gz(root/v/"methods.jsonl.gz"))
     pairs=[]
     # Match methods by semantic role, API-family calls, stable protocol anchors and normalized opcode shape.
-    for role in ("request_route","pow","sse_transport","sse_dispatch","flow_coroutine","serialization","agent_tool","session"):
+    for role in ("request_route","pow","sse_transport","sse_dispatch","flow_coroutine","serialization","agent_tool","session","prompt_pipeline","agent_planning","tool_registry_execution","local_api_gateway","multimodal_image","multimodal_audio","attachment_file","search_web","storage_sync","account_capability","ui_settings"):
         by_version={}
         for v,methods in candidates.items():
             selected=[m for m in methods if any(x["role"]==role for x in m.get("roles",[]))]
@@ -127,7 +127,7 @@ def main():
       "```json",json.dumps(probe_summary(pathlib.Path(".")),indent=2,ensure_ascii=False),"```","",
       "## Hook 设计门槛","","1. 先用包名、versionCode、versionName、APK SHA-256 和 DEX 指纹识别宿主；未知版本进入只读模式。",
       "2. 优先以语义边界定位：请求模型/路由构造、Flow/Continuation 边界、SSE parser、事件分派、会话恢复。",
-      "3. 每个候选需同时满足至少两个独立证据族（调用关系、参数/返回类型、继承/接口、稳定 API 调用、协议常量、字节码结构）。",
+      "3. 每个候选需同时满足至少三个独立证据族（调用关系、参数/返回类型、继承/接口、稳定 API 调用、协议常量、字节码结构）；字符串重复不算独立证据。",
       "4. 解析完整 JVM 描述符并检查 ClassLoader；禁止仅按混淆类名安装。",
       "5. 候选不唯一、描述符不符、运行时类不可见或版本未知时，fail-closed，不安装该 Hook。",
       "6. 安装按角色幂等；单个可选 Hook 失败不能阻断其他角色，失败记录版本、角色、候选 ID 和异常类型。",
@@ -138,10 +138,11 @@ def main():
       "- 2.7.1 的 APKS/split 历史分析文件属于先前材料，需与当前单文件 deepseek271.apk 的身份核对。",
       "- 2.7.3 / 2.7.5 既有 SSE 链是静态证据；尚未证明真实设备 Hook 成功。",
       "- 服务端 ToolOpen/ToolFind/Search 片段不等于本地工具执行器；需找到本地执行和结果回注闭环。",""]
-    out=root/"universal-hook-report.md"; out.parent.mkdir(parents=True,exist_ok=True); out.write_text("\n".join(report))
-    (root/"semantic-method-matches.json").write_text(json.dumps(pairs,indent=2,ensure_ascii=False))
-    (root/"probe-log-summary.json").write_text(json.dumps(probe_summary(pathlib.Path(".")),indent=2,ensure_ascii=False))
-    (root/"evidence-zip-inventory.json").write_text(json.dumps(evidence_zip_summary(pathlib.Path(".")),indent=2,ensure_ascii=False))
-    (root/"version-summary.json").write_text(json.dumps(summaries,indent=2,ensure_ascii=False))
+    outdir=root/"universal-hook"; outdir.mkdir(parents=True,exist_ok=True)
+    (outdir/"universal-hook-report.md").write_text("\n".join(report))
+    (outdir/"semantic-method-matches.json").write_text(json.dumps(pairs,indent=2,ensure_ascii=True))
+    (outdir/"probe-log-summary.json").write_text(json.dumps(probe_summary(pathlib.Path(".")),indent=2,ensure_ascii=True))
+    (outdir/"evidence-zip-inventory.json").write_text(json.dumps(evidence_zip_summary(pathlib.Path(".")),indent=2,ensure_ascii=True))
+    (outdir/"version-summary.json").write_text(json.dumps(summaries,indent=2,ensure_ascii=True))
     print(f"versions={len(summaries)} semantic_pairs={len(pairs)}")
 if __name__=="__main__": main()
