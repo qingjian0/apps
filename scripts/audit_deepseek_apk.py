@@ -271,6 +271,11 @@ def analyze_register_use_def(body_lines):
         regs=registers_in(stripped)
         if not regs:
             continue
+        # Wide Dalvik values occupy register pairs. Until pair-aware transfer
+        # functions are implemented, do not certify these instructions as complete.
+        if "wide" in op or "long" in op or "double" in op:
+            unknown.append({"line":line_no,"opcode":op,"reason":"wide-register-pair-not-modeled"})
+            continue
         if op.startswith(read_all_prefixes) or op.startswith(read_only_prefixes):
             reads=regs
             writes=[]
