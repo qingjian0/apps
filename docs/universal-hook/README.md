@@ -213,3 +213,6 @@ JADX 反编译失败必须保留退出码和错误日志；Smali 是控制流复
 新增产物：interprocedural-value-edges.jsonl.gz、field-slot-index.jsonl.gz。字段槽分组不证明对象实例相同，不能作为强语义证据；对象 points-to/alias 传播仍待实现。
 
 专用 Python 静态分析验证工作流：.github/workflows/universal-hook-semantic-audit.yml。测试未通过 Actions 成功结果前，不将本轮标记为 CI 通过。当前工作保留在 Draft PR #2，不合并 main。
+
+
+Kotlin StaticProgramGraph / StaticAuditCli 已读取参数/返回值边索引；只有 summary 明确确认边文件未截断时才导入。跨方法 DATA_FLOW 证据仅由参数/返回值边产生；相同字段槽的读写共现只作诊断，不再满足 DATA_FLOW 证据合同。对应 Python 与 Kotlin Actions 正在验证。
