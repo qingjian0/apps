@@ -1,0 +1,12 @@
+{
+  "apk": "component-9-split_config.hu.apk",
+  "bytes": 98514,
+  "sha256": "5d1906f1fb181b3b28067cb4a8f864f6f735a16b40094ad6a617028655ec28a4",
+  "manifest": {
+    "parse_error": "ParseError"
+  },
+  "apktool_exit": 0,
+  "jadx_exit": 0,
+  "java_files": 1,
+  "dex_count": 0
+}

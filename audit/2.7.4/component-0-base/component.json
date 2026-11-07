@@ -1,0 +1,12 @@
+{
+  "apk": "component-0-base.apk",
+  "bytes": 17785152,
+  "sha256": "2e898602374ed75f53d8e4c162fa625f5f4e1793b16fbd567f6dd02f6277a709",
+  "manifest": {
+    "parse_error": "ParseError"
+  },
+  "apktool_exit": 0,
+  "jadx_exit": 3,
+  "java_files": 14224,
+  "dex_count": 4
+}

@@ -1,0 +1,12 @@
+{
+  "apk": "component-19-split_config.ru.apk",
+  "bytes": 110802,
+  "sha256": "03814bc963c6d45168709aa564fb62dd86a4c8f486555f10978869d9d368a1aa",
+  "manifest": {
+    "parse_error": "ParseError"
+  },
+  "apktool_exit": 0,
+  "jadx_exit": 0,
+  "java_files": 1,
+  "dex_count": 0
+}

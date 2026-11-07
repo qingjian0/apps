@@ -1,0 +1,12 @@
+{
+  "apk": "component-10-split_config.in.apk",
+  "bytes": 90322,
+  "sha256": "a030373bed90d360392879fa53607a2c01a83b39280ab7869a9a4ef9b0a036bd",
+  "manifest": {
+    "parse_error": "ParseError"
+  },
+  "apktool_exit": 0,
+  "jadx_exit": 0,
+  "java_files": 1,
+  "dex_count": 0
+}

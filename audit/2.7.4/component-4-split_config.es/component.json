@@ -1,0 +1,12 @@
+{
+  "apk": "component-4-split_config.es.apk",
+  "bytes": 151762,
+  "sha256": "7de28dce9152e065cfa7627f9cc8fe3fb4790700cc88c5b07fa2c7a42a071e11",
+  "manifest": {
+    "parse_error": "ParseError"
+  },
+  "apktool_exit": 0,
+  "jadx_exit": 0,
+  "java_files": 1,
+  "dex_count": 0
+}

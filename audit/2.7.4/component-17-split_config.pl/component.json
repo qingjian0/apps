@@ -1,0 +1,12 @@
+{
+  "apk": "component-17-split_config.pl.apk",
+  "bytes": 94418,
+  "sha256": "23cb96b75f984d04ec00aa7ac260496234c02e38de1a000f6360f3031786ebd2",
+  "manifest": {
+    "parse_error": "ParseError"
+  },
+  "apktool_exit": 0,
+  "jadx_exit": 0,
+  "java_files": 1,
+  "dex_count": 0
+}

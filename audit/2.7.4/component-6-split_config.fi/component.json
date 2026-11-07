@@ -1,0 +1,12 @@
+{
+  "apk": "component-6-split_config.fi.apk",
+  "bytes": 94418,
+  "sha256": "7cac52a64af8a0a2315a07cbde54e6de7dcb724fb1647622e30d496a8dfa0f8c",
+  "manifest": {
+    "parse_error": "ParseError"
+  },
+  "apktool_exit": 0,
+  "jadx_exit": 0,
+  "java_files": 1,
+  "dex_count": 0
+}

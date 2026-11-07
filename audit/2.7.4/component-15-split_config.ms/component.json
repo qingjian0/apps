@@ -1,0 +1,12 @@
+{
+  "apk": "component-15-split_config.ms.apk",
+  "bytes": 90322,
+  "sha256": "8e9538e19dee5c5c58a1780889ca7ddfbde76c316ab8c2d764838d9ffdab7b58",
+  "manifest": {
+    "parse_error": "ParseError"
+  },
+  "apktool_exit": 0,
+  "jadx_exit": 0,
+  "java_files": 1,
+  "dex_count": 0
+}

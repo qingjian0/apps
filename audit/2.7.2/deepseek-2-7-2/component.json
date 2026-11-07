@@ -1,0 +1,12 @@
+{
+  "apk": "deepseek-2-7-2.apk",
+  "bytes": 22205160,
+  "sha256": "3c2fe31c73575400b9d59e46dde05daa2ef06491498ebfef658801e99eca1aff",
+  "manifest": {
+    "parse_error": "ParseError"
+  },
+  "apktool_exit": 0,
+  "jadx_exit": 3,
+  "java_files": 13935,
+  "dex_count": 3
+}

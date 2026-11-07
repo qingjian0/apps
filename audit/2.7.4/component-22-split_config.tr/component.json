@@ -1,0 +1,12 @@
+{
+  "apk": "component-22-split_config.tr.apk",
+  "bytes": 94418,
+  "sha256": "9ae32b39bb80a6556a869936e3882d02d55be8dd525ee950f6d0fb650f648108",
+  "manifest": {
+    "parse_error": "ParseError"
+  },
+  "apktool_exit": 0,
+  "jadx_exit": 0,
+  "java_files": 1,
+  "dex_count": 0
+}

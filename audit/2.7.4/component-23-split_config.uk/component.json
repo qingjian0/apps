@@ -1,0 +1,12 @@
+{
+  "apk": "component-23-split_config.uk.apk",
+  "bytes": 110802,
+  "sha256": "e8bdb1a71af311427c4d07528964cc4d556a6b075ec1d9366fefbdd808f22070",
+  "manifest": {
+    "parse_error": "ParseError"
+  },
+  "apktool_exit": 0,
+  "jadx_exit": 0,
+  "java_files": 1,
+  "dex_count": 0
+}

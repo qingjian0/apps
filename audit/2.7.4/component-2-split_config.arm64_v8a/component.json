@@ -1,0 +1,12 @@
+{
+  "apk": "component-2-split_config.arm64_v8a.apk",
+  "bytes": 9143648,
+  "sha256": "482af60defab32a280810bcbdb2a96d9505cb3214eab0d2c46b41d6a34bee03c",
+  "manifest": {
+    "parse_error": "ParseError"
+  },
+  "apktool_exit": 0,
+  "jadx_exit": 2,
+  "java_files": 0,
+  "dex_count": 0
+}

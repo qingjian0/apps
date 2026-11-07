@@ -1,0 +1,12 @@
+{
+  "apk": "DeepSeek_2.7.5.apk",
+  "bytes": 22210268,
+  "sha256": "ddc52ef868b991fd33e634de834a3e2c022b0cd7ff9e854f4f141996aaeadb70",
+  "manifest": {
+    "parse_error": "ParseError"
+  },
+  "apktool_exit": 0,
+  "jadx_exit": 3,
+  "java_files": 13940,
+  "dex_count": 3
+}

@@ -1,0 +1,12 @@
+{
+  "apk": "component-26-split_config.zh.apk",
+  "bytes": 151762,
+  "sha256": "22662db8db58f1e4195027f8f842cd211e47360885ac5bc47205d106ad9d0bdd",
+  "manifest": {
+    "parse_error": "ParseError"
+  },
+  "apktool_exit": 0,
+  "jadx_exit": 0,
+  "java_files": 1,
+  "dex_count": 0
+}

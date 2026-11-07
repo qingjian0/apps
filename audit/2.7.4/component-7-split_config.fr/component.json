@@ -1,0 +1,12 @@
+{
+  "apk": "component-7-split_config.fr.apk",
+  "bytes": 131282,
+  "sha256": "a59c05c16be6acc332808fbc091f4dfedb60c4c0128a365aa435fa97f8d4b1ef",
+  "manifest": {
+    "parse_error": "ParseError"
+  },
+  "apktool_exit": 0,
+  "jadx_exit": 0,
+  "java_files": 1,
+  "dex_count": 0
+}

@@ -1,0 +1,12 @@
+{
+  "apk": "component-5-split_config.et.apk",
+  "bytes": 90322,
+  "sha256": "d34b1e6fdc43251c96db6829f7b3251b7a82c35685d5432c1292ef6d311e608d",
+  "manifest": {
+    "parse_error": "ParseError"
+  },
+  "apktool_exit": 0,
+  "jadx_exit": 0,
+  "java_files": 1,
+  "dex_count": 0
+}

@@ -1,0 +1,12 @@
+{
+  "apk": "component-25-split_config.xxxhdpi.apk",
+  "bytes": 118528,
+  "sha256": "b8d2eb12aa499ff56739a73c72d3ca06c71145e5869d8617af058b325aba707a",
+  "manifest": {
+    "parse_error": "ParseError"
+  },
+  "apktool_exit": 0,
+  "jadx_exit": 0,
+  "java_files": 1,
+  "dex_count": 0
+}

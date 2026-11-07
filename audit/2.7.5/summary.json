@@ -1,0 +1,180 @@
+{
+  "version_label": "2.7.5",
+  "source_file": "DeepSeek_2.7.5.apk",
+  "source_bytes": 22210268,
+  "source_sha256": "ddc52ef868b991fd33e634de834a3e2c022b0cd7ff9e854f4f141996aaeadb70",
+  "components": [
+    "DeepSeek_2.7.5.apk"
+  ],
+  "component_metadata": [
+    {
+      "apk": "DeepSeek_2.7.5.apk",
+      "bytes": 22210268,
+      "sha256": "ddc52ef868b991fd33e634de834a3e2c022b0cd7ff9e854f4f141996aaeadb70",
+      "manifest": {
+        "parse_error": "ParseError"
+      },
+      "apktool_exit": 0,
+      "jadx_exit": 3,
+      "java_files": 13940,
+      "dex_count": 3
+    }
+  ],
+  "dex": [
+    {
+      "component": "DeepSeek_2.7.5.apk",
+      "entry": "classes.dex",
+      "sha256": "74eeb079c2ce731f91e02ebd8dadb890364af15a8413970c8bed3c00e32f6aeb",
+      "magic": "dex\n037",
+      "bytes": 12697064,
+      "header_file_size": 12697064,
+      "string_ids": 68740,
+      "type_ids": 15829,
+      "proto_ids": 17142,
+      "field_ids": 45913,
+      "method_ids": 65466,
+      "class_defs": 12239,
+      "file_size_matches": true,
+      "adler32_header": 260703495
+    },
+    {
+      "component": "DeepSeek_2.7.5.apk",
+      "entry": "classes2.dex",
+      "sha256": "17685809b5391b98519420a92f6fed973c8520aca35a8bc99457c14b5c407b7d",
+      "magic": "dex\n037",
+      "bytes": 264820,
+      "header_file_size": 264820,
+      "string_ids": 2040,
+      "type_ids": 258,
+      "proto_ids": 485,
+      "field_ids": 490,
+      "method_ids": 1595,
+      "class_defs": 144,
+      "file_size_matches": true,
+      "adler32_header": 3837151303
+    },
+    {
+      "component": "DeepSeek_2.7.5.apk",
+      "entry": "classes3.dex",
+      "sha256": "1d1cdbf997236abfc01e9ffa284dee46d8f49e139c4852059cac3f4548b53d78",
+      "magic": "dex\n037",
+      "bytes": 2759260,
+      "header_file_size": 2759260,
+      "string_ids": 18175,
+      "type_ids": 6057,
+      "proto_ids": 6311,
+      "field_ids": 11417,
+      "method_ids": 20243,
+      "class_defs": 2981,
+      "file_size_matches": true,
+      "adler32_header": 842297426
+    }
+  ],
+  "dex_count": 3,
+  "class_count": 15054,
+  "method_count": 72257,
+  "call_edge_count": 463096,
+  "candidate_method_count": 2290,
+  "native_libraries": [
+    {
+      "component": "DeepSeek_2.7.5.apk",
+      "path": "lib/arm64-v8a/libEncryptorP.so",
+      "bytes": 83928,
+      "sha256": "7fa8178b0bf2c1c8e545e5c35051e83ee85fcd04655b5d058f542c566b97154e"
+    },
+    {
+      "component": "DeepSeek_2.7.5.apk",
+      "path": "lib/arm64-v8a/libWCDB.so",
+      "bytes": 4327640,
+      "sha256": "2ace2afd179b2b06136ccfb67edc836ad453e4306690d6fbb64ae6faf8300a6b"
+    },
+    {
+      "component": "DeepSeek_2.7.5.apk",
+      "path": "lib/arm64-v8a/libandroidx.graphics.path.so",
+      "bytes": 10096,
+      "sha256": "41e9a793c43a0f4fddb19e33f346bace464f30f888ba7b9eaf96294ea115bfb6"
+    },
+    {
+      "component": "DeepSeek_2.7.5.apk",
+      "path": "lib/arm64-v8a/libapminsighta.so",
+      "bytes": 117136,
+      "sha256": "72828ea04596f4915aaf633304a289b7b8388795f9d4a95ca53b8a7bd0799c72"
+    },
+    {
+      "component": "DeepSeek_2.7.5.apk",
+      "path": "lib/arm64-v8a/libapminsightb.so",
+      "bytes": 133800,
+      "sha256": "d9c20b950749c9007b37474649ff615526e9766e24237b42f19528a879e01a3c"
+    },
+    {
+      "component": "DeepSeek_2.7.5.apk",
+      "path": "lib/arm64-v8a/libc++_shared.so",
+      "bytes": 1253544,
+      "sha256": "ad74bf43eb1fd576518168f664ad16a74e00eeda9595875c33dd87f6dd197869"
+    },
+    {
+      "component": "DeepSeek_2.7.5.apk",
+      "path": "lib/arm64-v8a/libflipped.so",
+      "bytes": 7384,
+      "sha256": "31494063717f1e594b6a30795255164a0dafb5abdb1cbafe4375988448c50b84"
+    },
+    {
+      "component": "DeepSeek_2.7.5.apk",
+      "path": "lib/arm64-v8a/libimage_processing_util_jni.so",
+      "bytes": 32544,
+      "sha256": "f0e4611db0d6b68942d8ba6977519f3dd1cdbffa87b7fc16d8006696ba954af4"
+    },
+    {
+      "component": "DeepSeek_2.7.5.apk",
+      "path": "lib/arm64-v8a/libliteavsdk.so",
+      "bytes": 11615464,
+      "sha256": "329b35208093dcfeab78e3634184d0ba309f33719049d1e41c9ef99d22ff3550"
+    },
+    {
+      "component": "DeepSeek_2.7.5.apk",
+      "path": "lib/arm64-v8a/libmmkv.so",
+      "bytes": 298176,
+      "sha256": "4ef0418b7c93d83145d00b6d970a6e385052b6afadb38a77b032661c4c3c916c"
+    },
+    {
+      "component": "DeepSeek_2.7.5.apk",
+      "path": "lib/arm64-v8a/librscrypto.so",
+      "bytes": 336568,
+      "sha256": "4571b9bcf08d5f070a47a495bdcd4c77f4a088feee560ed11701ca93c7b56053"
+    },
+    {
+      "component": "DeepSeek_2.7.5.apk",
+      "path": "lib/arm64-v8a/libsmsdk.so",
+      "bytes": 842488,
+      "sha256": "ed67766f729c3420693aab3006ff25ce00439f50ae59d169321e5cf991b408ec"
+    },
+    {
+      "component": "DeepSeek_2.7.5.apk",
+      "path": "lib/arm64-v8a/libsurface_util_jni.so",
+      "bytes": 4896,
+      "sha256": "6cb2eac3c68e6a82ce2a5ea5aba86749eb8c609914392e125f6cdfbc208992f8"
+    },
+    {
+      "component": "DeepSeek_2.7.5.apk",
+      "path": "lib/arm64-v8a/libtxffmpeg.so",
+      "bytes": 2092328,
+      "sha256": "2f943a6a34ec01a4321c49002981ec0cc6f33b35ff030d54c4f908905b319da4"
+    },
+    {
+      "component": "DeepSeek_2.7.5.apk",
+      "path": "lib/arm64-v8a/libtxsoundtouch.so",
+      "bytes": 194344,
+      "sha256": "a089bf333c567730f5d319670e45dea0a15caa652504f161e8842cdf58cb2d46"
+    },
+    {
+      "component": "DeepSeek_2.7.5.apk",
+      "path": "lib/arm64-v8a/libvolc_log.so",
+      "bytes": 133832,
+      "sha256": "17bb7fbc27b6cb315cef86e1cbf4474a384d27ae14f6a1f08a5e164c34f2a19b"
+    }
+  ],
+  "tool_limits": {
+    "JADX": "best-effort; inspect exit status and APKTool smali evidence",
+    "Hook": "static candidate discovery only; no device Hook is claimed"
+  }
+}

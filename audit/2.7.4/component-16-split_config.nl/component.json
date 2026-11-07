@@ -1,0 +1,12 @@
+{
+  "apk": "component-16-split_config.nl.apk",
+  "bytes": 94418,
+  "sha256": "80c4d4b0f049bfcc69649c831764ed874985b7e0d54f32b130dd11ce820686a3",
+  "manifest": {
+    "parse_error": "ParseError"
+  },
+  "apktool_exit": 0,
+  "jadx_exit": 0,
+  "java_files": 1,
+  "dex_count": 0
+}

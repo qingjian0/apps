@@ -1,0 +1,12 @@
+{
+  "apk": "component-14-split_config.ko.apk",
+  "bytes": 94418,
+  "sha256": "0ce9ca19a8e97e891727be2a88495ae0845c8c5935c4bc1009416247d3338dbe",
+  "manifest": {
+    "parse_error": "ParseError"
+  },
+  "apktool_exit": 0,
+  "jadx_exit": 0,
+  "java_files": 1,
+  "dex_count": 0
+}

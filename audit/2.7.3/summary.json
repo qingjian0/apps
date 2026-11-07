@@ -1,0 +1,150 @@
+{
+  "version_label": "2.7.3",
+  "source_file": "deepseek 273.apk",
+  "source_bytes": 14211169,
+  "source_sha256": "a6d025c14c98118a5a67849e04aaef6f3c9c13aaf0fa62caaee0e47091374ea3",
+  "components": [
+    "deepseek 273.apk"
+  ],
+  "component_metadata": [
+    {
+      "apk": "deepseek 273.apk",
+      "bytes": 14211169,
+      "sha256": "a6d025c14c98118a5a67849e04aaef6f3c9c13aaf0fa62caaee0e47091374ea3",
+      "manifest": {
+        "parse_error": "ParseError"
+      },
+      "apktool_exit": 0,
+      "jadx_exit": 3,
+      "java_files": 12319,
+      "dex_count": 3
+    }
+  ],
+  "dex": [
+    {
+      "component": "deepseek 273.apk",
+      "entry": "classes.dex",
+      "sha256": "e53b7a6cdebf1ec1cbfcb7093f729bc94a8a26037b475c8f788920204e324430",
+      "magic": "dex\n035",
+      "bytes": 12701040,
+      "header_file_size": 12701040,
+      "string_ids": 64863,
+      "type_ids": 14465,
+      "proto_ids": 15865,
+      "field_ids": 42868,
+      "method_ids": 65362,
+      "class_defs": 12563,
+      "file_size_matches": true,
+      "adler32_header": 2163791244
+    },
+    {
+      "component": "deepseek 273.apk",
+      "entry": "classes2.dex",
+      "sha256": "0becdf51918e8b6e120d2cedb7cab66c1126ac6b30d1c69e3cef278bd0feaf54",
+      "magic": "dex\n035",
+      "bytes": 551656,
+      "header_file_size": 551656,
+      "string_ids": 3072,
+      "type_ids": 787,
+      "proto_ids": 1169,
+      "field_ids": 1177,
+      "method_ids": 5598,
+      "class_defs": 581,
+      "file_size_matches": true,
+      "adler32_header": 2807596397
+    },
+    {
+      "component": "deepseek 273.apk",
+      "entry": "classes3.dex",
+      "sha256": "9a7f38ea6c66e32d9f5eeadbadade289e64fccdbf6384e0afccd6034b65ed0e7",
+      "magic": "dex\n035",
+      "bytes": 206952,
+      "header_file_size": 206952,
+      "string_ids": 2213,
+      "type_ids": 400,
+      "proto_ids": 433,
+      "field_ids": 560,
+      "method_ids": 1259,
+      "class_defs": 167,
+      "file_size_matches": true,
+      "adler32_header": 4029137928
+    }
+  ],
+  "dex_count": 3,
+  "class_count": 13043,
+  "method_count": 64557,
+  "call_edge_count": 400184,
+  "candidate_method_count": 1913,
+  "native_libraries": [
+    {
+      "component": "deepseek 273.apk",
+      "path": "lib/arm64-v8a/libEncryptorP.so",
+      "bytes": 83928,
+      "sha256": "45fd9913dc05cf9baf36aa83611fe59e4f0167a2eeea79e23e7935fd797209de"
+    },
+    {
+      "component": "deepseek 273.apk",
+      "path": "lib/arm64-v8a/libWCDB.so",
+      "bytes": 4327640,
+      "sha256": "2ace2afd179b2b06136ccfb67edc836ad453e4306690d6fbb64ae6faf8300a6b"
+    },
+    {
+      "component": "deepseek 273.apk",
+      "path": "lib/arm64-v8a/libandroidx.graphics.path.so",
+      "bytes": 10096,
+      "sha256": "41e9a793c43a0f4fddb19e33f346bace464f30f888ba7b9eaf96294ea115bfb6"
+    },
+    {
+      "component": "deepseek 273.apk",
+      "path": "lib/arm64-v8a/libapminsighta.so",
+      "bytes": 117136,
+      "sha256": "43b6240e73969b75d190059a6361679f2873a3fe03a601b9c6e1f46e5e5b9b55"
+    },
+    {
+      "component": "deepseek 273.apk",
+      "path": "lib/arm64-v8a/libapminsightb.so",
+      "bytes": 133800,
+      "sha256": "9f92ea4f0403949e683ad2a7650cd4574882b0b6309ddf0938d734003d011eb8"
+    },
+    {
+      "component": "deepseek 273.apk",
+      "path": "lib/arm64-v8a/libc++_shared.so",
+      "bytes": 1253544,
+      "sha256": "ad74bf43eb1fd576518168f664ad16a74e00eeda9595875c33dd87f6dd197869"
+    },
+    {
+      "component": "deepseek 273.apk",
+      "path": "lib/arm64-v8a/libflipped.so",
+      "bytes": 7384,
+      "sha256": "31494063717f1e594b6a30795255164a0dafb5abdb1cbafe4375988448c50b84"
+    },
+    {
+      "component": "deepseek 273.apk",
+      "path": "lib/arm64-v8a/libmmkv.so",
+      "bytes": 298176,
+      "sha256": "4ef0418b7c93d83145d00b6d970a6e385052b6afadb38a77b032661c4c3c916c"
+    },
+    {
+      "component": "deepseek 273.apk",
+      "path": "lib/arm64-v8a/librscrypto.so",
+      "bytes": 336568,
+      "sha256": "4571b9bcf08d5f070a47a495bdcd4c77f4a088feee560ed11701ca93c7b56053"
+    },
+    {
+      "component": "deepseek 273.apk",
+      "path": "lib/arm64-v8a/libsmsdk.so",
+      "bytes": 842488,
+      "sha256": "8147da63a1aa41b4cc13d8d084a6355cd1dda1c9e136a1e18dbb62da95c79821"
+    },
+    {
+      "component": "deepseek 273.apk",
+      "path": "lib/arm64-v8a/libvolc_log.so",
+      "bytes": 133832,
+      "sha256": "17bb7fbc27b6cb315cef86e1cbf4474a384d27ae14f6a1f08a5e164c34f2a19b"
+    }
+  ],
+  "tool_limits": {
+    "JADX": "best-effort; inspect exit status and APKTool smali evidence",
+    "Hook": "static candidate discovery only; no device Hook is claimed"
+  }
+}

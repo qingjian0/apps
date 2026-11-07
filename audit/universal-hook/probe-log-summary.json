@@ -1,0 +1,41 @@
+{
+  "dsprobe.log": {
+    "bytes": 12320,
+    "sha256": "77d5e701da887663001fcd1d0c20a93857411290708e3003e8638e28e7f51134",
+    "line_count": 49,
+    "event_counts": {
+      "host_generation:2.7.2/code289-cn": 1,
+      "hook_install_attempt": 10,
+      "wrong_full_mode_selection": 10,
+      "navigation_capture_installed": 1,
+      "class_not_found": 20,
+      "hook_install_failure": 10,
+      "native_root_capture": 1
+    },
+    "top_method_markers": []
+  },
+  "deekseep_vision.log": {
+    "bytes": 6440972,
+    "sha256": "07101f54feccbd4c6f04c40ae9d99bbe345849396baba3eb8cb387dd612588ef",
+    "line_count": 19746,
+    "event_counts": {
+      "observer_session_start": 1,
+      "observer_role:transport-low-level": 1,
+      "observer_installed_event": 4,
+      "observer_role:transport-dispatch": 1,
+      "request_class_marker": 1,
+      "request_constructor_candidate": 2,
+      "request_factory_candidate": 5
+    },
+    "top_method_markers": [
+      [
+        "jw3.g",
+        1
+      ],
+      [
+        "zn3.o",
+        1
+      ]
+    ]
+  }
+}
