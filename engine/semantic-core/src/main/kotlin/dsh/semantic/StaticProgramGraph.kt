@@ -155,7 +155,8 @@ class StaticProgramGraph private constructor(
             classesPath: String,
             valueEdgesPath: String? = null,
             summaryPath: String? = null,
-            pointsToPath: String? = null
+            pointsToPath: String? = null,
+            onMethodRecord: ((String) -> Unit)? = null
         ): StaticProgramGraph {
             val callers = mutableMapOf<String, MutableSet<String>>()
             val callees = mutableMapOf<String, MutableSet<String>>()
@@ -173,6 +174,7 @@ class StaticProgramGraph private constructor(
             BufferedReader(InputStreamReader(GZIPInputStream(FileInputStream(methodsPath)), Charsets.UTF_8)).use { input ->
                 input.lineSequence().forEach { line ->
                     val obj = json.parseToJsonElement(line).jsonObject
+                    onMethodRecord?.invoke(line)
                     val owner = obj["class"]?.jsonPrimitive?.contentOrNull ?: return@forEach
                     val name = obj["name"]?.jsonPrimitive?.contentOrNull ?: return@forEach
                     val descriptor = obj["descriptor"]?.jsonPrimitive?.contentOrNull ?: return@forEach
