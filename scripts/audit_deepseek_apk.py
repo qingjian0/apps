@@ -301,6 +301,93 @@ def analyze_register_use_def(body_lines):
     }
 
 
+
+def analyze_register_dataflow(body_lines, cfg):
+    """Conservative intraprocedural reaching-definitions over the recovered CFG."""
+    executable=[]
+    for line_no,line in enumerate(body_lines,1):
+        match=OP_RE.match(line)
+        if not match or line.lstrip().startswith((".",":","#")):
+            continue
+        op=match.group(1)
+        facts=analyze_register_use_def([line])
+        item=facts["instructions"][0] if facts["instructions"] else None
+        executable.append({"index":len(executable),"line":line_no,"opcode":op,
+                           "reads":item["reads"] if item else [],
+                           "writes":item["writes"] if item else [],
+                           "known":not facts["unknown_opcode_count"]})
+    blocks=cfg.get("blocks",[])
+    if not executable or not blocks:
+        return {"complete":False,"reason":"missing-instruction-or-block-index",
+                "instruction_count":len(executable),"definition_count":0,
+                "use_count":0,"ambiguous_use_count":0,"unresolved_use_count":0,
+                "uses":[],"definitions":[]}
+    block_by_instruction={}
+    for block in blocks:
+        for index in range(block["start"],block["end"]+1):
+            block_by_instruction[index]=block["id"]
+    if len(block_by_instruction)!=len(executable):
+        return {"complete":False,"reason":"cfg-instruction-index-mismatch",
+                "instruction_count":len(executable),"definition_count":0,
+                "use_count":0,"ambiguous_use_count":0,"unresolved_use_count":0,
+                "uses":[],"definitions":[]}
+    predecessors={b["id"]:set() for b in blocks}
+    for edge in cfg.get("edges",[]):
+        if edge["to"] in predecessors and edge["from"] in predecessors:
+            predecessors[edge["to"]].add(edge["from"])
+    definitions=[]; defs_by_instruction={}
+    all_defs_by_register=collections.defaultdict(set)
+    for ins in executable:
+        current=set()
+        for reg in ins["writes"]:
+            ident="d{}:{}".format(ins["index"],reg)
+            definitions.append({"id":ident,"register":reg,"instruction":ins["index"],
+                                "line":ins["line"],"opcode":ins["opcode"]})
+            current.add(ident); all_defs_by_register[reg].add(ident)
+        defs_by_instruction[ins["index"]]=current
+    gen={b["id"]:set() for b in blocks}; kill={b["id"]:set() for b in blocks}
+    for ins in executable:
+        gen[block_by_instruction[ins["index"]]].update(defs_by_instruction[ins["index"]])
+    for block in blocks:
+        bid=block["id"]
+        written={d["register"] for d in definitions
+                 if block_by_instruction[d["instruction"]]==bid}
+        for reg in written:
+            kill[bid].update(all_defs_by_register[reg]-gen[bid])
+    incoming={b["id"]:set() for b in blocks}
+    outgoing={b["id"]:set(gen[b["id"]]) for b in blocks}
+    changed=True; iterations=0
+    while changed and iterations<max(8,len(blocks)*4):
+        changed=False; iterations+=1
+        for block in blocks:
+            bid=block["id"]
+            new_in=set().union(*(outgoing[p] for p in predecessors[bid])) if predecessors[bid] else set()
+            new_out=gen[bid]|(new_in-kill[bid])
+            if new_in!=incoming[bid] or new_out!=outgoing[bid]:
+                incoming[bid]=new_in; outgoing[bid]=new_out; changed=True
+    uses=[]; ambiguous=0; unresolved=0
+    for ins in executable:
+        bid=block_by_instruction[ins["index"]]; reaching=set(incoming[bid])
+        for index in range(blocks[bid]["start"],ins["index"]):
+            reaching.difference_update(defs_by_instruction[index])
+            reaching.update(defs_by_instruction[index])
+        for reg in ins["reads"]:
+            matches=sorted(d for d in reaching if d.endswith(":"+reg))
+            state="resolved" if len(matches)==1 else ("ambiguous" if matches else "unresolved")
+            ambiguous+=state=="ambiguous"; unresolved+=state=="unresolved"
+            uses.append({"register":reg,"instruction":ins["index"],"line":ins["line"],
+                         "opcode":ins["opcode"],"reaching_definitions":matches[:16],
+                         "resolution":state})
+    known=all(x["known"] for x in executable)
+    complete=bool(cfg.get("complete")) and known and not changed
+    return {"complete":complete,"reason":None if complete else
+            ("unknown-opcodes" if not known else "incomplete-cfg-or-nonconvergence"),
+            "instruction_count":len(executable),"definition_count":len(definitions),
+            "use_count":len(uses),"ambiguous_use_count":ambiguous,
+            "unresolved_use_count":unresolved,"iterations":iterations,
+            "definitions":definitions[:256],"definitions_truncated":len(definitions)>256,
+            "uses":uses[:512],"uses_truncated":len(uses)>512}
+
 def analyze_smali(root):
     classes=[]; methods=[]; call_edges=[]
     for file in sorted(root.rglob("*.smali")):
@@ -342,6 +429,7 @@ def analyze_smali(root):
                     current["control_flow"]={"branch_count":current["branch_count"],"label_count":current["label_count"],
                         "return_count":current["return_count"],"throw_count":current["throw_count"],
                         "basic_block_estimate":cfg["block_count"],"cfg":cfg}
+                    current["register_dataflow"]=analyze_register_dataflow(current["body_lines"],cfg)
                     current["invokes"]=sorted(set(current["invokes"]))[:120]
                     current["strings"]=sorted(set(current["strings"]))[:100]
                     current.pop("body_lines",None)
