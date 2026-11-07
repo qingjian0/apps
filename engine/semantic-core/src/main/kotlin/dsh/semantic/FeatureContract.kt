@@ -51,6 +51,18 @@ object DeepSeekFeatureContracts {
         FeatureContract(RoleId("agent.result"), setOf(SafeEventField.RESULT_KIND), setOf(SafeEventField.TOOL_KIND, SafeEventField.STEP_INDEX, SafeEventField.STEP_STATE), "Agent result type and state only"),
         FeatureContract(RoleId("local_api.request"), setOf(SafeEventField.ROUTE_ID, SafeEventField.STREAMING), setOf(SafeEventField.MODEL_ID, SafeEventField.HTTP_STATUS_CLASS, SafeEventField.DURATION_BUCKET), "Local API routing metadata; no request body or API key"),
         FeatureContract(RoleId("conversation.submit"), setOf(SafeEventField.EVENT_KIND), setOf(SafeEventField.SESSION_PSEUDONYM, SafeEventField.MODEL_ID, SafeEventField.DURATION_BUCKET), "Conversation lifecycle metadata; no message content"),
-        FeatureContract(RoleId("sse.dispatch"), setOf(SafeEventField.EVENT_KIND), setOf(SafeEventField.STEP_STATE, SafeEventField.ERROR_KIND, SafeEventField.DURATION_BUCKET), "Stream event metadata; no delta payload")
+        FeatureContract(RoleId("sse.dispatch"), setOf(SafeEventField.EVENT_KIND), setOf(SafeEventField.STEP_STATE, SafeEventField.ERROR_KIND, SafeEventField.DURATION_BUCKET), "Stream event metadata; no delta payload"),
+        FeatureContract(RoleId("prompt.instruction.apply"), setOf(SafeEventField.SOURCE_LABEL, SafeEventField.ENABLED), setOf(SafeEventField.TEMPLATE_ID, SafeEventField.TEMPLATE_HASH), "Instruction source and toggle metadata only"),
+        FeatureContract(RoleId("agent.plan"), setOf(SafeEventField.STEP_STATE), setOf(SafeEventField.STEP_INDEX, SafeEventField.MODEL_ID), "Agent planning state; no plan text"),
+        FeatureContract(RoleId("tool.registry"), setOf(SafeEventField.TOOL_KIND), setOf(SafeEventField.TOOL_ID), "Tool capability registration metadata"),
+        FeatureContract(RoleId("local_api.server"), setOf(SafeEventField.ROUTE_ID), setOf(SafeEventField.STREAMING), "Local API listener and route metadata; no bind secret"),
+        FeatureContract(RoleId("local_api.stream"), setOf(SafeEventField.ROUTE_ID, SafeEventField.STREAMING), setOf(SafeEventField.EVENT_KIND, SafeEventField.DURATION_BUCKET), "Local API stream lifecycle metadata"),
+        FeatureContract(RoleId("conversation.history"), setOf(SafeEventField.EVENT_KIND), setOf(SafeEventField.SESSION_PSEUDONYM), "Conversation history metadata only"),
+        FeatureContract(RoleId("multimodal.image"), setOf(SafeEventField.EVENT_KIND), setOf(SafeEventField.MODEL_ID), "Image pipeline stage metadata; no image bytes or OCR text"),
+        FeatureContract(RoleId("multimodal.audio"), setOf(SafeEventField.EVENT_KIND), setOf(SafeEventField.MODEL_ID), "Audio pipeline stage metadata; no transcript or audio bytes"),
+        FeatureContract(RoleId("attachment.file"), setOf(SafeEventField.EVENT_KIND), setOf(SafeEventField.DURATION_BUCKET), "Attachment stage metadata; no filename or file content"),
+        FeatureContract(RoleId("search.query"), setOf(SafeEventField.EVENT_KIND), setOf(SafeEventField.TOOL_KIND, SafeEventField.DURATION_BUCKET), "Search stage metadata; no query or result text"),
+        FeatureContract(RoleId("storage.preference"), setOf(SafeEventField.EVENT_KIND), setOf(SafeEventField.ENABLED), "Preference change metadata; no stored values"),
+        FeatureContract(RoleId("settings.toggle"), setOf(SafeEventField.EVENT_KIND, SafeEventField.ENABLED), emptySet(), "Settings toggle metadata only")
     )
 }
