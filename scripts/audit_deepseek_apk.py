@@ -30,7 +30,7 @@ ANCHORS = {
     "account_capability": ("subscription", "quota", "model_capability", "feature_flag", "remote_config"),
     "ui_settings": ("Settings", "Preference", "ViewModel", "NavController", "Compose"),
 }
-SENSITIVE = re.compile(r"(?i)(authorization|bearer\\s+|cookie|api[_-]?key|access[_-]?token|refresh[_-]?token|password|message[_-]?content)")
+SENSITIVE = re.compile(r"(?i)(authorization|bearer\s+|cookie|api[_-]?key|access[_-]?token|refresh[_-]?token|password|message[_-]?content)")
 SAFE_PROMPT_MARKER = re.compile(r"(?i)^(system_?prompt|custom_?instructions?|prompt_?(template|id|type|source)|instruction_?(enabled|source|type)|context_window)$")
 METHOD_RE = re.compile(r"^\.method\s+(.+?)\s+([^\s(]+)(\([^)]*\).+)$")
 CLASS_RE = re.compile(r"^\.class\s+.*?\s+(L[^;]+;)")
