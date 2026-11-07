@@ -70,10 +70,18 @@ def feature_set(m):
 def mutual_best_matches(left_candidates, right_candidates, minimum_score=0.48, minimum_margin=0.06):
     """Return conservative one-to-one cross-version matches; ambiguous ties are never emitted."""
     if not left_candidates or not right_candidates:
-        return [], {"left_ambiguous": 0, "right_ambiguous": 0, "non_mutual": 0, "below_threshold": 0}
+        return [], {"left_ambiguous": 0, "right_ambiguous": 0, "non_mutual": 0, "below_threshold": 0, "no_shared_semantic_evidence": 0}
+
+    def semantic_score(left, right):
+        shared = left[1] & right[1]
+        # A shared role label is only a search bucket, not evidence of method identity.
+        # Require at least one shared protocol anchor, stable API call, or protocol string.
+        if not any(item.startswith(("anchor:", "api:", "string:")) for item in shared):
+            return 0.0
+        return prepared_similarity(left, right)
 
     scores = [
-        [prepared_similarity(left, right) for right in right_candidates]
+        [semantic_score(left, right) for right in right_candidates]
         for left in left_candidates
     ]
 
@@ -250,7 +258,7 @@ def main():
             ident=comp.get("manifest",{})
             identity_status = "package+version+signer+hash" if ident.get("version_code") and ident.get("version_name") and ident.get("signing_sha256") else ("package+version+hash" if ident.get("version_code") and ident.get("version_name") else ("package+signer+hash" if ident.get("signing_sha256") else "package+hash (version/signer attrs absent)"))
             report.append(f"| {v} | {comp.get('apk','')} | {ident.get('package','')} | {ident.get('version_code','')} | {ident.get('version_name','')} | {ident.get('split','')} | `{ident.get('signing_sha256','')}` | {identity_status} | `{comp.get('sha256','')}` |")
-    report += ["","## 语义候选匹配","","匹配分数由语义锚点、稳定框架/API 调用族和规范化 opcode 分布组成；候选截取前先按锚点数量、稳定 API 调用量和方法体规模排序。仅保留双向最佳且领先第二名至少 0.06 的匹配；并列或非互选候选被拒绝。分数仅用于排序，必须回看源码/Smali 和调用者/被调用者证据。","",
+    report += ["","## 语义候选匹配","","匹配分数由语义锚点、稳定框架/API 调用族和规范化 opcode 分布组成；候选截取前先按锚点数量、稳定 API 调用量和方法体规模排序。仅保留至少共享一个协议锚点、稳定 API 调用或协议字符串，且双向最佳并领先第二名至少 0.06 的匹配；仅角色相同、并列或非互选候选均被拒绝。分数仅用于排序，必须回看源码/Smali 和调用者/被调用者证据。","",
       "| 角色 | 来源版本 | 来源方法 | 目标版本 | 候选方法 | 相似度 |","|---|---|---|---|---|---:|"]
     for x in pairs[:1000]:
         report.append(f"| {x['role']} | {x['from_version']} | `{x['from']}` | {x['to_version']} | `{x['to']}` | {x['score']:.4f} |")
