@@ -89,7 +89,87 @@ jobs:
             "x-ds-sse-heartbeat-timeout-secs", "executeAutoResumeStreamFlow"
           ]
           def simple_name(descriptor):
-            return descriptor.rsplit("/", 1)[-1].removeprefix("L").rstrip(";")
+            if not descriptor or not descriptor.startswith("L") or not descriptor.endswith(";"):
+              return ""
+            body = descriptor[1:-1]
+            # The dynamic candidates are default-package obfuscated app classes.
+            # Do not collapse j$/time/.../d0 into the unrelated simple name "d0".
+            return body if "/" not in body else ""
+
+          def read_axml_manifest(path):
+            data = path.read_bytes()
+            def u16(pos): return int.from_bytes(data[pos:pos+2], "little")
+            def u32(pos): return int.from_bytes(data[pos:pos+4], "little")
+            def length8(pos):
+              first = data[pos]
+              if first & 0x80:
+                return ((first & 0x7f) << 8) | data[pos+1], pos+2
+              return first, pos+1
+            def length16(pos):
+              first = u16(pos)
+              if first & 0x8000:
+                return ((first & 0x7fff) << 16) | u16(pos+2), pos+4
+              return first, pos+2
+            def decode_string_pool(chunk, chunk_offset):
+              header_size = u16(chunk_offset+2)
+              count = u32(chunk_offset+8)
+              flags = u32(chunk_offset+16)
+              strings_start = u32(chunk_offset+20)
+              utf8 = bool(flags & 0x100)
+              values = []
+              for index in range(count):
+                string_offset = u32(chunk_offset+header_size+index*4)
+                pos = chunk_offset+strings_start+string_offset
+                if utf8:
+                  _, pos = length8(pos)
+                  byte_length, pos = length8(pos)
+                  values.append(data[pos:pos+byte_length].decode("utf-8", "replace"))
+                else:
+                  char_length, pos = length16(pos)
+                  values.append(data[pos:pos+char_length*2].decode("utf-16le", "replace"))
+              return values
+            if len(data) < 8 or u16(0) != 0x0003:
+              raise ValueError("not Android binary XML")
+            strings = []
+            result = {}
+            offset = 8
+            while offset+8 <= len(data):
+              chunk_type = u16(offset)
+              header_size = u16(offset+2)
+              chunk_size = u32(offset+4)
+              if chunk_size < 8 or offset+chunk_size > len(data):
+                raise ValueError("invalid binary XML chunk bounds")
+              if chunk_type == 0x0001:
+                strings = decode_string_pool(data[offset:offset+chunk_size], offset)
+              elif chunk_type == 0x0102 and strings:
+                tag_index = u32(offset+20)
+                tag = strings[tag_index] if tag_index < len(strings) else ""
+                if tag == "manifest":
+                  attribute_start = u16(offset+24)
+                  attribute_size = u16(offset+26)
+                  attribute_count = u16(offset+28)
+                  base = offset+16+attribute_start
+                  for index in range(attribute_count):
+                    pos = base+index*attribute_size
+                    name_index = u32(pos+4)
+                    raw_index = u32(pos+8)
+                    value_type = data[pos+15]
+                    value_data = u32(pos+16)
+                    name = strings[name_index] if name_index < len(strings) else ""
+                    if raw_index != 0xffffffff and raw_index < len(strings):
+                      value = strings[raw_index]
+                    elif value_type == 0x03 and value_data < len(strings):
+                      value = strings[value_data]
+                    elif value_type in (0x10, 0x11):
+                      value = value_data
+                    else:
+                      continue
+                    if name in ("package", "versionCode", "versionName"):
+                      result[name] = value
+                  return result
+              offset += chunk_size
+            raise ValueError("manifest root element not found")
+
           classes = {}
           method_rows = []
           call_rows = []
@@ -148,20 +228,24 @@ jobs:
               for term in terms:
                 if term in line and len(hits[term]) < 100:
                   hits[term].append({"file":str(p.relative_to(src)),"line":i,"text":line.strip()[:240]})
-          manifest = {"status":"binary_manifest_not_decoded_by_apktool_resource-skip_mode",
-                      "note":"Manifest metadata is intentionally omitted rather than misreported as a malformed XML document."}
+          manifest = read_axml_manifest(smroot/"AndroidManifest.xml")
+          if manifest.get("package") != "com.deepseek.chat" or manifest.get("versionCode") != 289 or manifest.get("versionName") != "2.7.2":
+            raise SystemExit("APK identity mismatch: expected com.deepseek.chat versionName=2.7.2 versionCode=289; got " + repr(manifest))
           summary = {"apk":apk.name,"bytes":apk.stat().st_size,
             "sha256":hashlib.sha256(apk.read_bytes()).hexdigest(),"manifest":manifest,
             "dex":dex,"dex_count":len(dex),"jadx_exit":int((out/"jadx.exit-code").read_text().strip()),
             "jadx_errors":int(em.group(1)) if em else None,
             "java_files":len(java_files),"smali_files":smali_count,"method_declarations":len(method_rows),
-            "candidate_classes_found":len(classes),"candidate_methods":sum(len(v["methods"]) for v in classes.values()),
+            "candidate_classes_found":len(classes),"candidate_candidates_total":len(candidates),
+            "candidate_missing":sorted(candidates-{simple_name(k) for k in classes}),
+            "candidate_methods":sum(len(v["methods"]) for v in classes.values()),
             "candidate_call_sites":len(call_rows),"native":native,"matches":{k:len(v) for k,v in hits.items()}}
           expected = {"ly1", "zn3", "jw3", "y60"}
           found = {simple_name(k) for k in classes}
           missing = sorted(expected - found)
           if not dex or not smali_count: raise SystemExit("DEX/smali inventory is empty; refusing to publish")
           if missing: raise SystemExit("Runtime-observed candidates missing from DEX inventory: " + ", ".join(missing))
+          if manifest.get("versionCode") != 289: raise SystemExit("Refusing to publish a non-code289 static audit")
           (out/"summary.json").write_text(json.dumps(summary,indent=2))
           (out/"candidate-class-descriptors.json").write_text(json.dumps(classes,indent=2))
           (out/"candidate-call-sites.json").write_text(json.dumps(call_rows,indent=2))
@@ -176,7 +260,8 @@ jobs:
             f"- Smali files: {smali_count}",f"- Method declarations: {len(method_rows)}",
             f"- Dynamic-evidence candidate classes found: {len(classes)}",
             f"- Candidate methods: {summary['candidate_methods']}",
-            f"- Candidate call sites: {len(call_rows)}","",
+            f"- Candidate call sites: {len(call_rows)}",
+            f"- Unresolved candidate simple names: {', '.join(summary['candidate_missing']) or 'none'}","",
             "## Dynamic-to-static candidate correlation","",
             "Candidate names originate from the 2.7.2 runtime observer log in the repository README.",
             "This report records exact DEX descriptors and call sites where found; it does not assign business semantics from obfuscated names alone.",
