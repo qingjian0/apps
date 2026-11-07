@@ -553,14 +553,14 @@ def analyze_object_points_to(body_lines, cfg, owner, method_name, descriptor,
     blocks=cfg.get("blocks",[])
     if not cfg.get("complete") or not executable or not blocks:
         return {"complete":False,"reason":"incomplete-cfg-or-empty-method",
-                "field_receivers":[],"same_instance_groups":[]}
+                "field_receivers":[],"same_instance_groups":[],"return_values":[]}
     block_by_instruction={}
     for block in blocks:
         for index in range(block["start"],block["end"]+1):
             block_by_instruction[index]=block["id"]
     if len(block_by_instruction)!=len(executable) or not all(x["known"] for x in executable):
         return {"complete":False,"reason":"instruction-index-mismatch-or-unknown-opcode",
-                "field_receivers":[],"same_instance_groups":[]}
+                "field_receivers":[],"same_instance_groups":[],"return_values":[]}
     predecessors={b["id"]:set() for b in blocks}
     normal_predecessors={b["id"]:set() for b in blocks}
     exception_predecessors={b["id"]:set() for b in blocks}
@@ -694,18 +694,39 @@ def analyze_object_points_to(body_lines, cfg, owner, method_name, descriptor,
                 changed=True
     if changed:
         return {"complete":False,"reason":"points-to-nonconvergence",
-                "field_receivers":[],"same_instance_groups":[]}
+                "field_receivers":[],"same_instance_groups":[],"return_values":[]}
 
     field_by_instruction={site["instruction"]:site for site in field_access_sites
                           if site.get("object_register")}
     invoke_by_instruction={site["instruction"]:site for site in invoke_sites}
     receiver_facts=[]
     invoke_argument_facts=[]
+    return_values=[]
     for block in blocks:
         bid=block["id"]
         points={reg:set(values) for reg,values in in_points[bid].items()}
         unknown=set(in_unknown[bid])
         for index in range(block["start"],block["end"]+1):
+            instruction=executable[index]
+            if instruction["opcode"].startswith("return-object"):
+                return_line=body_lines[instruction["line"]-1].strip()
+                return_regs=re.findall(r"\\b[vp]\\d+\\b",return_line)
+                if return_regs:
+                    return_reg=return_regs[0]
+                    return_ids=sorted(points.get(return_reg,set()))
+                    return_unknown=return_reg in unknown
+                    return_values.append({
+                        "instruction":index,"register":return_reg,
+                        "points_to":return_ids,"unknown":return_unknown,
+                        "identity_status":("unknown" if return_unknown else
+                            "singleton" if len(return_ids)==1 else
+                            "multiple" if len(return_ids)>1 else "unresolved")
+                    })
+                else:
+                    return_values.append({
+                        "instruction":index,"register":None,"points_to":[],
+                        "unknown":True,"identity_status":"unknown"
+                    })
             invoke_site=invoke_by_instruction.get(index)
             if invoke_site:
                 parsed=parse_method_descriptor(invoke_site.get("descriptor",""))
@@ -772,6 +793,9 @@ def analyze_object_points_to(body_lines, cfg, owner, method_name, descriptor,
             "field_receivers":receiver_facts,
             "invoke_arguments":invoke_argument_facts,
             "invoke_argument_count":len(invoke_argument_facts),
+            "return_values":return_values,
+            "return_value_count":len(return_values),
+            "instruction_writes":[{"instruction":x["index"],"registers":x["writes"]} for x in executable],
             "invoke_argument_incomplete_count":sum(not x["mapping_complete"] for x in invoke_argument_facts),
             "same_instance_groups":same_instance_groups,
             "singleton_receiver_count":sum(x["identity_status"]=="singleton" for x in receiver_facts),
