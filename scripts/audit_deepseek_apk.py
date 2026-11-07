@@ -902,44 +902,55 @@ def build_interprocedural_value_graph(methods):
             "edges_truncated":total_edge_count>200000}}
 
 
-def build_interprocedural_points_to_graph(methods):
-    """Project object identities through one exact call-site context into callee receivers.
+def build_interprocedural_points_to_graph(methods, max_call_depth=4):
+    """Build bounded call-string contexts for object receiver projection.
 
-    This is a bounded one-callsite-context projection, not a recursive whole-program
-    points-to fixed point. It never upgrades unknown/multiple inputs to singleton.
+    Every method is a possible analysis root. Contexts carry exact formal-to-actual
+    object identities through up to max_call_depth call edges. Recursive paths and
+    depth/record limits are cut conservatively; this is not a recursive fixed point.
     """
     by_signature=collections.defaultdict(list)
     for method in methods:
         key=method["class"]+"->"+method["name"]+method["descriptor"]
         method["_points_to_key"]=key
         by_signature[key].append(method)
+    roots=[m for m in methods if m.get("object_points_to",{}).get("complete")
+           and not m.get("invoke_sites_truncated") and not m.get("invoke_sites_incomplete")]
+    queue=collections.deque()
+    for root in roots:
+        queue.append({
+            "method":root,"context_id":"root:"+root["_points_to_key"],
+            "bindings":{},"path":(root["_points_to_key"],),"depth":0
+        })
     call_contexts=[]
     contextual_receivers=[]
-    resolved=0
-    unresolved=0
-    ambiguous=0
-    incomplete=0
-    singleton_context_receivers=0
+    resolved=unresolved=ambiguous=incomplete=0
+    recursive_contexts_cut=depth_contexts_cut=0
     records_truncated=False
     record_limit=200000
-    def contextualize(identity,callee_key,formal_map,context_id):
-        prefix="param:{}:".format(callee_key)
-        if identity.startswith(prefix):
-            formal=identity[len(prefix):]
-            actual=formal_map.get(formal)
+    seen_contexts=set()
+
+    def substitute(identity,method_key,bindings,context_id):
+        formal_prefix="param:{}:".format(method_key)
+        if identity.startswith(formal_prefix):
+            formal=identity[len(formal_prefix):]
+            actual=bindings.get(formal)
             if not actual or actual.get("unknown"):
                 return [],True
             return list(actual.get("points_to",[])),False
-        if identity.startswith("alloc:{}#".format(callee_key)):
+        allocation_prefix="alloc:{}#".format(method_key)
+        if identity.startswith(allocation_prefix):
             return ["context:{}:{}".format(context_id,identity)],False
         return [identity],False
-    for caller in methods:
+
+    while queue:
+        state=queue.popleft()
+        caller=state["method"]
         caller_key=caller["_points_to_key"]
         caller_pts=caller.get("object_points_to",{})
-        if (caller.get("invoke_sites_truncated") or caller.get("invoke_sites_incomplete")
-                or not caller_pts.get("complete")):
-            if caller.get("invoke_sites"):
-                incomplete+=len(caller.get("invoke_sites",[]))
+        if (not caller_pts.get("complete") or caller.get("invoke_sites_truncated")
+                or caller.get("invoke_sites_incomplete")):
+            incomplete+=len(caller.get("invoke_sites",[])) or 1
             continue
         args_by_instruction=collections.defaultdict(list)
         for item in caller_pts.get("invoke_arguments",[]):
@@ -964,31 +975,50 @@ def build_interprocedural_points_to_graph(methods):
                 incomplete+=1
                 continue
             actuals=args_by_instruction.get(site["instruction"],[])
-            if not actuals or any(not x.get("mapping_complete") for x in actuals):
+            if any(not x.get("mapping_complete") for x in actuals):
                 incomplete+=1
                 continue
-            formal_map={x["formal_register"]:x for x in actuals}
-            context_id="{}@{}".format(caller_key,site["instruction"])
+            context_id="{}=>{}@{}".format(
+                state["context_id"],caller_key,site["instruction"])
+            resolved_bindings={}
+            for item in actuals:
+                identities=[]
+                has_unknown=bool(item.get("unknown"))
+                for identity in item.get("points_to",[]):
+                    projected,unknown=substitute(
+                        identity,caller_key,state["bindings"],state["context_id"])
+                    identities.extend(projected)
+                    has_unknown=has_unknown or unknown
+                resolved_bindings[item["formal_register"]]={
+                    "points_to":sorted(set(identities)),"unknown":has_unknown
+                }
             if len(call_contexts)<record_limit:
                 call_contexts.append({
                     "context_id":context_id,"caller":caller_key,"callee":callee_key,
                     "call_instruction":site["instruction"],"call_line":site["line"],
+                    "call_depth":state["depth"]+1,
                     "arguments":[{
                         "formal_register":x["formal_register"],
                         "actual_register":x["actual_register"],
                         "argument_kind":x["argument_kind"],
-                        "points_to":x["points_to"],"unknown":x["unknown"],
-                        "identity_status":x["identity_status"]
+                        "points_to":resolved_bindings[x["formal_register"]]["points_to"],
+                        "unknown":resolved_bindings[x["formal_register"]]["unknown"],
+                        "identity_status":("unknown" if resolved_bindings[x["formal_register"]]["unknown"]
+                            else "singleton" if len(resolved_bindings[x["formal_register"]]["points_to"])==1
+                            else "multiple" if len(resolved_bindings[x["formal_register"]]["points_to"])>1
+                            else "unresolved")
                     } for x in actuals]
                 })
             else:
                 records_truncated=True
+                continue
             resolved+=1
             for fact in callee_pts.get("field_receivers",[]):
                 identities=[]
                 has_unknown=bool(fact.get("unknown"))
                 for identity in fact.get("points_to",[]):
-                    projected,unknown=contextualize(identity,callee_key,formal_map,context_id)
+                    projected,unknown=substitute(
+                        identity,callee_key,resolved_bindings,context_id)
                     identities.extend(projected)
                     has_unknown=has_unknown or unknown
                 identities=sorted(set(identities))
@@ -999,18 +1029,36 @@ def build_interprocedural_points_to_graph(methods):
                     contextual_receivers.append({
                         "context_id":context_id,"caller":caller_key,"callee":callee_key,
                         "call_instruction":site["instruction"],
+                        "call_depth":state["depth"]+1,
                         "receiver_instruction":fact.get("instruction"),
                         "field":fact.get("field"),"access":fact.get("access"),
                         "points_to":identities,"unknown":has_unknown,
                         "identity_status":status,
                         "identity":identities[0] if status=="singleton" else None,
-                        "identity_scope":"one-callsite-context",
+                        "identity_scope":"bounded-call-string-context",
                         "runtime_identity_proven":False
                     })
                 else:
                     records_truncated=True
                 if status=="singleton":
                     singleton_context_receivers+=1
+            if callee_key in state["path"]:
+                recursive_contexts_cut+=1
+                continue
+            if state["depth"]+1>=max_call_depth:
+                if callee.get("invoke_sites"):
+                    depth_contexts_cut+=1
+                continue
+            next_state_id=(callee_key,context_id)
+            if next_state_id in seen_contexts:
+                continue
+            seen_contexts.add(next_state_id)
+            queue.append({
+                "method":callee,"context_id":context_id,
+                "bindings":resolved_bindings,
+                "path":state["path"]+(callee_key,),
+                "depth":state["depth"]+1
+            })
     for method in methods:
         method.pop("_points_to_key",None)
     return {
@@ -1023,10 +1071,12 @@ def build_interprocedural_points_to_graph(methods):
             "singleton_context_receiver_count":singleton_context_receivers,
             "records_truncated":records_truncated,
             "record_limit":record_limit,
+            "max_call_depth":max_call_depth,
+            "recursive_contexts_cut":recursive_contexts_cut,
+            "depth_contexts_cut":depth_contexts_cut,
             "recursive_fixed_point":False,"runtime_identity_proven":False
         }
     }
-
 
 def build_field_slot_index(methods):
     """Group field reads/writes by exact DEX field descriptor, without claiming object identity."""
