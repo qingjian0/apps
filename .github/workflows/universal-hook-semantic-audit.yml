@@ -7,6 +7,8 @@ on:
     paths:
       - scripts/audit_deepseek_apk.py
       - tests/test_audit_smali_graph.py
+      - scripts/aggregate_deepseek_hook_audit.py
+      - tests/test_aggregate_deepseek_hook_audit.py
       - docs/universal-hook/ENGINE-ARCHITECTURE.md
       - .github/workflows/universal-hook-semantic-audit.yml
   pull_request:
@@ -23,8 +25,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: universal-hook-static-analysis
-  cancel-in-progress: true
+  group: universal-hook-static-analysis-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   python-static-analysis:
@@ -35,7 +37,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Compile audit pipeline
-        run: python -m py_compile scripts/audit_deepseek_apk.py
+      - name: Compile audit pipelines
+        run: |
+          python -m py_compile scripts/audit_deepseek_apk.py
+          python -m py_compile scripts/aggregate_deepseek_hook_audit.py
       - name: Run Smali and semantic graph unit tests
         run: python -m unittest discover -s tests -p "test_audit_smali_graph.py" -v
+      - name: Run cross-version aggregation unit tests
+        run: python -m unittest discover -s tests -p "test_aggregate_deepseek_hook_audit.py" -v
