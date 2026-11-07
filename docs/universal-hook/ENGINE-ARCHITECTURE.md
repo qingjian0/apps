@@ -141,7 +141,7 @@ A. 先完成并验证静态证据管线（现有五版本扫描器），包括�
 
 B. 建立独立 Kotlin/JVM 语义核心：模型、证据聚合、候选评分、唯一性门槛、fail-closed Resolver、幂等 HookCoordinator、FakeHookBackend 测试。
 
-C. 实现 DEX 结构/调用图/控制流数据提供器，将当前 Python 扫描器输出转换为核心引擎可消费的 schema。
+C. 已开始实现 DEX/Smali 调用图、跨方法字段读写关联和控制流形态数据提供器；下一步补充精确基本块边、字段值传播、类型/接口图和序列化注册关系。
 
 D. 为 Prompt、Agent、Tools、Local API、Conversation、Multimodal 等建立契约和版本证据矩阵。APK 不含的能力明确归属模块侧或 N/A。
 
@@ -165,5 +165,7 @@ F. 使用未参与开发的新版本 APK 盲测。盲测报告记录自动定位
 
 - 已有：五版本 APK/APKM 输入清单、独立审计 workflow、Smali/DEX 方法与调用边扫描器、初版候选聚合器、2.7.3/2.7.5 SSE 链路证据、2.7.2 动态 Hook 日志线索。
 - 正在修复/验证：Unicode/Smali 字符处理、APK 组件身份、五版本 Actions 全量审计、候选排序和报告。
-- 已有核心原型：Kotlin/JVM SemanticResolver（独立证据族、候选歧义和 fail-closed）、角色级幂等 HookCoordinator、HookBackend 抽象、Prompt/Agent/Local API/Conversation/SSE 元数据 FeatureContract 与严格字段白名单、读取 APK 审计 JSONL 的 StaticAuditJsonReader/StaticEvidenceMapper/StaticAuditCli，以及按目标场景与 baseline 对照的 RuntimeBehaviorVerifier；Kotlin 核心 CI 已通过，五版本真实索引接入正在执行。
+- 已有核心原型：Kotlin/JVM SemanticResolver（独立证据族、候选歧义和 fail-closed）、角色级幂等 HookCoordinator、HookBackend 抽象、元数据 FeatureContract、StaticAuditJsonReader/StaticEvidenceMapper/StaticAuditCli、RuntimeBehaviorVerifier，以及 StaticProgramGraph（调用者/被调用者索引、跨方法字段读写关联、控制流形态统计）。
+- 最新五版本真实数据接入曾全部拒绝 19 个角色，原因是候选锚点过宽、歧义过高；这是正确的 fail-closed 结果，不是 Hook 解析成功。当前已增加锚点稀有度加权、调用图和字段流证据，并为 Smali 字段/控制流解析新增回归测试，等待新一轮 CI 验证。
+- 当前 CFG 仅是分支/标签/返回/异常的结构摘要与基本块数量估计，不是完整基本块图；当前字段流是基于字段读写的跨方法静态关联，不等于完整污点分析。
 - 尚未实现：完整 DEX/CFG/Dataflow 引擎、从 APK 自动生成运行时证据的语义发现器、LSPosed Android Backend、Prompt/Agent/Local API 全功能桥接、未知版本盲测、真机验证。
