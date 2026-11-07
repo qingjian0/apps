@@ -11,14 +11,16 @@
 
 ## 1. 仓库材料盘点
 
-本仓库当前保留两份 APK 和两份运行日志。2.7.5 已完成一次完整的静态证据采集；2.7.3 仍未执行同等级静态审计。
+本仓库当前保留两份 APK 和两份运行日志。2.7.5 已完成 2.7.5 与 2.7.3 双版本静态证据采集，并完成 SSE / 网络 / PoW 语义映射。
 
 | 文件 | 大小 | 本轮处理状态 |
 |---|---:|---|
 | DeepSeek_2.7.5.apk | 22,210,268 bytes | 已提取 3 个 DEX；JADX 1.5.6 输出 13,940 个 Java 源文件；第一方索引覆盖 12,596 个类 |
-| deepseek 273.apk | 14,211,169 bytes | 已盘点，尚未执行同等级静态反编译 |
+| deepseek 273.apk | 14,211,169 bytes | 已提取 3 个 DEX；JADX 12,319 个 Java 源文件；APKTool 13,311 个 smali 文件；304 项 JADX 错误 |
 | deekseep_vision.log | 6,440,972 bytes / 19,747 行 | 已完成动态事件、线程、异常、Continuation 与 Callback 统计 |
 | dsprobe.log | 12,320 bytes / 50 行 | 已完成 Hook 安装失败和版本映射分析 |
+
+2.7.3 APK SHA-256：a6d025c14c98118a5a67849e04aaef6f3c9c13aaf0fa62caaee0e47091374ea3
 
 2.7.5 APK SHA-256：ddc52ef868b991fd33e634de834a3e2c022b0cd7ff9e854f4f141996aaeadb70
 
@@ -356,7 +358,7 @@ nw3.c / ChatChallengeRequest
 
 ### 8.3 当前仍不能下结论的部分
 
-2.7.5 的 l5.z 与 ot1.z 是多用途协程状态机方法：l5 的 e=8 分支由 nw3.e 创建并用于请求执行路径；ot1 的 e=3 分支由 pv1.l 创建并用于 Flow 收集。它们不是原始 SSE 行解析器。原始 SSE 解析器已由 smali 确认为 vs1.z；2.7.3 对应解析器为 jz0.A。
+- 2.7.5 的 l5.z 与 ot1.z 是多用途协程状态机方法：l5 的 e=8 分支由 nw3.e 创建并用于请求执行路径；ot1 的 e=3 分支由 pv1.l 创建并用于 Flow 收集。它们不是原始 SSE 行解析器。原始 SSE 解析器已由 smali 确认为 vs1.z；2.7.3 对应解析器为 jz0.A。
 - 原生 PoW 库已确认 JNI 导出符号、Rust SHA3/Keccak 相关依赖和 Keccak 计算路径；精确的 digest 变体、nonce 搜索条件和输入字节拼接仍需更深的原生反汇编。
 - ToolOpen、ToolFind、Search 等片段的数据模型已确认；完整工具执行发生在服务端还是某个未识别的本地子系统，尚未被当前 APK 静态证据完全证明。
 - 2.7.5 真实设备运行、Hook 可用性和请求/响应时序尚未验证。
@@ -432,8 +434,10 @@ nw3.c / ChatChallengeRequest
 
 - 主仓库：qingjian0/apps
 - 文档分支：main
-- 静态审计分支：work/deepseek-275-apk-audit
+- 2.7.5 静态审计分支：work/deepseek-275-apk-audit
 - 2.7.5 静态审计工作流：<https://github.com/qingjian0/apps/actions/runs/42335918440>
+- 双版本审计分支：work/deepseek-version-comparison-audit
+- 双版本审计工作流：<https://github.com/qingjian0/apps/actions/runs/42338674344>
 - 审计工作流源码：<https://github.com/qingjian0/apps/blob/work/deepseek-275-apk-audit/.github/workflows/deepseek-275-apk-audit.yml>
 - 审计工具：JADX 1.5.6，启用 show-bad-code
 - 目标 APK：DeepSeek_2.7.5.apk
@@ -1099,7 +1103,7 @@ nativeCalculateDeepSeekHashV1Pow(String base, String challenge, long difficulty)
 
 ### 26.2 本轮证据包
 
-- 双版本比较工作流运行和产物：<https://github.com/qingjian0/apps/actions>
+- 双版本比较工作流运行和产物：<https://github.com/qingjian0/apps/actions/runs/42338674344>
 - 目标 APK 与摘要见第 24 节。
 - 精简的 SSE/Hook/PoW 关键类证据包：deepseek-sse-hook-evidence.zip（本轮交付附件）。
 - 完整 smali archive 包含 2.7.3 的 13,311 个和 2.7.5 的 15,364 个 smali 文件。
