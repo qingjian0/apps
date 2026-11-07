@@ -1,6 +1,7 @@
 package dsh.semantic
 
 import java.io.BufferedReader
+import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.util.zip.GZIPInputStream
@@ -20,7 +21,11 @@ fun main(args: Array<String>) {
                 reader.anchorKeys(line).forEach { key -> anchorFrequency[key] = (anchorFrequency[key] ?: 0) + 1 }
             }
         }
-        val graph = StaticProgramGraph.load(methodsPath, edgesPath, classesPath)
+        val auditDirectory = File(methodsPath).parentFile
+        val valueEdgesPath = auditDirectory?.resolve("interprocedural-value-edges.jsonl.gz")
+            ?.takeIf { it.isFile }?.path
+        val summaryPath = auditDirectory?.resolve("summary.json")?.takeIf { it.isFile }?.path
+        val graph = StaticProgramGraph.load(methodsPath, edgesPath, classesPath, valueEdgesPath, summaryPath)
         val byRole = mutableMapOf<RoleId, MutableList<SemanticCandidate>>()
         var methods = 0
         BufferedReader(InputStreamReader(GZIPInputStream(FileInputStream(methodsPath)), Charsets.UTF_8)).use { input ->
