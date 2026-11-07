@@ -28,7 +28,7 @@
 | `deepseek-sse-hook-evidence.zip` | 已有 SSE/Hook 证据包 | 生成条目、大小、哈希清单并与新扫描结果核对 |
 | 先前分析归档 | 2.7.1、2.7.3/2.7.5、Nexus/Deekseep 模块分析 | 只作为历史证据和参考实现；不将模块 APK 当作 DeepSeek 宿主 APK |
 
-2.7.2 APK 已上传到仓库根目录（`deepseek-2-7-2.apk`，22,205,160 bytes）。本轮扫描会提取每个 APK/APKM 组件的 Manifest 包名、versionCode、versionName、split 标记及 SHA-256；只有这些身份字段与 `dsprobe.log` 的 `2.7.2/code289-cn` 一致，才可认定为同一构建。不得仅凭文件名或 versionName 认定。
+2.7.2 APK 已上传到仓库根目录（`deepseek-2-7-2.apk`，22,205,160 bytes）。当前 APKTool 解码结果能确认 Manifest 包名为 `com.deepseek.chat`，但该 APK 根 Manifest 未提供 `versionCode` / `versionName` 属性；因此当前身份等级只能是 package+APK SHA-256+DEX 指纹。`dsprobe.log` 的 `2.7.2/code289-cn` 不能仅凭文件名认定为同一构建，仍需可比较的设备端 DEX/签名指纹。
 
 ## 核心设计：语义定位而非混淆名映射
 
