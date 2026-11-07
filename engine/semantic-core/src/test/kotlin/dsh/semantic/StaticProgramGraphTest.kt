@@ -178,6 +178,12 @@ class StaticProgramGraphTest {
         val flowEvidence = enriched.evidence.single { it.family == EvidenceFamily.DATA_FLOW }
         assertTrue(flowEvidence.key.contains("interprocedural-argument-edges=1"))
         assertTrue(graph.graphStats()["interproceduralArgumentEdges"] == 1)
+        assertTrue(graph.graphStats()["interproceduralValueFlowExpectedEdges"] == 1)
+        assertTrue(graph.graphStats()["interproceduralValueFlowStoredEdges"] == 1)
+        assertTrue(graph.graphStats()["interproceduralValueFlowLoadedEdges"] == 1)
+        assertTrue(graph.graphStats()["interproceduralValueFlowSkippedMissingMethods"] == 0)
+        assertTrue(graph.graphStats()["interproceduralValueFlowFilePresent"] == 1)
+        assertTrue(graph.graphStats()["interproceduralValueFlowComplete"] == 1)
 
         val truncatedSummary = textFile("""{"interprocedural_value_flow":{"edges_truncated":true}}""")
         val truncatedGraph = StaticProgramGraph.load(methods, edges, classes, valueEdges, truncatedSummary)
