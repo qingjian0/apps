@@ -806,7 +806,7 @@ APK 中存在 lib/arm64-v8a/librscrypto.so，导出 JNI 符号：
 
 Java_com_deepseek_crypto_PowCalculator_nativeCalculateDeepSeekHashV1Pow
 
-原生库字符串包含 Rust sha3c 与 keccak crate 的源码路径和 KECCAK_F_ROUND_COUNT 相关信息；AArch64 反汇编也能看到 Keccak 状态/轮函数路径。该库没有可用的完整 DWARF 调试信息，精确 SHA3 变体、nonce 搜索条件和难度判定尚未完全恢复。
+原生库字符串包含 Rust sha3c 与 keccak crate 的源码路径和 KECCAK_F_ROUND_COUNT 相关信息；AArch64 反汇编也能看到 Keccak 状态/轮函数路径（包含 0x88 字节状态/速率相关操作）。JNI 符号位于 0x18e40，函数长度 484 bytes；librscrypto.so SHA-256 为 4571b9bcf08d5f070a47a495bdcd4c77f4a088feee560ed11701ca93c7b56053。该库没有可用的完整 DWARF 调试信息，精确 SHA3 变体、nonce 搜索条件和难度判定尚未完全恢复。
 
 本次 APK 的 16 个 .so 均位于 arm64-v8a；不能据此宣称其他 ABI 也具备相同 JNI 实现。
 
