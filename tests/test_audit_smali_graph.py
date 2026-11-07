@@ -502,6 +502,48 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertEqual("one-callsite-context", receiver["identity_scope"])
         self.assertFalse(receiver["runtime_identity_proven"])
 
+    def test_interprocedural_points_to_keeps_distinct_callsite_contexts_separate(self):
+        caller_body = [
+            "    new-instance v0, Lx/Thing;",
+            "    invoke-static {v0}, Lx/Worker;->consume(Lx/Thing;)V",
+            "    new-instance v1, Lx/Thing;",
+            "    invoke-static {v1}, Lx/Worker;->consume(Lx/Thing;)V",
+            "    return-void",
+        ]
+        caller_cfg = AUDIT.build_smali_cfg(caller_body)
+        caller_invokes = AUDIT.extract_invoke_sites(caller_body)
+        caller_pts = AUDIT.analyze_object_points_to(
+            caller_body, caller_cfg, "Lx/Caller;", "run", "()V", "static",
+            [], caller_invokes)
+        callee_body = [
+            "    iget-object v0, p0, Lx/Thing;->value:Ljava/lang/Object;",
+            "    return-object v0",
+        ]
+        callee_cfg = AUDIT.build_smali_cfg(callee_body)
+        callee_fields = AUDIT.extract_field_access_sites(callee_body)
+        callee_pts = AUDIT.analyze_object_points_to(
+            callee_body, callee_cfg, "Lx/Worker;", "consume",
+            "(Lx/Thing;)V", "static", callee_fields, [])
+        caller = {
+            "class": "Lx/Caller;", "name": "run", "descriptor": "()V",
+            "component": "base", "invoke_sites": caller_invokes,
+            "invoke_sites_truncated": False, "invoke_sites_incomplete": False,
+            "object_points_to": caller_pts,
+        }
+        callee = {
+            "class": "Lx/Worker;", "name": "consume",
+            "descriptor": "(Lx/Thing;)V", "component": "base",
+            "object_points_to": callee_pts,
+        }
+        graph = AUDIT.build_interprocedural_points_to_graph([caller, callee])
+        self.assertEqual(2, graph["summary"]["resolved_call_contexts"])
+        self.assertEqual(2, graph["summary"]["singleton_context_receiver_count"])
+        identities = [x["identity"] for x in graph["contextual_receivers"]]
+        self.assertEqual(2, len(set(identities)))
+        self.assertNotEqual(
+            graph["contextual_receivers"][0]["context_id"],
+            graph["contextual_receivers"][1]["context_id"])
+
     def test_interprocedural_points_to_does_not_upgrade_unknown_actual(self):
         caller_body = [
             "    move-result-object v0",
