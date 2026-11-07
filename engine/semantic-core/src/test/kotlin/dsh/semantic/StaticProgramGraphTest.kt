@@ -191,5 +191,38 @@ class StaticProgramGraphTest {
         assertFalse(truncated.evidence.any { it.family == EvidenceFamily.DATA_FLOW })
         assertTrue(truncatedGraph.graphStats()["interproceduralArgumentEdges"] == 0)
     }
+ 
+    @Test fun incompleteValueFlowIngestionNeverBecomesDataFlowEvidence() {
+        val target = "Lx/Target;->compose(Ljava/lang/String;)Ljava/lang/String;"
+        val caller = "Lx/Caller;->send()V"
+        val methods = gzipLines(listOf(
+            """{"class":"Lx/Target;","name":"compose","descriptor":"(Ljava/lang/String;)Ljava/lang/String;","field_reads":[],"field_writes":[],"roles":[{"role":"prompt_pipeline","anchors":["custom_instructions"]}]}""",
+            """{"class":"Lx/Caller;","name":"send","descriptor":"()V","field_reads":[],"field_writes":[]}"""
+        ))
+        val edges = gzipLines(emptyList())
+        val classes = gzipLines(listOf(
+            """{"descriptor":"Lx/Target;","super":"Ljava/lang/Object;","interfaces":[]}""",
+            """{"descriptor":"Lx/Caller;","super":"Ljava/lang/Object;","interfaces":[]}"""
+        ))
+        val valueEdges = gzipLines(listOf(
+            """{"kind":"argument","from_method":"$caller","from_definition":"d1:v0","to_method":"$target","to_parameter":"entry:p0"}""",
+            """{"kind":"argument","from_method":"Lx/Missing;->unknown()V","from_definition":"d1:v0","to_method":"$target","to_parameter":"entry:p0"}"""
+        ))
+        val summary = textFile("""{"interprocedural_value_flow":{"edge_count":2,"stored_edge_count":2,"edges_truncated":false}}""")
+        val host = HostFingerprint("com.deepseek.chat", 300, "future", "cert", "dex-300", "loader")
+        val candidate = SemanticCandidate(
+            RoleId("prompt.compose"),
+            MethodShape("Lx/Target;", "compose", "(Ljava/lang/String;)Ljava/lang/String;",
+                listOf("Ljava/lang/String;"), "Ljava/lang/String;"),
+            host,
+            listOf(Evidence(EvidenceFamily.PROTOCOL_ANCHOR, "custom_instructions", 0.9))
+        )
+        val graph = StaticProgramGraph.load(methods, edges, classes, valueEdges, summary)
+        val enriched = graph.enrich(candidate)
+        assertFalse(enriched.evidence.any { it.family == EvidenceFamily.DATA_FLOW })
+        assertTrue(graph.graphStats()["interproceduralValueFlowLoadedEdges"] == 1)
+        assertTrue(graph.graphStats()["interproceduralValueFlowSkippedMissingMethods"] == 1)
+        assertTrue(graph.graphStats()["interproceduralValueFlowComplete"] == 0)
+    }
 
 }
