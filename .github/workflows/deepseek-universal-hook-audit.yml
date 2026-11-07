@@ -7,6 +7,7 @@ on:
       - .github/workflows/deepseek-universal-hook-audit.yml
       - scripts/audit_deepseek_apk.py
       - scripts/aggregate_deepseek_hook_audit.py
+      - engine/semantic-core/**
       - DeepSeek_2.7.5.apk
       - deepseek271.apk
       - deepseek-2-7-2.apk
