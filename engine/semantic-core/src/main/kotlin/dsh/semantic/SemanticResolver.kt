@@ -4,8 +4,8 @@ package dsh.semantic
 class SemanticResolver {
     fun resolve(host: HostFingerprint, policy: RolePolicy, candidates: List<SemanticCandidate>): Resolution {
         if (!host.isUsableForHooking()) return rejected(policy.role, "untrusted-or-incomplete-host")
-        val matching = candidates.filter { it.role == policy.role && it.host == host }
-        if (matching.isEmpty()) return rejected(policy.role, "no-host-matched-candidates")
+        val matching = candidates.filter { it.role == policy.role && it.host == host && it.method.isWellFormed() }
+        if (matching.isEmpty()) return rejected(policy.role, "no-well-formed-host-matched-candidates")
         val ranked = matching.map { candidate ->
             val families = candidate.evidence.map { it.family }.toSet()
             val score = candidate.evidence.groupBy { it.family }.values.sumOf { group -> group.maxOfOrNull { it.weight } ?: 0.0 }
