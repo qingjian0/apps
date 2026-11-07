@@ -34,7 +34,7 @@ class StaticProgramGraph private constructor(
         val incoming = callers[id].orEmpty()
         val outgoing = callees[id].orEmpty()
         val facts = methods[id]
-        val frameworkCalls = outgoing.count { it.startsWith(FRAMEWORK_PREFIXES) }
+        val frameworkCalls = outgoing.count { target -> FRAMEWORK_PREFIXES.any { target.startsWith(it) } }
         val linkedReads = facts?.fieldReads.orEmpty().sumOf { field -> writers[field].orEmpty().count { it != id } }
         val linkedWrites = facts?.fieldWrites.orEmpty().sumOf { field -> readers[field].orEmpty().count { it != id } }
         val evidence = candidate.evidence.filterNot {
