@@ -9,6 +9,7 @@ enum class EvidenceFamily { PROTOCOL_ANCHOR, TYPE_SHAPE, CALL_GRAPH, CONTROL_FLO
 
 data class HostFingerprint(val packageName: String, val versionCode: Long?, val versionName: String?, val signingDigest: String?, val dexDigest: String, val classLoaderId: String) {
     fun isUsableForHooking() = packageName == "com.deepseek.chat" && dexDigest.isNotBlank() && classLoaderId.isNotBlank()
+    fun hasCompleteRuntimeIdentity() = isUsableForHooking() && versionCode != null && !versionName.isNullOrBlank() && !signingDigest.isNullOrBlank()
 }
 
 data class Evidence(val family: EvidenceFamily, val key: String, val weight: Double, val detail: String = "") {
