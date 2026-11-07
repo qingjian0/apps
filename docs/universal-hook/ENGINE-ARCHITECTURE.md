@@ -172,5 +172,6 @@ F. 使用未参与开发的新版本 APK 盲测。盲测报告记录自动定位
 - 已有核心原型：Kotlin/JVM SemanticResolver（独立证据族、候选歧义和 fail-closed）、角色级幂等 HookCoordinator、HookBackend 抽象、元数据 FeatureContract、StaticAuditJsonReader/StaticEvidenceMapper/StaticAuditCli、RuntimeBehaviorVerifier，以及 StaticProgramGraph（调用者/被调用者索引、跨方法字段读写关联、控制流形态统计、类继承与接口实现关系）。
 - 身份增强后的五版本静态接入 Run `42347209753` 对每个版本均得到 0/17 个角色可接受，所有候选均因歧义被拒绝；首轮发现的宿主 Local API 假阳性已移除。这是当前 fail-closed 结果，不是 Hook 解析成功。
 - 语义证据继续收紧：默认至少四个独立证据族；平台框架/第三方 SDK owner 带负面证据并被默认策略禁止；调用图和跨方法字段流现在传播稀有语义锚点，以区别“方法自身命中字符串”与“上下游共同体现同一语义”。对应测试正在运行。
+- 新增 RolePolicy.forRole：按功能域要求核心证据族（协议锚点、调用图、类型结构），并为 Prompt/Agent/Tools/Conversation/Storage/Search/多模态等要求字段数据流，为 SSE/PoW 要求控制流，为网络路由/Flow 要求稳定框架交互；静态 ingest 现使用生产策略而非宽松默认策略。
 - 当前 CFG 仅是分支/标签/返回/异常的结构摘要与基本块数量估计，不是完整基本块图；当前字段流是基于字段读写的跨方法静态关联，不等于完整污点分析；类型图目前覆盖父类/接口/实现者，尚未覆盖泛型签名、注解、反射和运行时动态类型。
 - 尚未实现：完整 DEX/CFG/Dataflow 引擎、从 APK 自动生成运行时证据的语义发现器、LSPosed Android Backend、Prompt/Agent/Tools/Conversation/Multimodal/Storage/Settings 全功能桥接、模块侧 Local API Gateway、未知版本盲测、真机验证。
