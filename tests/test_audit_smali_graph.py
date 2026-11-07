@@ -68,6 +68,22 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertEqual("com.deepseek.chat", parsed["package"])
         self.assertNotIn("version_code", parsed)
 
+    def test_signer_parser_handles_android_signer_rotation_entries(self):
+        output = (
+            "Signer (minSdkVersion=33, maxSdkVersion=2147483647) certificate SHA-256 digest: "
+            "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa\n"
+            "Signer (minSdkVersion=24, maxSdkVersion=32) certificate SHA-256 digest: "
+            "1eecc46fdc2173437d70140f163aaa97941d41b04d91da3eb689aec4f339abeb\n"
+        )
+        parsed = AUDIT.parse_signing_certificates(output)
+        self.assertEqual("c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa", parsed["signing_sha256"])
+        self.assertEqual(2, len(parsed["signing_sha256s"]))
+
+    def test_signer_parser_supports_numbered_signer_format(self):
+        output = "Signer #1 certificate SHA-256 digest: c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa\n"
+        parsed = AUDIT.parse_signing_certificates(output)
+        self.assertEqual(1, len(parsed["signing_sha256s"]))
+
 
 if __name__ == "__main__":
     unittest.main()
