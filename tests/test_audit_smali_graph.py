@@ -502,6 +502,50 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertEqual("one-callsite-context", receiver["identity_scope"])
         self.assertFalse(receiver["runtime_identity_proven"])
 
+    def test_interprocedural_points_to_propagates_identity_across_two_call_edges(self):
+        a_body = [
+            "    new-instance v0, Lx/Thing;",
+            "    invoke-static {v0}, Lx/Worker;->middle(Lx/Thing;)V",
+            "    return-void",
+        ]
+        b_body = [
+            "    invoke-static {p0}, Lx/Sink;->consume(Lx/Thing;)V",
+            "    return-void",
+        ]
+        c_body = [
+            "    iget-object v0, p0, Lx/Thing;->value:Ljava/lang/Object;",
+            "    return-void",
+        ]
+        def facts(owner, name, descriptor, access, body):
+            cfg = AUDIT.build_smali_cfg(body)
+            invokes = AUDIT.extract_invoke_sites(body)
+            fields = AUDIT.extract_field_access_sites(body)
+            pts = AUDIT.analyze_object_points_to(
+                body, cfg, owner, name, descriptor, access, fields, invokes)
+            return {
+                "class": owner, "name": name, "descriptor": descriptor,
+                "component": "base", "invoke_sites": invokes,
+                "invoke_sites_truncated": False, "invoke_sites_incomplete": False,
+                "object_points_to": pts,
+            }
+        methods = [
+            facts("Lx/Caller;", "start", "()V", "static", a_body),
+            facts("Lx/Worker;", "middle", "(Lx/Thing;)V", "static", b_body),
+            facts("Lx/Sink;", "consume", "(Lx/Thing;)V", "static", c_body),
+        ]
+        graph = AUDIT.build_interprocedural_points_to_graph(methods, max_call_depth=4)
+        terminal = [
+            row for row in graph["contextual_receivers"]
+            if row["callee"] == "Lx/Sink;->consume(Lx/Thing;)V"
+            and row["field"] == "Lx/Thing;->value:Ljava/lang/Object;"
+            and row["identity_status"] == "singleton"
+        ]
+        self.assertTrue(terminal)
+        self.assertTrue(any(row["call_depth"] == 2 for row in terminal))
+        self.assertTrue(graph["summary"]["context_expansion_complete"])
+        self.assertFalse(terminal[0]["runtime_identity_proven"])
+        self.assertEqual("bounded-call-string-context", terminal[0]["identity_scope"])
+
     def test_interprocedural_points_to_keeps_distinct_callsite_contexts_separate(self):
         caller_body = [
             "    new-instance v0, Lx/Thing;",
