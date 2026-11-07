@@ -25,6 +25,11 @@ class StaticProgramGraphTest {
             """{"from":"Lx/Caller;->start()V","to":"$target"}""",
             """{"from":"$target","to":"Lkotlinx/coroutines/flow/Flow;->emit(Ljava/lang/Object;)V"}"""
         ))
+        val classes = gzipLines(listOf(
+            """{"descriptor":"Lx/A;","super":"Ljava/lang/Object;","interfaces":["Lx/PromptComposer;"]}""",
+            """{"descriptor":"Lx/B;","super":"Ljava/lang/Object;","interfaces":["Lx/PromptComposer;"]}""",
+            """{"descriptor":"Lx/PromptComposer;","super":"Ljava/lang/Object;","interfaces":[]}"""
+        ))
         val host = HostFingerprint("com.deepseek.chat", 300, "future", "cert", "dex-300", "loader")
         val candidate = SemanticCandidate(
             RoleId("prompt.compose"),
@@ -36,12 +41,15 @@ class StaticProgramGraphTest {
                 Evidence(EvidenceFamily.BYTECODE_SHAPE, "small-method", 0.5)
             )
         )
-        val graph = StaticProgramGraph.load(methods, edges)
+        val graph = StaticProgramGraph.load(methods, edges, classes)
         val enriched = graph.enrich(candidate)
         val families = enriched.evidence.map { it.family }.toSet()
         assertTrue(EvidenceFamily.CALL_GRAPH in families)
         assertTrue(EvidenceFamily.DATA_FLOW in families)
         assertTrue(EvidenceFamily.CONTROL_FLOW in families)
+        assertTrue(EvidenceFamily.TYPE_SHAPE in families)
+        assertTrue(enriched.evidence.any { it.family == EvidenceFamily.TYPE_SHAPE && it.key.contains("interface-implementors=2") })
         assertTrue(graph.graphStats()["sharedFields"] == 1)
+        assertTrue(graph.graphStats()["classes"] == 3)
     }
 }
