@@ -1,0 +1,196 @@
+name: DeepSeek version comparison audit
+
+on:
+  push:
+    branches: [work/deepseek-version-comparison-audit]
+    paths:
+      - .github/workflows/deepseek-version-comparison.yml
+      - DeepSeek_2.7.5.apk
+      - "deepseek 273.apk"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ["273", "275"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Select input APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ matrix.version }}" = "275" ]; then
+            echo "APK=DeepSeek_2.7.5.apk" >> "$GITHUB_ENV"
+            echo "OUT=2.7.5" >> "$GITHUB_ENV"
+          else
+            echo "APK=deepseek 273.apk" >> "$GITHUB_ENV"
+            echo "OUT=2.7.3" >> "$GITHUB_ENV"
+          fi
+          test -s "$([ "${{ matrix.version }}" = "275" ] && echo 'DeepSeek_2.7.5.apk' || echo 'deepseek 273.apk')"
+      - name: Install JADX and baksmali
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 https://github.com/skylot/jadx/releases/download/v1.5.6/jadx-1.5.6.zip -o jadx.zip
+          unzip -q jadx.zip -d jadx-dist
+          chmod +x jadx-dist/bin/jadx
+          curl -fL --retry 3 https://repo.maven.apache.org/maven2/org/smali/baksmali/2.5.2/baksmali-2.5.2.jar -o baksmali.jar
+      - name: APK identity and DEX inventory
+        run: |
+          set -euo pipefail
+          mkdir -p "audit/$OUT" dex-input
+          sha256sum "$APK" > "audit/$OUT/apk.sha256"
+          unzip -Z1 "$APK" | grep -E '^classes[0-9]*\.dex$' > "audit/$OUT/dex-files.txt"
+          unzip -l "$APK" | grep -E 'classes[0-9]*\.dex$' > "audit/$OUT/dex-inventory.txt"
+          while IFS= read -r dex; do unzip -p "$APK" "$dex" > "dex-input/$dex"; done < "audit/$OUT/dex-files.txt"
+      - name: JADX source decompilation
+        shell: bash
+        run: |
+          set -uo pipefail
+          set +e
+          jadx-dist/bin/jadx --show-bad-code --no-res --threads-count 2 -d "decompiled-$OUT" "$APK" > "audit/$OUT/jadx.stdout.log" 2> "audit/$OUT/jadx.stderr.log"
+          status=$?
+          set -e
+          echo "$status" > "audit/$OUT/jadx.exit-code"
+          test -d "decompiled-$OUT/sources"
+      - name: Baksmali disassemble all DEX files
+        run: |
+          set -euo pipefail
+          mkdir -p "smali-$OUT"
+          while IFS= read -r dex; do
+            java -jar baksmali.jar disassemble "dex-input/$dex" -o "smali-$OUT/$(basename "$dex" .dex)"
+          done < "audit/$OUT/dex-files.txt"
+          (cd "smali-$OUT" && zip -qr "../audit/$OUT/all-smali.zip" .)
+      - name: Build static evidence index
+        run: |
+          set -euo pipefail
+          python3 - "$APK" "$OUT" <<'PY'
+          import hashlib,json,pathlib,re,sys,zipfile
+          apk=pathlib.Path(sys.argv[1]); name=sys.argv[2]; out=pathlib.Path("audit")/name
+          src=pathlib.Path("decompiled-"+name)/"sources"; sm=pathlib.Path("smali-"+name)
+          terms=["/api/v0/chat/completion","/api/v0/chat/regenerate","/api/v0/chat/continue",
+          "/api/v0/chat/edit_message","/api/v0/chat/resume_stream","/api/v0/chat/create_pow_challenge",
+          "/api/v0/chat/stop_stream","/api/v0/chat/history_messages","X-DS-PoW-Response",
+          "X-DS-Challenge-Response","nativeCalculateDeepSeekHashV1Pow","PowCalculator",
+          "ChatCompletionReadyEventData","DeltaCommand","ToolOpenFragment","ToolFindFragment",
+          "SearchFragment","allow_parallel_streams","interrupt_and_send_enabled","sse_first_delta",
+          "sse_auto_resume","text/event-stream","readUTF8Line","update_session",
+          "update_parent_message","check_client_update","auto_tts_capability"]
+          hits={t:[] for t in terms}
+          for base,kind in ((src,"java"),(sm,"smali")):
+            files=list(base.rglob("*.java" if kind=="java" else "*.smali"))
+            for p in files:
+              try: lines=p.read_text(errors="replace").splitlines()
+              except Exception: continue
+              method=""
+              for i,line in enumerate(lines,1):
+                if kind=="smali" and line.startswith(".method "): method=line.strip()
+                elif kind=="java":
+                  m=re.match(r"\s*(?:public|private|protected|static|final|native|abstract|\s)+[\w.$<>?,\[\]]+\s+([\w$]+)\s*\(",line)
+                  if m: method=m.group(1)
+                for t in terms:
+                  if t in line and len(hits[t])<80:
+                    hits[t].append({"file":str(p.relative_to(base)),"line":i,"method":method,"text":line.strip()[:200],"kind":kind})
+          with zipfile.ZipFile(apk) as z:
+            dex=[{"name":x.filename,"bytes":x.file_size} for x in z.infolist() if re.fullmatch(r"classes[0-9]*\.dex",x.filename)]
+            native=[{"name":x.filename,"bytes":x.file_size,"sha256":hashlib.sha256(z.read(x)).hexdigest()} for x in z.infolist() if x.filename.startswith("lib/") and x.filename.endswith(".so")]
+          sources=list(src.rglob("*.java")); smali_files=list(sm.rglob("*.smali"))
+          diag=(out/"jadx.stdout.log").read_text(errors="replace")+(out/"jadx.stderr.log").read_text(errors="replace")
+          summary={"apk":apk.name,"bytes":apk.stat().st_size,"sha256":hashlib.sha256(apk.read_bytes()).hexdigest(),
+          "dex":dex,"dex_count":len(dex),"jadx_exit":int((out/"jadx.exit-code").read_text().strip()),
+          "jadx_error_lines":len(re.findall(r"(?m)^.*(?:ERROR|Exception|failed).*$",diag,re.I)),
+          "java_files":len(sources),"smali_files":len(smali_files),"native":native,"matches":{k:len(v) for k,v in hits.items()}}
+          (out/"summary.json").write_text(json.dumps(summary,indent=2))
+          (out/"symbol-hits.json").write_text(json.dumps(hits,indent=2))
+          selected=[p for p in sources if p.name in {"l5.java","ot1.java","pv1.java","nw3.java","rr2.java"} or any(t in p.read_text(errors="replace") for t in terms)]
+          with zipfile.ZipFile(out/"relevant-java.zip","w",zipfile.ZIP_DEFLATED,compresslevel=6) as z:
+            for p in selected:z.write(p,p.relative_to(src))
+          lines=[f"# DeepSeek {name} static audit","",f"- APK: {apk.name}",f"- Bytes: {summary['bytes']}",f"- SHA-256: {summary['sha256']}",
+          f"- DEX: {len(dex)}",f"- JADX exit: {summary['jadx_exit']}",f"- JADX diagnostic lines: {summary['jadx_error_lines']}",
+          f"- Java files: {len(sources)}",f"- Smali files: {len(smali_files)}",f"- Native libraries: {len(native)}",""]
+          for t,items in hits.items():
+            lines += [f"## {t}",f"- Matches: {len(items)}"]
+            lines += [f"- {x['file']}:{x['line']} [{x['kind']}] {x['method']} :: {x['text']}" for x in items[:12]]
+            lines.append("")
+          lines += ["## Limits","- Static string matches do not prove runtime execution order.",
+          "- JADX failures must be checked against the smali archive.",
+          "- Obfuscated names are version-local; do not map across APKs without descriptors and call-site evidence.",
+          "- Native strings/symbols are not a substitute for control-flow analysis."]
+          (out/"report.md").write_text("\n".join(lines)+"\n")
+          print(json.dumps(summary,indent=2))
+          PY
+      - name: Validate
+        run: |
+          set -euo pipefail
+          python3 -m json.tool "audit/$OUT/summary.json" >/dev/null
+          python3 -m json.tool "audit/$OUT/symbol-hits.json" >/dev/null
+          test -s "audit/$OUT/all-smali.zip"
+          test -s "audit/$OUT/report.md"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deepseek-audit-${{ matrix.version }}
+          path: audit/
+          if-no-files-found: error
+          retention-days: 14
+
+  compare:
+    needs: audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: deepseek-audit-*
+          path: evidence
+          merge-multiple: true
+      - name: Build version delta report
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,pathlib
+          root=pathlib.Path("evidence")
+          a=json.loads((root/"2.7.3"/"summary.json").read_text())
+          b=json.loads((root/"2.7.5"/"summary.json").read_text())
+          ha=json.loads((root/"2.7.3"/"symbol-hits.json").read_text())
+          hb=json.loads((root/"2.7.5"/"symbol-hits.json").read_text())
+          lines=["# DeepSeek 2.7.3 vs 2.7.5 static comparison","",
+          "| Metric | 2.7.3 | 2.7.5 |","|---|---:|---:|",
+          f"| APK bytes | {a['bytes']} | {b['bytes']} |",
+          f"| SHA-256 | {a['sha256']} | {b['sha256']} |",
+          f"| DEX count | {a['dex_count']} | {b['dex_count']} |",
+          f"| JADX exit | {a['jadx_exit']} | {b['jadx_exit']} |",
+          f"| Java files | {a['java_files']} | {b['java_files']} |",
+          f"| Smali files | {a['smali_files']} | {b['smali_files']} |",
+          f"| Native libs | {len(a['native'])} | {len(b['native'])} |","",
+          "## Marker match counts","",
+          "| Marker | 2.7.3 | 2.7.5 |","|---|---:|---:|"]
+          for k in ha:lines.append(f"| {k} | {len(ha[k])} | {len(hb.get(k,[]))} |")
+          na={x["name"]:x["sha256"] for x in a["native"]};nb={x["name"]:x["sha256"] for x in b["native"]}
+          lines += ["","## Native library deltas","",
+          "- Only 2.7.3: "+(", ".join(sorted(set(na)-set(nb))) or "none"),
+          "- Only 2.7.5: "+(", ".join(sorted(set(nb)-set(na))) or "none"),
+          "- Changed at same path: "+(", ".join(sorted(k for k in set(na)&set(nb) if na[k]!=nb[k])) or "none"),
+          "","## Interpretation limits","",
+          "- Match counts are static reconnaissance, not runtime counts.",
+          "- No string match does not prove feature absence.",
+          "- Class mapping requires descriptor, inheritance, call-site and behavior evidence.",
+          "- This audit does not prove device Hook compatibility."]
+          pathlib.Path("comparison-report.md").write_text("\n".join(lines)+"\n")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deepseek-273-275-comparison
+          path: |
+            comparison-report.md
+            evidence/
+          if-no-files-found: error
+          retention-days: 14
