@@ -164,7 +164,7 @@ class StaticProgramGraphTest {
         val valueEdges = gzipLines(listOf(
             """{"kind":"argument","from_method":"$caller","from_definition":"d1:v0","to_method":"$target","to_parameter":"entry:p0"}"""
         ))
-        val completeSummary = textFile("""{"interprocedural_value_flow":{"edges_truncated":false}}""")
+        val completeSummary = textFile("""{"interprocedural_value_flow":{"edge_count":1,"stored_edge_count":1,"edges_truncated":false}}""")
         val host = HostFingerprint("com.deepseek.chat", 300, "future", "cert", "dex-300", "loader")
         val candidate = SemanticCandidate(
             RoleId("prompt.compose"),
