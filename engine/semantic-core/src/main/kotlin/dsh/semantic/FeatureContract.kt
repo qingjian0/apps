@@ -24,9 +24,22 @@ class FeatureEventSanitizer {
     fun sanitize(contract: FeatureContract, supplied: Map<SafeEventField, String>): SafeFeatureEvent? {
         if (!supplied.keys.containsAll(contract.requiredFields)) return null
         val accepted = supplied.filterKeys { it in contract.allowedFields }
-            .filterValues { value -> value.length <= 160 && value.none { it == '\n' || it == '\r' } }
+            .filter { (field, value) -> isSafeValue(field, value) }
         if (!accepted.keys.containsAll(contract.requiredFields)) return null
         return SafeFeatureEvent(contract.role, accepted)
+    }
+
+    private fun isSafeValue(field: SafeEventField, value: String): Boolean {
+        if (value.length !in 1..96 || value.any { it.isISOControl() }) return false
+        val token = Regex("[A-Za-z0-9_.:-]{1,96}")
+        return when (field) {
+            SafeEventField.ENABLED, SafeEventField.STREAMING -> value == "true" || value == "false"
+            SafeEventField.CHARACTER_COUNT_BUCKET -> value in setOf("0", "1-32", "33-128", "129-512", "513-2048", "2049+")
+            SafeEventField.HTTP_STATUS_CLASS -> value in setOf("1xx", "2xx", "3xx", "4xx", "5xx")
+            SafeEventField.SESSION_PSEUDONYM, SafeEventField.TEMPLATE_HASH -> value.matches(Regex("[a-fA-F0-9]{16,96}"))
+            SafeEventField.DURATION_BUCKET -> value in setOf("<10ms", "10-50ms", "50-200ms", "200ms-1s", "1-5s", "5s+")
+            else -> token.matches(value)
+        }
     }
 }
 
