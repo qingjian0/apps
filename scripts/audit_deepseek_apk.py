@@ -3,6 +3,10 @@
 from __future__ import annotations
 import argparse, collections, gzip, hashlib, json, pathlib, re, shutil, struct, subprocess, zipfile, xml.etree.ElementTree as ET
 
+# Covers the largest complete positive value-edge inventory in the audited 2.7.1–2.7.5 APKs.
+# If a future build exceeds this bound, the summary remains truncated and Kotlin refuses DATA_FLOW evidence.
+MAX_INTERPROCEDURAL_VALUE_EDGES = 400_000
+
 ROUTES = (
     "/api/v0/chat/completion", "/api/v0/chat/regenerate", "/api/v0/chat/continue",
     "/api/v0/chat/edit_message", "/api/v0/chat/resume_stream",
@@ -829,7 +833,7 @@ def build_interprocedural_value_graph(methods):
     def append_edge(edge):
         nonlocal total_edge_count
         total_edge_count+=1
-        if len(edges)<200000:
+        if len(edges)<MAX_INTERPROCEDURAL_VALUE_EDGES:
             edges.append(edge)
     for caller in methods:
         caller_key=caller["_semantic_key"]
@@ -930,7 +934,7 @@ def build_interprocedural_value_graph(methods):
             "incomplete_dataflow_call_sites":incomplete_dataflow_calls,
             "truncated_callsite_methods":truncated_callsite_methods,
             "edge_count":total_edge_count,"stored_edge_count":len(edges),
-            "edges_truncated":total_edge_count>200000}}
+            "edges_truncated":total_edge_count>MAX_INTERPROCEDURAL_VALUE_EDGES}}
 
 
 def build_interprocedural_points_to_graph(methods, max_call_depth=4):
