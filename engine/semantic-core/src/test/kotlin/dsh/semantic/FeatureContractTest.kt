@@ -20,6 +20,11 @@ class FeatureContractTest {
         assertNull(FeatureEventSanitizer().sanitize(contract, mapOf(SafeEventField.SOURCE_LABEL to "You are a helpful assistant")))
     }
 
+    @Test fun arbitrarySingleWordCannotMasqueradeAsPromptSource() {
+        val contract = DeepSeekFeatureContracts.all.single { it.role.value == "prompt.compose" }
+        assertNull(FeatureEventSanitizer().sanitize(contract, mapOf(SafeEventField.SOURCE_LABEL to "Hello")))
+    }
+
     @Test fun missingRequiredMetadataRejectsEvent() {
         val contract = DeepSeekFeatureContracts.all.single { it.role.value == "agent.tool.dispatch" }
         assertNull(FeatureEventSanitizer().sanitize(contract, mapOf(SafeEventField.TOOL_KIND to "search")))
