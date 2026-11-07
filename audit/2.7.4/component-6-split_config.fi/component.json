@@ -20,7 +20,7 @@
       "version_name": null,
       "split": "config.fi"
     },
-    "signing_sha256": null,
+    "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
     "apksigner_exit": 0
   },
   "apktool_exit": 0,

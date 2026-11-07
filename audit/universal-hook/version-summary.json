@@ -639,7 +639,7 @@
             "version_code": "294",
             "version_name": "2.7.4"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -669,7 +669,7 @@
             "version_name": null,
             "split": "config.ar"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -700,7 +700,7 @@
             "version_name": null,
             "split": "config.arm64_v8a"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -730,7 +730,7 @@
             "version_name": null,
             "split": "config.de"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -760,7 +760,7 @@
             "version_name": null,
             "split": "config.es"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -790,7 +790,7 @@
             "version_name": null,
             "split": "config.et"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -820,7 +820,7 @@
             "version_name": null,
             "split": "config.fi"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -850,7 +850,7 @@
             "version_name": null,
             "split": "config.fr"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -880,7 +880,7 @@
             "version_name": null,
             "split": "config.hi"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -910,7 +910,7 @@
             "version_name": null,
             "split": "config.hu"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -940,7 +940,7 @@
             "version_name": null,
             "split": "config.in"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -970,7 +970,7 @@
             "version_name": null,
             "split": "config.it"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -1000,7 +1000,7 @@
             "version_name": null,
             "split": "config.ja"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -1030,7 +1030,7 @@
             "version_name": null,
             "split": "config.xxhdpi"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -1060,7 +1060,7 @@
             "version_name": null,
             "split": "config.ko"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -1090,7 +1090,7 @@
             "version_name": null,
             "split": "config.ms"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -1120,7 +1120,7 @@
             "version_name": null,
             "split": "config.nl"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -1150,7 +1150,7 @@
             "version_name": null,
             "split": "config.pl"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -1180,7 +1180,7 @@
             "version_name": null,
             "split": "config.pt"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -1210,7 +1210,7 @@
             "version_name": null,
             "split": "config.ru"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -1240,7 +1240,7 @@
             "version_name": null,
             "split": "config.sv"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -1270,7 +1270,7 @@
             "version_name": null,
             "split": "config.th"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -1300,7 +1300,7 @@
             "version_name": null,
             "split": "config.tr"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -1330,7 +1330,7 @@
             "version_name": null,
             "split": "config.uk"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -1360,7 +1360,7 @@
             "version_name": null,
             "split": "config.vi"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -1390,7 +1390,7 @@
             "version_name": null,
             "split": "config.xxxhdpi"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -1420,7 +1420,7 @@
             "version_name": null,
             "split": "config.zh"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
@@ -1450,7 +1450,7 @@
             "version_name": null,
             "split": "config.hdpi"
           },
-          "signing_sha256": null,
+          "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
           "apksigner_exit": 0
         },
         "apktool_exit": 0,
