@@ -925,6 +925,7 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4):
     call_contexts=[]
     contextual_receivers=[]
     resolved=unresolved=ambiguous=incomplete=0
+    singleton_context_receivers=0
     recursive_contexts_cut=depth_contexts_cut=0
     records_truncated=False
     record_limit=200000
