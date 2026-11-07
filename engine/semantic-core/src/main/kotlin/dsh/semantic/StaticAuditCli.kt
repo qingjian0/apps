@@ -7,12 +7,12 @@ import java.util.zip.GZIPInputStream
 
 /** Ingests real APK method and call-edge indexes; this is analysis only, never Hook installation. */
 fun main(args: Array<String>) {
-    require(args.isNotEmpty() && args.size % 4 == 0) {
-        "Arguments must be groups of: methods.jsonl.gz call-edges.jsonl.gz version dexDigest"
+    require(args.isNotEmpty() && args.size % 5 == 0) {
+        "Arguments must be groups of: methods.jsonl.gz call-edges.jsonl.gz classes.jsonl.gz version dexDigest"
     }
     val reader = StaticAuditJsonReader()
     val resolver = SemanticResolver()
-    args.toList().chunked(4).forEach { (methodsPath, edgesPath, version, dexDigest) ->
+    args.toList().chunked(5).forEach { (methodsPath, edgesPath, classesPath, version, dexDigest) ->
         val host = HostFingerprint("com.deepseek.chat", null, version, null, dexDigest, "static-audit")
         val anchorFrequency = mutableMapOf<String, Int>()
         BufferedReader(InputStreamReader(GZIPInputStream(FileInputStream(methodsPath)), Charsets.UTF_8)).use { input ->
@@ -20,7 +20,7 @@ fun main(args: Array<String>) {
                 reader.anchorKeys(line).forEach { key -> anchorFrequency[key] = (anchorFrequency[key] ?: 0) + 1 }
             }
         }
-        val graph = StaticProgramGraph.load(methodsPath, edgesPath)
+        val graph = StaticProgramGraph.load(methodsPath, edgesPath, classesPath)
         val byRole = mutableMapOf<RoleId, MutableList<SemanticCandidate>>()
         var methods = 0
         BufferedReader(InputStreamReader(GZIPInputStream(FileInputStream(methodsPath)), Charsets.UTF_8)).use { input ->
