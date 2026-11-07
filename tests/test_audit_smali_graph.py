@@ -328,7 +328,7 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         cfg = AUDIT.build_smali_cfg(body)
         sites = AUDIT.extract_field_access_sites(body)
         facts = AUDIT.analyze_object_points_to(
-            body, cfg, "Lx/Owner;", "run", "(Lx/State;)V", "public static", sites)
+            body, cfg, "Lx/Owner;", "run", "(Lx/State;)V", "public", sites)
         self.assertTrue(facts["complete"])
         self.assertEqual(1, len(facts["same_instance_groups"]))
         self.assertEqual("singleton", facts["field_receivers"][0]["identity_status"])
