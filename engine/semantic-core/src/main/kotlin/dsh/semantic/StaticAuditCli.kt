@@ -36,7 +36,7 @@ fun main(args: Array<String>) {
         byRole.entries.sortedBy { it.key.value }.forEach { entry ->
             val role = entry.key
             val candidates = entry.value
-            val result = resolver.resolve(host, RolePolicy(role), candidates)
+            val result = resolver.resolve(host, RolePolicy.forRole(role), candidates)
             roleSummary[role.value] = if (result.accepted) {
                 acceptedRoles++
                 "resolved:" + (result.selected?.method?.stableIdentity ?: "unknown") +
