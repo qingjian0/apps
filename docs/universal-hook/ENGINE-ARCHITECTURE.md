@@ -360,3 +360,14 @@ alias/no-alias proof: distinct parameter tokens may still denote the same runtim
 and interprocedural parameter/return propagation is not yet implemented. Incomplete CFGs
 and non-convergent analysis fail closed.
 
+
+
+## 2026-11-07 Points-to 异常边健全性修复
+
+对象 Points-to 的 CFG 数据流不能把异常处理边当作普通基本块出口边。异常可能发生在受保护基本块内任意指令处；若异常处理器只接收基本块最终状态，块内后续赋值可能覆盖异常发生前的对象身份，从而错误地把多种可能 receiver 收窄成单一 Allocation Site。
+
+当前实现将前驱边分为普通边与异常边：普通边传播基本块最终状态；异常边传播块入口及每条指令前后状态的并集。该策略是保守 over-approximation，允许产生多对象/unknown 结果，但不应因异常路径而虚构 singleton identity。新增回归用例覆盖同一 try block 内连续覆盖对象寄存器、异常处理器读取 receiver 的场景。
+
+验证：Universal Hook Static Analysis Run `42373677093` 已成功，Python 单元测试 `36/36` 通过（含新增异常边用例）。Semantic Core CI Run `42373677128` 当时仍在运行，完成状态需以 GitHub Actions 最终结果为准。
+
+边界：该修复仍是单方法激活范围的 Points-to；尚未把 caller 的实际对象身份跨 invoke 传播到 callee 的 receiver/formal 参数，也未解决反射、动态 dispatch、数组元素、JNI/Native 对象来源及协程恢复。任何不完整 CFG、未知对象来源或多重 points-to 集合均不得生成 singleton receiver 证据。
