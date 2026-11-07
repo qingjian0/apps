@@ -19,7 +19,8 @@ class StaticProgramGraphTest {
         val target = "Lx/A;->compose()V"
         val methods = gzipLines(listOf(
             """{"class":"Lx/A;","name":"compose","descriptor":"()V","field_reads":["Lx/State;->prompt:Ljava/lang/String;"],"field_writes":[],"control_flow":{"branch_count":2,"label_count":3,"return_count":1,"throw_count":0}}""",
-            """{"class":"Lx/State;","name":"update","descriptor":"()V","field_reads":[],"field_writes":["Lx/State;->prompt:Ljava/lang/String;"],"control_flow":{"branch_count":1,"label_count":1,"return_count":1,"throw_count":0}}"""
+            """{"class":"Lx/State;","name":"update","descriptor":"()V","field_reads":[],"field_writes":["Lx/State;->prompt:Ljava/lang/String;"],"roles":[{"role":"prompt_pipeline","anchors":["custom_instructions"]}],"control_flow":{"branch_count":1,"label_count":1,"return_count":1,"throw_count":0}}""",
+            """{"class":"Lx/Caller;","name":"start","descriptor":"()V","field_reads":[],"field_writes":[],"roles":[{"role":"prompt_pipeline","anchors":["custom_instructions"]}],"control_flow":{"branch_count":0,"label_count":0,"return_count":1,"throw_count":0}}"""
         ))
         val edges = gzipLines(listOf(
             """{"from":"Lx/Caller;->start()V","to":"$target"}""",
@@ -49,6 +50,8 @@ class StaticProgramGraphTest {
         assertTrue(EvidenceFamily.CONTROL_FLOW in families)
         assertTrue(EvidenceFamily.TYPE_SHAPE in families)
         assertTrue(enriched.evidence.any { it.family == EvidenceFamily.TYPE_SHAPE && it.key.contains("interface-implementors=2") })
+        assertTrue(enriched.evidence.any { it.family == EvidenceFamily.CALL_GRAPH && it.key.contains("neighbor-rare-anchor-hits=1") })
+        assertTrue(enriched.evidence.any { it.family == EvidenceFamily.DATA_FLOW && it.key.contains("field-neighbor-rare-anchor-hits=1") })
         assertTrue(graph.graphStats()["sharedFields"] == 1)
         assertTrue(graph.graphStats()["classes"] == 3)
     }
