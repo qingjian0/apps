@@ -51,7 +51,7 @@ def safe_strings(line):
     m=STR_RE.search(line)
     if not m: return []
     value=m.group(1)
-    value=bytes(value,"utf-8").decode("unicode_escape",errors="replace")
+    # Preserve Smali-escaped text verbatim; unicode_escape corrupts non-ASCII and can create surrogates.
     if SENSITIVE.search(value): return ["<redacted-sensitive-marker>"]
     return [value[:240]]
 
@@ -186,9 +186,9 @@ def main():
       "call_edge_count":len(all_edges),"candidate_method_count":len(candidates),
       "native_libraries":native,"tool_limits":{"JADX":"best-effort; inspect exit status and APKTool smali evidence",
       "Hook":"static candidate discovery only; no device Hook is claimed"}}
-    (out/"summary.json").write_text(json.dumps(summary,indent=2,ensure_ascii=False))
-    (out/"hook-candidates.json").write_text(json.dumps(candidates,indent=2,ensure_ascii=False))
+    (out/"summary.json").write_text(json.dumps(summary,indent=2,ensure_ascii=True))
+    (out/"hook-candidates.json").write_text(json.dumps(candidates,indent=2,ensure_ascii=True))
     (out/"candidate-methods.csv").write_text("version,component,class,method,descriptor,score,roles,file,line\n"+"".join(
       ",".join(json.dumps(v,ensure_ascii=True) for v in [a.version,c["component"],c["class"],c["name"],c["descriptor"],c["score"],"|".join(x["role"] for x in c["roles"]),c["file"],c["line"]])+"\n" for c in candidates))
-    print(json.dumps({k:summary[k] for k in ("version_label","source_sha256","dex_count","class_count","method_count","call_edge_count","candidate_method_count")},ensure_ascii=False))
+    print(json.dumps({k:summary[k] for k in ("version_label","source_sha256","dex_count","class_count","method_count","call_edge_count","candidate_method_count")},ensure_ascii=True))
 if __name__=="__main__": main()
