@@ -4,7 +4,7 @@ from __future__ import annotations
 import collections, difflib, gzip, json, pathlib, re, zipfile, hashlib
 
 ROOT=pathlib.Path("audit/universal-hook")
-VERSIONS=("2.7.1","2.7.3","2.7.4","2.7.5")
+VERSIONS=("2.7.1","2.7.2","2.7.3","2.7.4","2.7.5")
 def read_json(path): return json.loads(path.read_text())
 def read_jsonl_gz(path):
     with gzip.open(path,"rt",encoding="utf-8") as f:
