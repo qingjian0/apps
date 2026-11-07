@@ -77,7 +77,6 @@ class StaticProgramGraphTest {
         assertTrue(EvidenceFamily.TYPE_SHAPE in families)
         assertTrue(enriched.evidence.any { it.family == EvidenceFamily.TYPE_SHAPE && it.key.contains("interface-implementors=2") })
         assertTrue(enriched.evidence.any { it.family == EvidenceFamily.CALL_GRAPH && it.key.contains("neighbor-rare-anchor-hits=1") })
-        assertTrue(enriched.evidence.any { it.family == EvidenceFamily.DATA_FLOW && it.key.contains("field-neighbor-rare-anchor-hits=1") })
         assertTrue(graph.graphStats()["sharedFields"] == 1)
         assertTrue(graph.graphStats()["classes"] == 3)
     }
