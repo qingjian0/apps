@@ -567,6 +567,11 @@ def main():
       "field_write_count":sum(len(m.get("field_writes",[])) for m in all_methods),
       "methods_with_control_flow":sum(1 for m in all_methods if m.get("control_flow",{}).get("branch_count",0)>0),
       "control_flow_branch_count":sum(m.get("control_flow",{}).get("branch_count",0) for m in all_methods),
+      "methods_with_complete_register_dataflow":sum(1 for m in all_methods if m.get("register_dataflow",{}).get("complete",False)),
+      "register_dataflow_definition_count":sum(m.get("register_dataflow",{}).get("definition_count",0) for m in all_methods),
+      "register_dataflow_use_count":sum(m.get("register_dataflow",{}).get("use_count",0) for m in all_methods),
+      "register_dataflow_ambiguous_use_count":sum(m.get("register_dataflow",{}).get("ambiguous_use_count",0) for m in all_methods),
+      "register_dataflow_unresolved_use_count":sum(m.get("register_dataflow",{}).get("unresolved_use_count",0) for m in all_methods),
       "candidate_method_count":len(candidates),
       "native_libraries":native,"tool_limits":{"JADX":"best-effort; inspect exit status and APKTool smali evidence",
       "Hook":"static candidate discovery only; no device Hook is claimed"}}
