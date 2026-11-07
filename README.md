@@ -249,7 +249,7 @@ MacroState 的固定金融因子说明：即使领域对象和 Pipeline 看起�
 ### 8.5 可复现分析产物
 
 - APK 静态分析任务：<https://github.com/qingjian0/apps/actions/runs/42335116242>
-- 最新分析与索引任务：<https://github.com/qingjian0/apps/actions/runs/42335418821>
+- 最新分析与索引任务：<https://github.com/qingjian0/apps/actions/runs/42335469685>
 - 工作分支：<https://github.com/qingjian0/apps/tree/work/deepseek-275-apk-audit>
 - 分析脚本：.github/workflows/deepseek-275-apk-audit.yml
 
