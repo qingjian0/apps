@@ -75,10 +75,10 @@ jobs:
               methods = []
               fields = []
               for line in data.splitlines():
-                  m = re.match(r"\s*(?:public|protected|private)\s+(?:(?:static|final|synchronized|native|abstract)\s+)*([\w.$<>?, \[\]]+)\s+([\w$]+)\s*\(([^)]*)\)", line)
+                  m = re.match(r"\s*(?:public|protected|private)\s+(?:(?:static|final|synchronized|native|abstract)\s+)*([\w.$<>?,\[\]]+)\s+([\w$]+)\s*\(([^)]*)\)", line)
                   if m and len(methods) < 40:
                       methods.append(m.group(2) + "(" + re.sub(r"\s+", " ", m.group(3)).strip() + "):" + m.group(1).strip())
-                  f = re.match(r"\s*(?:public|protected|private)\s+(?:(?:static|final|volatile|transient)\s+)*([\w.$<>?, \[\]]+)\s+([\w$]+)\s*(?:=|;)", line)
+                  f = re.match(r"\s*(?:public|protected|private)\s+(?:(?:static|final|volatile|transient)\s+)*([\w.$<>?,\[\]]+)\s+([\w$]+)\s*(?:=|;)", line)
                   if f and len(fields) < 40:
                       fields.append(f.group(2) + ":" + f.group(1).strip())
               constants = []
@@ -92,8 +92,8 @@ jobs:
                            decl.group(2).strip() if decl else "", hits, methods, fields, constants))
           rows.sort(key=lambda x: (-x[0], x[1]))
           first_party = []
-          method_sig = re.compile(r"(?m)^\s*(?!(?:return|throw|new|if|for|while|switch|catch|else|do|try|assert)\b)(?:(?:public|protected|private|static|final|synchronized|native|abstract|strictfp)\s+)*([\w.$<>?, \[\]]+)\s+([\w$]+)\s*\(([^)]*)\)")
-          field_sig = re.compile(r"(?m)^\s*(?:(?:public|protected|private|static|final|volatile|transient)\s+)*([\w.$<>?, \[\]]+)\s+([\w$]+)\s*(?:=[^;]*|;)\s*$")
+          method_sig = re.compile(r"(?m)^\s*(?!(?:return|throw|new|if|for|while|switch|catch|else|do|try|assert)\b)(?:(?:public|protected|private|static|final|synchronized|native|abstract|strictfp)\s+)*([\w.$<>?,\[\]]+)\s+([\w$]+)\s*\(([^)]*)\)")
+          field_sig = re.compile(r"(?m)^\s*(?:(?:public|protected|private|static|final|volatile|transient)\s+)*([\w.$<>?,\[\]]+)\s+([\w$]+)\s*(?:=[^;]*|;)\s*$")
           class_sig = re.compile(r"(?m)^\s*(?:(?:public|protected|private|abstract|final|static|synchronized)\s+)*(?:class|interface|enum|record|@interface)\s+([\w$]+)([^\n{]*)")
           for path in java_files:
               rel = str(path.relative_to(root))
