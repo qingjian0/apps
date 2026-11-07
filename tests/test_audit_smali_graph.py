@@ -139,7 +139,7 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         facts = AUDIT.analyze_register_use_def(["    foo-op v0, v1"])
         self.assertFalse(facts["complete"])
         self.assertEqual(1, facts["unknown_opcode_count"])
-        self.assertEqual("invoke-custom", facts["unknown_opcodes"][0]["opcode"])
+        self.assertEqual("foo-op", facts["unknown_opcodes"][0]["opcode"])
 
     def test_register_ranges_and_two_address_reads_are_expanded(self):
         facts = AUDIT.analyze_register_use_def([
