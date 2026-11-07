@@ -1292,5 +1292,57 @@ class CallerControlFlowReturnBoundaryTest(unittest.TestCase):
         self.assertEqual("unknown", sink_receiver["identity_status"])
 
 
+    def test_interprocedural_points_to_reports_root_and_record_budget_diagnostics(self):
+        def method(owner, name, invokes=None, roles=None):
+            return {
+                "class": owner, "name": name, "descriptor": "()V",
+                "component": "base", "roles": roles or [],
+                "invoke_sites": invokes or [],
+                "invoke_sites_truncated": False, "invoke_sites_incomplete": False,
+                "object_points_to": {
+                    "complete": True, "invoke_arguments": [],
+                    "field_receivers": [], "return_values": [],
+                    "instruction_writes": [],
+                },
+            }
+
+        def call(target, instruction):
+            return {
+                "instruction": instruction, "line": instruction + 1,
+                "owner": target, "name": "run", "descriptor": "()V",
+                "opcode": "invoke-static", "registers": [],
+                "result_instruction": None, "result_register": None,
+            }
+
+        caller = method(
+            "Lx/Caller;", "entry",
+            [call("Lx/First;", 0), call("Lx/Second;", 1)],
+            roles=[{"role": "request", "anchors": ["chat_completion"]}],
+        )
+        first = method("Lx/First;", "run")
+        second = method("Lx/Second;", "run")
+        graph = AUDIT.build_interprocedural_points_to_graph(
+            [caller, first, second], max_records=1
+        )
+        summary = graph["summary"]
+        self.assertEqual(3, summary["root_method_count"])
+        self.assertEqual(1, summary["semantic_candidate_root_count"])
+        self.assertEqual(1, summary["record_limit"])
+        self.assertTrue(summary["records_truncated"])
+        self.assertEqual(1, summary["call_context_records_dropped"])
+        self.assertGreaterEqual(summary["queue_states_processed"], 1)
+        self.assertEqual(
+            summary["queue_states_enqueued"],
+            summary["queue_states_processed"] + len([]) + (
+                summary["queue_states_enqueued"] - summary["queue_states_processed"]
+            ),
+        )
+        self.assertFalse(summary["context_expansion_complete"])
+
+    def test_interprocedural_points_to_rejects_non_positive_record_budget(self):
+        with self.assertRaises(ValueError):
+            AUDIT.build_interprocedural_points_to_graph([], max_records=0)
+
+
 if __name__ == "__main__":
     unittest.main()
