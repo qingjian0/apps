@@ -1169,28 +1169,11 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4):
             parsed_target=parse_method_descriptor(site.get("descriptor",""))
             is_object_return=(parsed_target is not None and
                 parsed_target["return_type"].startswith(("L","[")))
-            return_facts=callee_pts.get("return_values",[])
-            expected_returns=callee.get("control_flow",{}).get("return_count",0)
-            if is_object_return and site.get("result_register") and site.get("result_instruction") is not None:
-                if expected_returns>0 and len(return_facts)==expected_returns:
-                    returned=set()
-                    has_unknown=False
-                    for fact in return_facts:
-                        has_unknown=has_unknown or bool(fact.get("unknown"))
-                        for identity in fact.get("points_to",[]):
-                            projected,unknown=substitute(
-                                identity,callee_key,resolved_bindings,context_id)
-                            returned.update(projected)
-                            has_unknown=has_unknown or unknown
-                    values=sorted(returned)
-                    status=("unknown" if has_unknown else
-                            "singleton" if len(values)==1 else
-                            "multiple" if len(values)>1 else "unresolved")
-                    return_summary={"points_to":values,"unknown":has_unknown,
-                                    "identity_status":status}
-                else:
-                    return_summary={"points_to":[],"unknown":True,
-                                    "identity_status":"unknown"}
+            if (is_object_return and site.get("result_register")
+                    and site.get("result_instruction") is not None):
+                return_summary=resolve_contextual_return(
+                    callee,context_id,resolved_bindings,
+                    state["path"]+(caller_key,callee_key),state["depth"]+1,expand=True)
                 if return_summary["identity_status"]=="singleton" and linear_return_safe:
                     register_overrides[site["result_register"]]={
                         "definition_instruction":site["result_instruction"],
