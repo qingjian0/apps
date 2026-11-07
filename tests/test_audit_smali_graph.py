@@ -50,6 +50,65 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertEqual([], methods[0]["field_writes"])
         self.assertEqual(0, methods[0]["control_flow"]["branch_count"])
 
+    def test_builds_conditional_and_goto_control_flow_edges(self):
+        body = [
+            "    const/4 v0, 0x0",
+            "    if-eqz v0, :cond_0",
+            "    invoke-static {}, Lx/Worker;->run()V",
+            "    goto :goto_0",
+            "    :cond_0",
+            "    const/4 v1, 0x1",
+            "    :goto_0",
+            "    return-void",
+        ]
+        cfg = AUDIT.build_smali_cfg(body)
+        self.assertTrue(cfg["complete"])
+        self.assertEqual(7, cfg["instruction_count"])
+        self.assertGreaterEqual(cfg["block_count"], 4)
+        self.assertIn("conditional", {edge["kind"] for edge in cfg["edges"]})
+        self.assertIn("goto", {edge["kind"] for edge in cfg["edges"]})
+        self.assertIn("fallthrough", {edge["kind"] for edge in cfg["edges"]})
+
+    def test_switch_payload_resolves_case_targets_without_counting_payload_as_code(self):
+        body = [
+            "    packed-switch v0, :pswitch_data_0",
+            "    goto :end",
+            "    :case_0",
+            "    return-void",
+            "    :end",
+            "    return-void",
+            "    :pswitch_data_0",
+            "    .packed-switch 0x0",
+            "        0x0 -> :case_0",
+            "    .end packed-switch",
+        ]
+        cfg = AUDIT.build_smali_cfg(body)
+        self.assertTrue(cfg["complete"])
+        self.assertEqual(5, cfg["instruction_count"])
+        self.assertIn("switch", {edge["kind"] for edge in cfg["edges"]})
+        self.assertIn("switch-default", {edge["kind"] for edge in cfg["edges"]})
+
+    def test_unresolved_branch_target_marks_cfg_incomplete(self):
+        cfg = AUDIT.build_smali_cfg(["    if-eqz v0, :missing", "    return-void"])
+        self.assertFalse(cfg["complete"])
+        self.assertEqual(1, cfg["unresolved_target_count"])
+        self.assertIn(":missing", cfg["unresolved_targets"])
+
+    def test_exception_handler_edges_are_explicit(self):
+        body = [
+            "    :try_start_0",
+            "    invoke-static {}, Lx/Worker;->run()V",
+            "    :try_end_0",
+            "    return-void",
+            "    :catch_0",
+            "    move-exception v0",
+            "    return-void",
+            "    .catch Ljava/lang/Exception; {:try_start_0 .. :try_end_0} :catch_0",
+        ]
+        cfg = AUDIT.build_smali_cfg(body)
+        self.assertTrue(cfg["complete"])
+        self.assertIn("exception", {edge["kind"] for edge in cfg["edges"]})
+
     def test_redaction_marker_cannot_trigger_prompt_anchor(self):
         redacted = AUDIT.safe_strings('    const-string v0, "prompt body must not persist"')
         self.assertEqual(["<redacted-content>"], redacted)
