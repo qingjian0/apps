@@ -1,0 +1,401 @@
+{
+  "schema_version": 1,
+  "profile_id": "deepseek-2.7.5",
+  "host_package": "com.deepseek.chat",
+  "version": "2.7.5",
+  "build": "2.7.5-apk-sha-bound",
+  "apk": {
+    "path": "DeepSeek_2.7.5.apk",
+    "sha256": "ddc52ef868b991fd33e634de834a3e2c022b0cd7ff9e854f4f141996aaeadb70",
+    "dex_count": 3,
+    "bytes": 22210268
+  },
+  "evidence": {
+    "static_dex": {
+      "source": "apps workflow 42338674344 artifact deepseek-audit-275 and workflow 42335918440",
+      "first_party_classes": 12596,
+      "method_signatures": 46473,
+      "field_signatures": 25451,
+      "jadx_java_files": 13940,
+      "jadx_exit_code": 3,
+      "jadx_errors": 344,
+      "smali_files": 15364,
+      "smali_source": "separate comparison artifact 42338674344 / 2.7.5/all-smali.zip",
+      "dex_inventory": [
+        {
+          "name": "classes.dex",
+          "bytes": 12697064
+        },
+        {
+          "name": "classes2.dex",
+          "bytes": 264820
+        },
+        {
+          "name": "classes3.dex",
+          "bytes": 2759260
+        }
+      ],
+      "native_library_count": 16,
+      "native_library_bytes": 9126084,
+      "profile_descriptor_validation": {
+        "status": "manually_verified_against_all_smali_archive",
+        "artifact_run_id": 42338674344,
+        "classes_verified": 17,
+        "methods_verified": 26,
+        "note": "Exact method descriptors and class files were checked against the 2.7.5 all-smali.zip artifact."
+      }
+    },
+    "dynamic_runtime": {
+      "status": "not_provided_for_2.7.5",
+      "note": "This profile is static evidence only; no 2.7.5 runtime observer trace is being inferred from 2.7.2 logs."
+    }
+  },
+  "semantic_nodes": {
+    "message_submit": {
+      "class": "Lgx1;",
+      "interfaces": [
+        "Ljw1;",
+        "Ltc6;"
+      ],
+      "methods": [
+        "b(Lzs;Ljava/lang/String;Ljava/lang/Integer;Ljava/util/List;ZZLjava/lang/String;Ljda;Lsr2;Ldc3;)Ljava/lang/Object;"
+      ],
+      "role": "chat-message-submit",
+      "evidence": [
+        "README sections 8.2, 17 and 19",
+        "DEX method descriptor and class fields"
+      ],
+      "confidence": "high"
+    },
+    "chat_request_model": {
+      "class": "Lqy1;",
+      "interfaces": [
+        "Lyu1;"
+      ],
+      "constructors": [
+        "<init>(ILjava/lang/String;Ljava/lang/Integer;Ljava/lang/String;Ljava/util/List;ZZLjava/lang/String;ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+        "<init>(Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/String;Ljava/util/ArrayList;ZZLjava/lang/String;ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V"
+      ],
+      "fields": [
+        "a:Ljava/lang/String;",
+        "b:Ljava/lang/Integer;",
+        "c:Ljava/lang/String;",
+        "d:Ljava/util/List;",
+        "e:Z",
+        "f:Z",
+        "g:Ljava/lang/String;",
+        "h:Z",
+        "i:Ljava/lang/String;",
+        "j:Ljava/lang/String;",
+        "k:Ljava/lang/String;",
+        "l:Ljava/lang/String;"
+      ],
+      "role": "chat-request-model",
+      "evidence": [
+        "README section 17.2",
+        "DEX exact interface, constructor and field inventory"
+      ],
+      "confidence": "high"
+    },
+    "request_dispatch_and_serialization": {
+      "class": "Lnw3;",
+      "interfaces": [
+        "Ltc6;",
+        "Lts1;"
+      ],
+      "method": "e(Lyu1;Ljava/lang/Long;)Lb70;",
+      "role": "request-route-serialize-execute",
+      "evidence": [
+        "README sections 8.2 and 17.1",
+        "DEX exact method descriptor"
+      ],
+      "confidence": "high"
+    },
+    "request_flow_wrapper": {
+      "class": "Lb70;",
+      "interfaces": [
+        "Lil4;"
+      ],
+      "method": "b(Ljl4;Ldc3;)Ljava/lang/Object;",
+      "role": "request-flow-wrapper",
+      "evidence": [
+        "README sections 8.2 and 19",
+        "DEX exact interface and method"
+      ],
+      "confidence": "high"
+    },
+    "stream_orchestrator": {
+      "class": "Lrr2;",
+      "methods": [
+        "h(Lzs;Lis2;Lsr2;Ljava/lang/String;JZLyr;Lyr;Lyr;Lzy4;Lly4;Lbz4;Lec3;)Ljava/lang/Object;"
+      ],
+      "role": "stream-and-auto-resume-orchestrator",
+      "evidence": [
+        "README sections 8.2 and 19.1",
+        "DEX exact method descriptor"
+      ],
+      "confidence": "high"
+    },
+    "sse_dispatch_and_collection": {
+      "class": "Lpv1;",
+      "methods": [
+        "a(Lpv1;Lbia;Lec3;)Ljava/lang/Object;",
+        "j(Lil4;Lec3;)Ljava/lang/Object;",
+        "k(Lwu1;Lec3;)Ljava/lang/Object;",
+        "l(Lil4;Lec3;)Ljava/lang/Object;"
+      ],
+      "role": "sse-flow-collect-and-event-dispatch",
+      "evidence": [
+        "README sections 8.2 and 19",
+        "DEX method inventory"
+      ],
+      "confidence": "high"
+    },
+    "sse_line_parser": {
+      "class": "Lvs1;",
+      "super": "Lgna;",
+      "interfaces": [
+        "Lzy4;"
+      ],
+      "method": "z(Ljava/lang/Object;)Ljava/lang/Object;",
+      "fields": [
+        "h:Lkw0;",
+        "i:Lkw0;",
+        "j:J",
+        "k:I",
+        "l:I"
+      ],
+      "role": "sse-byte-line-parser-coroutine",
+      "evidence": [
+        "README sections 8.3 and 23",
+        "Smali fields and branch audit"
+      ],
+      "confidence": "high"
+    },
+    "sse_event_collector": {
+      "class": "Lot1;",
+      "super": "Lgna;",
+      "interfaces": [
+        "Lzy4;"
+      ],
+      "method": "z(Ljava/lang/Object;)Ljava/lang/Object;",
+      "role": "sse-event-flow-collector-state-machine",
+      "evidence": [
+        "README sections 8.2 and 19",
+        "DEX state-machine inventory"
+      ],
+      "confidence": "high"
+    },
+    "sse_lifecycle": {
+      "class": "Liv1;",
+      "methods": [
+        "c(Lfda;)V"
+      ],
+      "fields": [
+        "b:Ljava/lang/String;",
+        "c:Ljava/lang/String;",
+        "d:J",
+        "e:Ljava/lang/String;"
+      ],
+      "role": "sse-lifecycle-observer-model",
+      "evidence": [
+        "README section 19.3",
+        "DEX exact class fields and methods"
+      ],
+      "confidence": "high"
+    },
+    "pow_algorithm_selector": {
+      "class": "Lof2;",
+      "super": "Lik0;",
+      "interfaces": [
+        "Ltc6;"
+      ],
+      "method": "k(Lts9;Lec3;)Ljava/lang/Object;",
+      "role": "pow-algorithm-prefetch-and-select",
+      "evidence": [
+        "README section 18.1",
+        "DEX exact method descriptor"
+      ],
+      "confidence": "high"
+    },
+    "challenge_request": {
+      "class": "Lwt1;",
+      "constructor": "<init>(Ljava/lang/String;)V",
+      "role": "pow-challenge-request",
+      "evidence": [
+        "README section 18.1",
+        "DEX constructor"
+      ],
+      "confidence": "high"
+    },
+    "challenge_response": {
+      "class": "Lzt1;",
+      "fields": [
+        "a:Lts9;"
+      ],
+      "role": "pow-challenge-response-wrapper",
+      "evidence": [
+        "README section 18.1",
+        "DEX field descriptor"
+      ],
+      "confidence": "high"
+    },
+    "server_challenge": {
+      "class": "Lts9;",
+      "fields": [
+        "a:Ljava/lang/String;",
+        "b:Ljava/lang/String;",
+        "c:Ljava/lang/String;",
+        "d:Ljava/lang/String;",
+        "e:J",
+        "f:J",
+        "g:J",
+        "h:Ljava/lang/String;"
+      ],
+      "role": "server-pow-challenge-model",
+      "evidence": [
+        "README section 18.1",
+        "DEX field inventory"
+      ],
+      "confidence": "high"
+    },
+    "pow_solution": {
+      "class": "Lhf0;",
+      "interfaces": [
+        "Loe4;"
+      ],
+      "fields": [
+        "a:Ljava/lang/String;",
+        "b:Ljava/lang/String;",
+        "c:Ljava/lang/String;",
+        "d:Ljava/lang/String;",
+        "e:J",
+        "f:Ljava/lang/String;",
+        "g:J"
+      ],
+      "role": "authed-pow-solution-model",
+      "evidence": [
+        "README section 18.1",
+        "DEX field inventory"
+      ],
+      "confidence": "high"
+    },
+    "challenge_header_composer": {
+      "class": "Loq1;",
+      "method": "c(Lgf5;Lsg5;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lec3;)Ljava/lang/Object;",
+      "role": "challenge-and-pow-header-composition",
+      "evidence": [
+        "README section 18.2",
+        "DEX exact method descriptor"
+      ],
+      "confidence": "high"
+    },
+    "send_policy": {
+      "class": "Lfh2;",
+      "method": "b(ZZ)I",
+      "role": "parallel-and-interrupt-send-mode",
+      "evidence": [
+        "README section 21",
+        "DEX exact method descriptor"
+      ],
+      "confidence": "high"
+    },
+    "send_policy_gate": {
+      "class": "Lgh2;",
+      "methods": [
+        "b(Lzs;)Z",
+        "c(Ljava/lang/String;)Z",
+        "d(Lzs;)Z",
+        "h(Lzs;Z)I"
+      ],
+      "role": "parallel-interrupt-send-policy-gates",
+      "evidence": [
+        "README section 21",
+        "DEX method inventory"
+      ],
+      "confidence": "high"
+    }
+  },
+  "semantic_markers": {
+    "routes": [
+      "/api/v0/chat/completion",
+      "/api/v0/chat/regenerate",
+      "/api/v0/chat/continue",
+      "/api/v0/chat/edit_message",
+      "/api/v0/chat/resume_stream",
+      "/api/v0/chat/create_pow_challenge",
+      "/api/v0/chat/stop_stream",
+      "/api/v0/chat/history_messages"
+    ],
+    "sse_events": [
+      "ready",
+      "finish",
+      "toast",
+      "hint",
+      "title",
+      "update_session",
+      "update_file",
+      "update_parent_message",
+      "close",
+      "check_client_update",
+      "auto_tts_capability"
+    ],
+    "agent_fragments": [
+      "ToolOpenFragment",
+      "ToolFindFragment",
+      "SearchFragment",
+      "ToolOpenFragmentReference",
+      "ToolFindFragmentReference",
+      "ToolSearchFragmentReference"
+    ],
+    "pow_headers": [
+      "X-DS-PoW-Response",
+      "X-DS-Challenge-Response"
+    ]
+  },
+  "native": {
+    "library": "lib/arm64-v8a/librscrypto.so",
+    "sha256": "4571b9bcf08d5f070a47a495bdcd4c77f4a088feee560ed11701ca93c7b56053",
+    "jni_symbol": "Java_com_deepseek_crypto_PowCalculator_nativeCalculateDeepSeekHashV1Pow",
+    "status": "JNI entry and Keccak/SHA3-family path identified; exact digest variant and nonce predicate not fully proven"
+  },
+  "cross_version_isolation": {
+    "known_name_collisions": {
+      "jw3": "2.7.2 transport-low-level; 2.7.5 Android ID helper",
+      "zn3": "2.7.2 transport-dispatch; 2.7.5 unrelated interface",
+      "y60": "2.7.2 transport continuation; 2.7.5 unrelated coroutine continuation",
+      "qj3": "2.7.2 callback observer candidate; 2.7.5 ActivityOptions-related class"
+    },
+    "rule": "Class/method names are version-local. Never map by obfuscated name equality."
+  },
+  "agent_boundary": {
+    "confirmed": "Server-originated ToolOpen/ToolFind/Search fragments are received, merged and rendered.",
+    "unconfirmed": "A complete local Android tool execution loop / ToolExecutor has not been established."
+  },
+  "hook_guidance": {
+    "preferred_order": [
+      "Lgx1; message submission",
+      "Lnw3; request dispatch/serialization",
+      "Lof2; PoW selection",
+      "Loq1; header composition",
+      "Lpv1; SSE event dispatch",
+      "Lvs1; SSE line parser",
+      "Lrr2; auto-resume orchestration",
+      "Lfh2; send-policy boundary"
+    ],
+    "mode": "read-only observer first; validate exact descriptor and runtime invocation before functional Hook",
+    "prohibited_assumptions": [
+      "Do not infer local Agent tool execution from server result fragments",
+      "Do not reuse 2.7.2 class names in 2.7.5",
+      "Do not synthesize PoW or challenge header values",
+      "Do not treat JADX pseudocode as proof when Smali is available"
+    ]
+  },
+  "limitations": [
+    "JADX exited 3 with 344 errors; smali evidence is required for affected methods",
+    "2.7.5 has no dynamic runtime trace in this profile",
+    "Static evidence is not device Hook validation",
+    "The exact PoW hash variant and nonce predicate remain unresolved",
+    "The full local Agent execution loop remains unconfirmed"
+  ]
+}

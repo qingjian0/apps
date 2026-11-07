@@ -1,0 +1,316 @@
+name: DeepSeek 2.7.2 static audit
+
+on:
+  push:
+    branches: [work/deepseek-272-static-audit]
+    paths:
+      - .github/workflows/deepseek-272-static-audit.yml
+      - deepseek-2-7-2.apk
+      - profiles/deepseek-2.7.2-code289-cn.json
+      - tools/validate_semantic_profile.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Verify input APK
+        run: |
+          set -euo pipefail
+          test -s deepseek-2-7-2.apk
+          mkdir -p audit/2.7.2 dex-input
+          sha256sum deepseek-2-7-2.apk | tee audit/2.7.2/apk.sha256
+          unzip -Z1 deepseek-2-7-2.apk | grep -E '^classes[0-9]*\.dex$' | tee audit/2.7.2/dex-files.txt
+          test -s audit/2.7.2/dex-files.txt
+          while IFS= read -r dex; do
+            unzip -p deepseek-2-7-2.apk "$dex" > "dex-input/$dex"
+            test -s "dex-input/$dex"
+          done < audit/2.7.2/dex-files.txt
+
+      - name: Install JADX and APKTool
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 https://github.com/skylot/jadx/releases/download/v1.5.6/jadx-1.5.6.zip -o jadx.zip
+          unzip -q jadx.zip -d jadx-dist
+          chmod +x jadx-dist/bin/jadx
+          curl -fL --retry 3 https://github.com/iBotPeaches/Apktool/releases/download/v2.11.1/apktool_2.11.1.jar -o apktool.jar
+          echo "56d59c524fc764263ba8d345754d8daf55b1887818b15cd3b594f555d249e2db  apktool.jar" | sha256sum -c -
+
+      - name: JADX source decompilation
+        shell: bash
+        run: |
+          set -uo pipefail
+          set +e
+          jadx-dist/bin/jadx --show-bad-code --no-res --threads-count 2 -d decompiled-272 deepseek-2-7-2.apk > audit/2.7.2/jadx.stdout.log 2> audit/2.7.2/jadx.stderr.log
+          status=$?
+          set -e
+          echo "$status" > audit/2.7.2/jadx.exit-code
+          test -d decompiled-272/sources
+
+      - name: APKTool DEX/smali disassembly
+        run: |
+          set -euo pipefail
+          java -jar apktool.jar d -f -r -o smali-272 deepseek-2-7-2.apk
+          (cd smali-272 && zip -qr ../audit/2.7.2/all-smali.zip .)
+          test -s audit/2.7.2/all-smali.zip
+
+      - name: Build descriptor and call-site evidence
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, json, pathlib, re, zipfile, xml.etree.ElementTree as ET
+          apk = pathlib.Path("deepseek-2-7-2.apk")
+          out = pathlib.Path("audit/2.7.2")
+          src = pathlib.Path("decompiled-272/sources")
+          smroot = pathlib.Path("smali-272")
+          candidates = {
+            "ly1", "zn3", "jw3", "y60", "qj3", "qa", "k13", "cr9", "b5",
+            "s5", "kr1", "hm4", "k41", "mm4", "il5", "x0", "f0", "g0",
+            "je2", "ir1", "pg1", "d0", "jm4"
+          }
+          terms = [
+            "/api/v0/chat/completion", "/api/v0/chat/regenerate",
+            "/api/v0/chat/continue", "/api/v0/chat/edit_message",
+            "/api/v0/chat/resume_stream", "/api/v0/chat/create_pow_challenge",
+            "/api/v0/chat/stop_stream", "/api/v0/chat/history_messages",
+            "X-DS-PoW-Response", "X-DS-Challenge-Response",
+            "nativeCalculateDeepSeekHashV1Pow", "PowCalculator",
+            "ChatCompletionReadyEventData", "DeltaCommand", "ToolOpenFragment",
+            "ToolFindFragment", "SearchFragment", "allow_parallel_streams",
+            "interrupt_and_send_enabled", "sse_first_delta", "sse_auto_resume",
+            "x-ds-sse-heartbeat-timeout-secs", "executeAutoResumeStreamFlow"
+          ]
+          def simple_name(descriptor):
+            if not descriptor or not descriptor.startswith("L") or not descriptor.endswith(";"):
+              return ""
+            body = descriptor[1:-1]
+            # The dynamic candidates are default-package obfuscated app classes.
+            # Do not collapse j$/time/.../d0 into the unrelated simple name "d0".
+            return body if "/" not in body else ""
+
+          def read_axml_manifest(path):
+            data = path.read_bytes()
+            def u16(pos): return int.from_bytes(data[pos:pos+2], "little")
+            def u32(pos): return int.from_bytes(data[pos:pos+4], "little")
+            def length8(pos):
+              first = data[pos]
+              if first & 0x80:
+                return ((first & 0x7f) << 8) | data[pos+1], pos+2
+              return first, pos+1
+            def length16(pos):
+              first = u16(pos)
+              if first & 0x8000:
+                return ((first & 0x7fff) << 16) | u16(pos+2), pos+4
+              return first, pos+2
+            def decode_string_pool(chunk, chunk_offset):
+              header_size = u16(chunk_offset+2)
+              count = u32(chunk_offset+8)
+              flags = u32(chunk_offset+16)
+              strings_start = u32(chunk_offset+20)
+              utf8 = bool(flags & 0x100)
+              values = []
+              for index in range(count):
+                string_offset = u32(chunk_offset+header_size+index*4)
+                pos = chunk_offset+strings_start+string_offset
+                if utf8:
+                  _, pos = length8(pos)
+                  byte_length, pos = length8(pos)
+                  values.append(data[pos:pos+byte_length].decode("utf-8", "replace"))
+                else:
+                  char_length, pos = length16(pos)
+                  values.append(data[pos:pos+char_length*2].decode("utf-16le", "replace"))
+              return values
+            if len(data) < 8 or u16(0) != 0x0003:
+              raise ValueError("not Android binary XML")
+            strings = []
+            result = {}
+            offset = 8
+            while offset+8 <= len(data):
+              chunk_type = u16(offset)
+              header_size = u16(offset+2)
+              chunk_size = u32(offset+4)
+              if chunk_size < 8 or offset+chunk_size > len(data):
+                raise ValueError("invalid binary XML chunk bounds")
+              if chunk_type == 0x0001:
+                strings = decode_string_pool(data[offset:offset+chunk_size], offset)
+              elif chunk_type == 0x0102 and strings:
+                tag_index = u32(offset+20)
+                tag = strings[tag_index] if tag_index < len(strings) else ""
+                if tag == "manifest":
+                  attribute_start = u16(offset+24)
+                  attribute_size = u16(offset+26)
+                  attribute_count = u16(offset+28)
+                  base = offset+16+attribute_start
+                  for index in range(attribute_count):
+                    pos = base+index*attribute_size
+                    name_index = u32(pos+4)
+                    raw_index = u32(pos+8)
+                    value_type = data[pos+15]
+                    value_data = u32(pos+16)
+                    name = strings[name_index] if name_index < len(strings) else ""
+                    if raw_index != 0xffffffff and raw_index < len(strings):
+                      value = strings[raw_index]
+                    elif value_type == 0x03 and value_data < len(strings):
+                      value = strings[value_data]
+                    elif value_type in (0x10, 0x11):
+                      value = value_data
+                    else:
+                      continue
+                    if name in ("package", "versionCode", "versionName"):
+                      result[name] = value
+                  return result
+              offset += chunk_size
+            raise ValueError("manifest root element not found")
+
+          classes = {}
+          method_rows = []
+          call_rows = []
+          for p in smroot.rglob("*.smali"):
+            try: lines = p.read_text(errors="replace").splitlines()
+            except Exception: continue
+            cls = None; super_cls = None; interfaces = []; current = None
+            for no, line in enumerate(lines, 1):
+              st = line.strip()
+              if st.startswith(".class "):
+                m = re.search(r"(L[^;]+;)", st)
+                if m: cls = m.group(1)
+              elif st.startswith(".super "):
+                super_cls = st.split()[-1]
+              elif st.startswith(".implements "):
+                interfaces.append(st.split()[-1])
+              elif st.startswith(".method "):
+                m = re.search(r"([^ ]+)\((.*)\)(\S+)$", st)
+                if m:
+                  current = {"class": cls, "method": m.group(1), "params": m.group(2),
+                             "return": m.group(3), "descriptor": st.split()[-1],
+                             "access": st.split(".method",1)[1].split(m.group(1),1)[0].strip(),
+                             "file": str(p.relative_to(smroot)), "line": no}
+                  method_rows.append(current)
+                  if cls and simple_name(cls) in candidates:
+                    classes.setdefault(cls, {"class":cls,"file":str(p.relative_to(smroot)),
+                      "super":super_cls,"interfaces":interfaces,"methods":[]})
+                    classes[cls]["methods"].append({k:current[k] for k in
+                      ("method","params","return","descriptor","access","line")})
+              elif st.startswith(".end method"):
+                current = None
+              elif current:
+                m = re.search(r"invoke-[a-z]+\s+\{[^}]*\},\s*(L[^;]+;->[^ ]+)", st)
+                if m:
+                  target = m.group(1)
+                  owner = target.split(";->",1)[0] + ";"
+                  if simple_name(owner) in candidates or (
+                      current["class"] and simple_name(current["class"]) in candidates):
+                    call_rows.append({"caller":current["class"]+"->"+current["descriptor"],
+                      "target":target,"file":str(p.relative_to(smroot)),"line":no})
+          diag = (out/"jadx.stdout.log").read_text(errors="replace") + (out/"jadx.stderr.log").read_text(errors="replace")
+          em = re.search(r"finished with errors, count:\s*(\d+)", diag, re.I)
+          with zipfile.ZipFile(apk) as z:
+            dex = [{"name":x.filename,"bytes":x.file_size} for x in z.infolist()
+                   if re.fullmatch(r"classes[0-9]*\.dex",x.filename)]
+            native = [{"name":x.filename,"bytes":x.file_size,
+                       "sha256":hashlib.sha256(z.read(x)).hexdigest()}
+                      for x in z.infolist() if x.filename.startswith("lib/") and x.filename.endswith(".so")]
+          smali_count = sum(1 for _ in smroot.rglob("*.smali"))
+          java_files = list(src.rglob("*.java"))
+          hits = {t:[] for t in terms}
+          for p in java_files:
+            try: ls = p.read_text(errors="replace").splitlines()
+            except Exception: continue
+            for i,line in enumerate(ls,1):
+              for term in terms:
+                if term in line and len(hits[term]) < 100:
+                  hits[term].append({"file":str(p.relative_to(src)),"line":i,"text":line.strip()[:240]})
+          manifest = read_axml_manifest(smroot/"AndroidManifest.xml")
+          if manifest.get("package") != "com.deepseek.chat" or manifest.get("versionCode") != 289 or manifest.get("versionName") != "2.7.2":
+            raise SystemExit("APK identity mismatch: expected com.deepseek.chat versionName=2.7.2 versionCode=289; got " + repr(manifest))
+          summary = {"apk":apk.name,"bytes":apk.stat().st_size,
+            "sha256":hashlib.sha256(apk.read_bytes()).hexdigest(),"manifest":manifest,
+            "dex":dex,"dex_count":len(dex),"jadx_exit":int((out/"jadx.exit-code").read_text().strip()),
+            "jadx_errors":int(em.group(1)) if em else None,
+            "java_files":len(java_files),"smali_files":smali_count,"method_declarations":len(method_rows),
+            "candidate_classes_found":len(classes),"candidate_candidates_total":len(candidates),
+            "candidate_missing":sorted(candidates-{simple_name(k) for k in classes}),
+            "candidate_methods":sum(len(v["methods"]) for v in classes.values()),
+            "candidate_call_sites":len(call_rows),"native":native,"matches":{k:len(v) for k,v in hits.items()}}
+          expected = {"ly1", "zn3", "jw3", "y60"}
+          found = {simple_name(k) for k in classes}
+          missing = sorted(expected - found)
+          if not dex or not smali_count: raise SystemExit("DEX/smali inventory is empty; refusing to publish")
+          if missing: raise SystemExit("Runtime-observed candidates missing from DEX inventory: " + ", ".join(missing))
+          if manifest.get("versionCode") != 289: raise SystemExit("Refusing to publish a non-code289 static audit")
+          (out/"summary.json").write_text(json.dumps(summary,indent=2))
+          (out/"candidate-class-descriptors.json").write_text(json.dumps(classes,indent=2))
+          (out/"candidate-call-sites.json").write_text(json.dumps(call_rows,indent=2))
+          (out/"symbol-hits.json").write_text(json.dumps(hits,indent=2))
+          (out/"method-inventory.json").write_text(json.dumps(method_rows,indent=2))
+          report = [
+            "# DeepSeek 2.7.2 static audit","",
+            f"- APK: {summary['apk']}",f"- Bytes: {summary['bytes']}",
+            f"- SHA-256: {summary['sha256']}",f"- Manifest: {json.dumps(manifest,ensure_ascii=False)}",
+            f"- DEX count: {len(dex)}",f"- JADX exit: {summary['jadx_exit']}",
+            f"- JADX errors: {summary['jadx_errors']}",f"- Java files: {len(java_files)}",
+            f"- Smali files: {smali_count}",f"- Method declarations: {len(method_rows)}",
+            f"- Dynamic-evidence candidate classes found: {len(classes)}",
+            f"- Candidate methods: {summary['candidate_methods']}",
+            f"- Candidate call sites: {len(call_rows)}",
+            f"- Unresolved candidate simple names: {', '.join(summary['candidate_missing']) or 'none'}","",
+            "## Dynamic-to-static candidate correlation","",
+            "Candidate names originate from the 2.7.2 runtime observer log in the repository README.",
+            "This report records exact DEX descriptors and call sites where found; it does not assign business semantics from obfuscated names alone.",
+            "A missing candidate is not proof of absence because class loading, split DEX, and JADX/DEX parsing can be incomplete.","",
+            "## Candidate class inventory","",
+            "The four runtime-observed request/transport/continuation classes must be present in this APK. Their exact descriptors below are the version-local anchor; class names are never reused as cross-version identity.",""
+          ]
+          for desc,obj in sorted(classes.items()):
+            report.append(f"### {desc}")
+            report.append(f"- File: {obj['file']}; super: {obj['super']}; interfaces: {', '.join(obj['interfaces'])}")
+            for m in obj["methods"]:
+              report.append(f"- {m['descriptor']}")
+            report.append("")
+          report += ["## Static marker hits",""]
+          for term,items in hits.items():
+            report.append(f"### {term} ({len(items)})")
+            report.extend(f"- {x['file']}:{x['line']} {x['text']}" for x in items[:15])
+            report.append("")
+          report += ["## Evidence limits",
+            "- JADX failures are not treated as successful decompilation; use all-smali.zip for failed methods.",
+            "- Dynamic 2.7.2 observations and static descriptors are correlated only within this APK identity.",
+            "- No class name is reused as a 2.7.3/2.7.5 mapping without descriptor, interface, call-site and behavior evidence.",
+            "- Static presence does not prove runtime execution; device Hook validation remains separate.",
+            "- User content, credentials, cookies and authorization headers are not collected."]
+          (out/"report.md").write_text("\n".join(report)+"\n")
+          print(json.dumps(summary,indent=2))
+          PY
+
+      - name: Validate evidence outputs and semantic profile
+        run: |
+          set -euo pipefail
+          for f in summary.json candidate-class-descriptors.json candidate-call-sites.json symbol-hits.json method-inventory.json; do
+            python3 -m json.tool "audit/2.7.2/$f" >/dev/null
+          done
+          python3 -m json.tool profiles/deepseek-2.7.2-code289-cn.json >/dev/null
+          python3 tools/validate_semantic_profile.py \
+            --profile profiles/deepseek-2.7.2-code289-cn.json \
+            --summary audit/2.7.2/summary.json \
+            --smali-root smali-272 \
+            --output audit/2.7.2/semantic-profile-validation.json
+          test -s audit/2.7.2/all-smali.zip
+          test -s audit/2.7.2/report.md
+          test -s audit/2.7.2/semantic-profile-validation.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deepseek-272-static-evidence
+          path: audit/2.7.2/
+          if-no-files-found: error
+          retention-days: 14
