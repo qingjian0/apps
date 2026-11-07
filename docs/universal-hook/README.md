@@ -191,4 +191,10 @@ JADX 反编译失败必须保留退出码和错误日志；Smali 是控制流复
 
 ## 当前状态
 
-本方案与自动审计流水线已扩展为五版本矩阵（2.7.1–2.7.5，含 2.7.4 APKM）。完成 Actions 全量扫描并核对每个组件的 Manifest/DEX 身份、Smali 解析完整性和语义候选后，才更新各版本的具体 Profile 和可安装 Hook 代码。静态候选报告不会被标记为真机 Hook 成功。
+本方案与自动审计流水线已扩展为五版本矩阵（2.7.1–2.7.5，含 2.7.4 APKM）。2026-11-07 的五版本审计 Run \`42345954380\` 中五个版本 job 和 aggregate 均成功，生成 5 份完整索引与聚合报告。
+
+详细扫描数量、SHA-256、组件/split、DEX 头部、方法/调用边/字段/控制流统计、语义候选结果和未完成项，见 [五版本静态审计与语义解析记录](五版本静态审计与语义解析记录-2026-11-07.md)。自动报告位于 \`audit/universal-hook/universal-hook-report.md\`，完整 JSON/JSONL 索引位于 \`audit/\`。
+
+首轮 Resolver 曾把第三方验证 SDK 错判为宿主 Local API，且 2.7.5 会话候选仅以约 0.355 分差胜出。已移除宿主 APK 中的 Local API Gateway 角色映射，默认胜出分差提高至 0.5；HookCoordinator 现要求完整运行时宿主身份和 \`HOST_IDENTITY\`、\`RUNTIME_BEHAVIOR\` 证据。对应回归测试已加入，等待最新 Semantic Core CI 验证。
+
+**静态候选报告不会被标记为真机 Hook 成功。** 当前尚无完整 LSPosed Android Backend、功能桥接和真机闭环测试。
