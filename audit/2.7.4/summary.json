@@ -698,7 +698,11 @@
   "class_count": 15370,
   "method_count": 73611,
   "call_edge_count": 472017,
-  "candidate_method_count": 2311,
+  "field_read_count": 158420,
+  "field_write_count": 72875,
+  "methods_with_control_flow": 28351,
+  "control_flow_branch_count": 261392,
+  "candidate_method_count": 2283,
   "native_libraries": [
     {
       "component": "component-2-split_config.arm64_v8a.apk",

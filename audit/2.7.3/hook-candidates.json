@@ -367,91 +367,6 @@
     "opcode_count": 693
   },
   {
-    "class": "Lre;",
-    "name": "A",
-    "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
-    "component": "deepseek 273.apk",
-    "file": "smali/re.smali",
-    "line": 70,
-    "score": 6,
-    "roles": [
-      {
-        "role": "serialization",
-        "anchors": [
-          "serializer"
-        ]
-      },
-      {
-        "role": "session",
-        "anchors": [
-          "session_id",
-          "message_id"
-        ]
-      },
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      },
-      {
-        "role": "multimodal_image",
-        "anchors": [
-          "image/png"
-        ]
-      },
-      {
-        "role": "multimodal_audio",
-        "anchors": [
-          "audio"
-        ]
-      }
-    ],
-    "invokes": [
-      "La41;-><init>(Ljava/util/List;)V",
-      "Lab5;->k(Ljava/lang/String;)V",
-      "Lac1;-><init>(Lfa2;)V",
-      "Lag3;->Z(Ljava/io/File;Ljava/lang/String;)Ljava/io/File;",
-      "Landroid/content/ContentResolver;->getType(Landroid/net/Uri;)Ljava/lang/String;",
-      "Landroid/content/ContentResolver;->insert(Landroid/net/Uri;Landroid/content/ContentValues;)Landroid/net/Uri;",
-      "Landroid/content/ContentResolver;->notifyChange(Landroid/net/Uri;Landroid/database/ContentObserver;)V",
-      "Landroid/content/ContentResolver;->openOutputStream(Landroid/net/Uri;)Ljava/io/OutputStream;",
-      "Landroid/content/ContentValues;-><init>()V",
-      "Landroid/content/ContentValues;->put(Ljava/lang/String;Ljava/lang/String;)V",
-      "Landroid/content/Context;->getAssets()Landroid/content/res/AssetManager;",
-      "Landroid/content/Context;->getCacheDir()Ljava/io/File;",
-      "Landroid/content/Context;->getContentResolver()Landroid/content/ContentResolver;",
-      "Landroid/content/Intent;->resolveType(Landroid/content/ContentResolver;)Ljava/lang/String;",
-      "Landroid/content/res/AssetManager;->open(Ljava/lang/String;)Ljava/io/InputStream;",
-      "Landroid/graphics/Bitmap;->compress(Landroid/graphics/Bitmap$CompressFormat;ILjava/io/OutputStream;)Z",
-      "Landroid/graphics/Bitmap;->prepareToDraw()V",
-      "Landroid/graphics/BitmapFactory$Options;-><init>()V",
-      "Landroid/graphics/BitmapFactory;->decodeByteArray([BIILandroid/graphics/BitmapFactory$Options;)Landroid/graphics/Bitmap;",
-      "Landroid/graphics/BitmapFactory;->decodeStream(Ljava/io/InputStream;Landroid/graphics/Rect;Landroid/graphics/BitmapFactory$Options;)Landroid/graphics/Bitmap;",
-      "Landroid/graphics/BitmapRegionDecoder;->decodeRegion(Landroid/graphics/Rect;Landroid/graphics/BitmapFactory$Options;)Landroid/graphics/Bitmap;",
-      "Landroid/os/Trace;->endSection()V",
-      "Landroid/util/Base64;->decode(Ljava/lang/String;I)[B",
-      "Lao1;->M()Lwr;",
-      "Lao1;->P()Z",
-      "Lao1;->Q()Loc1;",
-      "Lao1;->b(Lcc1;)V",
-      "Lav1;->a(Lav1;)Lav1;",
-      "Lay4;-><init>(Ljava/util/Iterator;I)V",
-      "Lbc2;-><init>(Lh78;)V",
-      "Lbn7;->b(Ljava/lang/Class;)Lf15;",
-      "Lch7;-><init>(Lep4;[C)V",
-      "Lcka;->A(Lv35;)Lv35;",
-      "Lcka;->F(Ljava/util/ArrayList;Ljava/io/File;Lhh4;)V",
-      "Lcom/deepseek/chat/ui/components/blob/FluidBlobTextureView;->h()V",
-      "Ld42;->d()V",
-      "Ld64;-><init>(Lh64;Lrk0;Lhf2;I)V",
-      "Ldb6;->setValue(Ljava/lang/Object;)V",
-      "Ldia;->h(B)B",
-      "Ldia;->r(Ldia;Ljava/lang/String;ILjava/lang/String;I)V"
-    ],
-    "opcode_count": 1315
-  },
-  {
     "class": "Lyo;",
     "name": "run",
     "descriptor": "()V",
@@ -748,6 +663,85 @@
     "opcode_count": 8872
   },
   {
+    "class": "Lre;",
+    "name": "A",
+    "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+    "component": "deepseek 273.apk",
+    "file": "smali/re.smali",
+    "line": 70,
+    "score": 5,
+    "roles": [
+      {
+        "role": "serialization",
+        "anchors": [
+          "serializer"
+        ]
+      },
+      {
+        "role": "session",
+        "anchors": [
+          "session_id",
+          "message_id"
+        ]
+      },
+      {
+        "role": "multimodal_image",
+        "anchors": [
+          "image/png"
+        ]
+      },
+      {
+        "role": "multimodal_audio",
+        "anchors": [
+          "audio"
+        ]
+      }
+    ],
+    "invokes": [
+      "La41;-><init>(Ljava/util/List;)V",
+      "Lab5;->k(Ljava/lang/String;)V",
+      "Lac1;-><init>(Lfa2;)V",
+      "Lag3;->Z(Ljava/io/File;Ljava/lang/String;)Ljava/io/File;",
+      "Landroid/content/ContentResolver;->getType(Landroid/net/Uri;)Ljava/lang/String;",
+      "Landroid/content/ContentResolver;->insert(Landroid/net/Uri;Landroid/content/ContentValues;)Landroid/net/Uri;",
+      "Landroid/content/ContentResolver;->notifyChange(Landroid/net/Uri;Landroid/database/ContentObserver;)V",
+      "Landroid/content/ContentResolver;->openOutputStream(Landroid/net/Uri;)Ljava/io/OutputStream;",
+      "Landroid/content/ContentValues;-><init>()V",
+      "Landroid/content/ContentValues;->put(Ljava/lang/String;Ljava/lang/String;)V",
+      "Landroid/content/Context;->getAssets()Landroid/content/res/AssetManager;",
+      "Landroid/content/Context;->getCacheDir()Ljava/io/File;",
+      "Landroid/content/Context;->getContentResolver()Landroid/content/ContentResolver;",
+      "Landroid/content/Intent;->resolveType(Landroid/content/ContentResolver;)Ljava/lang/String;",
+      "Landroid/content/res/AssetManager;->open(Ljava/lang/String;)Ljava/io/InputStream;",
+      "Landroid/graphics/Bitmap;->compress(Landroid/graphics/Bitmap$CompressFormat;ILjava/io/OutputStream;)Z",
+      "Landroid/graphics/Bitmap;->prepareToDraw()V",
+      "Landroid/graphics/BitmapFactory$Options;-><init>()V",
+      "Landroid/graphics/BitmapFactory;->decodeByteArray([BIILandroid/graphics/BitmapFactory$Options;)Landroid/graphics/Bitmap;",
+      "Landroid/graphics/BitmapFactory;->decodeStream(Ljava/io/InputStream;Landroid/graphics/Rect;Landroid/graphics/BitmapFactory$Options;)Landroid/graphics/Bitmap;",
+      "Landroid/graphics/BitmapRegionDecoder;->decodeRegion(Landroid/graphics/Rect;Landroid/graphics/BitmapFactory$Options;)Landroid/graphics/Bitmap;",
+      "Landroid/os/Trace;->endSection()V",
+      "Landroid/util/Base64;->decode(Ljava/lang/String;I)[B",
+      "Lao1;->M()Lwr;",
+      "Lao1;->P()Z",
+      "Lao1;->Q()Loc1;",
+      "Lao1;->b(Lcc1;)V",
+      "Lav1;->a(Lav1;)Lav1;",
+      "Lay4;-><init>(Ljava/util/Iterator;I)V",
+      "Lbc2;-><init>(Lh78;)V",
+      "Lbn7;->b(Ljava/lang/Class;)Lf15;",
+      "Lch7;-><init>(Lep4;[C)V",
+      "Lcka;->A(Lv35;)Lv35;",
+      "Lcka;->F(Ljava/util/ArrayList;Ljava/io/File;Lhh4;)V",
+      "Lcom/deepseek/chat/ui/components/blob/FluidBlobTextureView;->h()V",
+      "Ld42;->d()V",
+      "Ld64;-><init>(Lh64;Lrk0;Lhf2;I)V",
+      "Ldb6;->setValue(Ljava/lang/Object;)V",
+      "Ldia;->h(B)B",
+      "Ldia;->r(Ldia;Ljava/lang/String;ILjava/lang/String;I)V"
+    ],
+    "opcode_count": 1315
+  },
+  {
     "class": "La18;",
     "name": "s",
     "descriptor": "(Lld6;Lc76;Lcd8;Lki9;Lv77;Ley3;I)V",
@@ -863,42 +857,6 @@
       "Lup4;->b(Ljava/lang/Object;Ljava/lang/Object;)Z"
     ],
     "opcode_count": 249
-  },
-  {
-    "class": "Lc41;",
-    "name": "<clinit>",
-    "descriptor": "()V",
-    "component": "deepseek 273.apk",
-    "file": "smali/c41.smali",
-    "line": 16,
-    "score": 4,
-    "roles": [
-      {
-        "role": "session",
-        "anchors": [
-          "session_id",
-          "message_id"
-        ]
-      },
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      },
-      {
-        "role": "multimodal_audio",
-        "anchors": [
-          "audio"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ljava/lang/Object;-><init>()V",
-      "Lm47;-><init>(Ljava/lang/String;Luy3;I)V",
-      "Lm47;->j(Ljava/lang/String;Z)V"
-    ],
-    "opcode_count": 31
   },
   {
     "class": "Lch;",
@@ -1907,112 +1865,6 @@
       "Lyo;-><init>(I)V"
     ],
     "opcode_count": 43
-  },
-  {
-    "class": "Ltya;",
-    "name": "h",
-    "descriptor": "(Ljava/lang/String;Lvq;Ljava/lang/String;Ljava/lang/String;IILif2;)Ljava/lang/Object;",
-    "component": "deepseek 273.apk",
-    "file": "smali/tya.smali",
-    "line": 3016,
-    "score": 4,
-    "roles": [
-      {
-        "role": "session",
-        "anchors": [
-          "session_id",
-          "message_id"
-        ]
-      },
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      },
-      {
-        "role": "multimodal_audio",
-        "anchors": [
-          "audio"
-        ]
-      }
-    ],
-    "invokes": [
-      "Laf4;-><init>(Ljava/lang/Object;Ljava/lang/Object;Lhf2;I)V",
-      "Lga8;-><init>(Ltya;Lif2;)V",
-      "Ljava/lang/Integer;-><init>(I)V",
-      "Ljava/lang/Number;->intValue()I",
-      "Ljava/lang/String;->length()I",
-      "Ljava/lang/StringBuilder;-><init>()V",
-      "Lnqa;->p(Ljava/lang/String;Lorg/json/JSONObject;)V",
-      "Lorg/json/JSONObject;->put(Ljava/lang/String;I)Lorg/json/JSONObject;",
-      "Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;",
-      "Los8;->z(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)Lorg/json/JSONObject;",
-      "Lpm0;->e(Ljava/lang/String;)V",
-      "Lsqa;->a(Ljava/lang/StringBuilder;Ljava/lang/String;Ljava/lang/String;I)Ljava/lang/String;",
-      "Lv9a;->f0(Lag2;Lwv3;Lhf2;)Ljava/lang/Object;",
-      "Lvq;->d()Ljava/lang/String;",
-      "Lvq;->x()I",
-      "Lwe5;->F(Ljava/lang/Object;)V"
-    ],
-    "opcode_count": 95
-  },
-  {
-    "class": "Ltya;",
-    "name": "m",
-    "descriptor": "(Ljava/lang/String;IJLjava/lang/String;Lwr;ZZLjava/lang/String;Ljava/util/List;Lnd1;Lpr8;)V",
-    "component": "deepseek 273.apk",
-    "file": "smali/tya.smali",
-    "line": 2346,
-    "score": 4,
-    "roles": [
-      {
-        "role": "session",
-        "anchors": [
-          "session_id"
-        ]
-      },
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      },
-      {
-        "role": "multimodal_audio",
-        "anchors": [
-          "audio"
-        ]
-      },
-      {
-        "role": "search_web",
-        "anchors": [
-          "sources"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ljava/lang/Iterable;->iterator()Ljava/util/Iterator;",
-      "Ljava/lang/String;->length()I",
-      "Ljava/lang/String;->toLowerCase(Ljava/util/Locale;)Ljava/lang/String;",
-      "Ljava/util/Collection;->toArray([Ljava/lang/Object;)[Ljava/lang/Object;",
-      "Ljava/util/Iterator;->hasNext()Z",
-      "Ljava/util/Iterator;->next()Ljava/lang/Object;",
-      "Ljava/util/LinkedHashSet;-><init>()V",
-      "Ljava/util/List;->size()I",
-      "Ljava/util/Set;->add(Ljava/lang/Object;)Z",
-      "Llx0;->P(I)Z",
-      "Lnqa;->p(Ljava/lang/String;Lorg/json/JSONObject;)V",
-      "Lorg/json/JSONArray;-><init>()V",
-      "Lorg/json/JSONArray;->put(Ljava/lang/Object;)Lorg/json/JSONArray;",
-      "Lorg/json/JSONObject;->put(Ljava/lang/String;I)Lorg/json/JSONObject;",
-      "Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;",
-      "Lrj2;->k(I)Ljava/lang/String;",
-      "Lsqa;->c(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/json/JSONObject;",
-      "Ltga;->F(Lwr;)I",
-      "Lwr;->h()Ljava/lang/String;"
-    ],
-    "opcode_count": 127
   },
   {
     "class": "Lvi9;",
@@ -3629,6 +3481,36 @@
       "Lz99;->f(Lz99;JJLjp3;Lhp3;Lun3;JLm69;IIJLyg5;II)Lz99;"
     ],
     "opcode_count": 1437
+  },
+  {
+    "class": "Lc41;",
+    "name": "<clinit>",
+    "descriptor": "()V",
+    "component": "deepseek 273.apk",
+    "file": "smali/c41.smali",
+    "line": 16,
+    "score": 3,
+    "roles": [
+      {
+        "role": "session",
+        "anchors": [
+          "session_id",
+          "message_id"
+        ]
+      },
+      {
+        "role": "multimodal_audio",
+        "anchors": [
+          "audio"
+        ]
+      }
+    ],
+    "invokes": [
+      "Ljava/lang/Object;-><init>()V",
+      "Lm47;-><init>(Ljava/lang/String;Luy3;I)V",
+      "Lm47;->j(Ljava/lang/String;Z)V"
+    ],
+    "opcode_count": 31
   },
   {
     "class": "Lcn/fly/verify/da;",
@@ -5783,36 +5665,6 @@
     "opcode_count": 28
   },
   {
-    "class": "Ld31;",
-    "name": "<clinit>",
-    "descriptor": "()V",
-    "component": "deepseek 273.apk",
-    "file": "smali/d31.smali",
-    "line": 16,
-    "score": 3,
-    "roles": [
-      {
-        "role": "session",
-        "anchors": [
-          "session_id",
-          "message_id"
-        ]
-      },
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ljava/lang/Object;-><init>()V",
-      "Lm47;-><init>(Ljava/lang/String;Luy3;I)V",
-      "Lm47;->j(Ljava/lang/String;Z)V"
-    ],
-    "opcode_count": 27
-  },
-  {
     "class": "Ld37;",
     "name": "w",
     "descriptor": "()Ljava/lang/String;",
@@ -7830,42 +7682,6 @@
     "opcode_count": 34
   },
   {
-    "class": "Lmva;",
-    "name": "c0",
-    "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/String;III)V",
-    "component": "deepseek 273.apk",
-    "file": "smali/mva.smali",
-    "line": 3262,
-    "score": 3,
-    "roles": [
-      {
-        "role": "session",
-        "anchors": [
-          "session_id"
-        ]
-      },
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      },
-      {
-        "role": "multimodal_audio",
-        "anchors": [
-          "audio"
-        ]
-      }
-    ],
-    "invokes": [
-      "Lmva;->C(Ljava/lang/String;Lorg/json/JSONObject;)V",
-      "Lorg/json/JSONObject;->put(Ljava/lang/String;I)Lorg/json/JSONObject;",
-      "Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;",
-      "Lsqa;->c(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/json/JSONObject;"
-    ],
-    "opcode_count": 27
-  },
-  {
     "class": "Ln30;",
     "name": "b",
     "descriptor": "(Ljava/util/ArrayList;Ljava/util/ArrayList;ILjava/util/ArrayList;)V",
@@ -7931,78 +7747,6 @@
       "Lqg1;-><init>(IILjava/lang/Integer;Ljava/util/List;)V"
     ],
     "opcode_count": 298
-  },
-  {
-    "class": "Lnb5;",
-    "name": "c",
-    "descriptor": "(Ljb1;Lyp1;Lv56;Ljava/lang/String;Lhv3;Lc76;Lrv;Ldo8;Ley3;I)V",
-    "component": "deepseek 273.apk",
-    "file": "smali/nb5.smali",
-    "line": 3021,
-    "score": 3,
-    "roles": [
-      {
-        "role": "flow_coroutine",
-        "anchors": [
-          "collect"
-        ]
-      },
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      },
-      {
-        "role": "multimodal_image",
-        "anchors": [
-          "vision"
-        ]
-      }
-    ],
-    "invokes": [
-      "Lb20;-><init>(ILjava/lang/Object;)V",
-      "Lbn7;->b(Ljava/lang/Class;)Lf15;",
-      "Leb6;-><init>(Ljava/lang/Object;)V",
-      "Leb6;->i1(Ljava/lang/Object;)V",
-      "Let3;-><init>(ZLjb1;Ljava/lang/String;Lhp8;Landroid/content/Context;Lika;Lyp1;Lig2;Ldb6;Lrv;Ldb6;Ldo8;)V",
-      "Ley3;->E()Z",
-      "Ley3;->S()Ljava/lang/Object;",
-      "Ley3;->X(IZ)Z",
-      "Ley3;->a0()V",
-      "Ley3;->c0()V",
-      "Ley3;->f(Ljava/lang/Object;)Z",
-      "Ley3;->g(Z)Z",
-      "Ley3;->g0(I)V",
-      "Ley3;->h(Ljava/lang/Object;)Z",
-      "Ley3;->i0(I)Ley3;",
-      "Ley3;->j(Lqd7;)Ljava/lang/Object;",
-      "Ley3;->q(Z)V",
-      "Ley3;->q0(Ljava/lang/Object;)V",
-      "Ley3;->r()V",
-      "Ley3;->v()Ljk7;",
-      "Lge5;->Q(Ljava/lang/Object;)Lnv6;",
-      "Lge5;->V(Ljava/lang/Object;Ley3;)Ldb6;",
-      "Lhp8;->i()Ln1;",
-      "Lhp8;->isEmpty()Z",
-      "Li08;->b(Lf15;Lev6;Lmf7;)Ljava/lang/Object;",
-      "Li32;->W0(Ljava/util/List;)Ljava/lang/Object;",
-      "Li32;->r1(Ljava/lang/Iterable;Ljava/util/Comparator;)Ljava/util/List;",
-      "Li32;->z1(Ljava/lang/Iterable;)Ljava/util/List;",
-      "Li52;->c0(Lag2;Ley3;)Lig2;",
-      "Li52;->u(Lhv3;Ley3;)V",
-      "Lika;-><init>(Ly97;ZLeb6;)V",
-      "Liv;->b(Lwv3;Ley3;II)V",
-      "Lj92;->d()Z",
-      "Lj92;->e()V",
-      "Lj92;->f(Ljava/lang/String;)V",
-      "Ljava/lang/Boolean;->booleanValue()Z",
-      "Ljava/lang/Boolean;->valueOf(Z)Ljava/lang/Boolean;",
-      "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;",
-      "Ljava/lang/Iterable;->iterator()Ljava/util/Iterator;",
-      "Ljava/lang/Number;->intValue()I"
-    ],
-    "opcode_count": 843
   },
   {
     "class": "Lnsa;",
@@ -9393,11 +9137,54 @@
   },
   {
     "class": "Ltya;",
-    "name": "l",
-    "descriptor": "(Ljava/lang/String;IZZZZLpr8;Ljava/lang/String;Ljava/util/List;Ljava/lang/String;Z)V",
+    "name": "h",
+    "descriptor": "(Ljava/lang/String;Lvq;Ljava/lang/String;Ljava/lang/String;IILif2;)Ljava/lang/Object;",
     "component": "deepseek 273.apk",
     "file": "smali/tya.smali",
-    "line": 1976,
+    "line": 3016,
+    "score": 3,
+    "roles": [
+      {
+        "role": "session",
+        "anchors": [
+          "session_id",
+          "message_id"
+        ]
+      },
+      {
+        "role": "multimodal_audio",
+        "anchors": [
+          "audio"
+        ]
+      }
+    ],
+    "invokes": [
+      "Laf4;-><init>(Ljava/lang/Object;Ljava/lang/Object;Lhf2;I)V",
+      "Lga8;-><init>(Ltya;Lif2;)V",
+      "Ljava/lang/Integer;-><init>(I)V",
+      "Ljava/lang/Number;->intValue()I",
+      "Ljava/lang/String;->length()I",
+      "Ljava/lang/StringBuilder;-><init>()V",
+      "Lnqa;->p(Ljava/lang/String;Lorg/json/JSONObject;)V",
+      "Lorg/json/JSONObject;->put(Ljava/lang/String;I)Lorg/json/JSONObject;",
+      "Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;",
+      "Los8;->z(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)Lorg/json/JSONObject;",
+      "Lpm0;->e(Ljava/lang/String;)V",
+      "Lsqa;->a(Ljava/lang/StringBuilder;Ljava/lang/String;Ljava/lang/String;I)Ljava/lang/String;",
+      "Lv9a;->f0(Lag2;Lwv3;Lhf2;)Ljava/lang/Object;",
+      "Lvq;->d()Ljava/lang/String;",
+      "Lvq;->x()I",
+      "Lwe5;->F(Ljava/lang/Object;)V"
+    ],
+    "opcode_count": 95
+  },
+  {
+    "class": "Ltya;",
+    "name": "m",
+    "descriptor": "(Ljava/lang/String;IJLjava/lang/String;Lwr;ZZLjava/lang/String;Ljava/util/List;Lnd1;Lpr8;)V",
+    "component": "deepseek 273.apk",
+    "file": "smali/tya.smali",
+    "line": 2346,
     "score": 3,
     "roles": [
       {
@@ -9407,9 +9194,9 @@
         ]
       },
       {
-        "role": "prompt_pipeline",
+        "role": "multimodal_audio",
         "anchors": [
-          "prompt"
+          "audio"
         ]
       },
       {
@@ -9429,15 +9216,18 @@
       "Ljava/util/LinkedHashSet;-><init>()V",
       "Ljava/util/List;->size()I",
       "Ljava/util/Set;->add(Ljava/lang/Object;)Z",
+      "Llx0;->P(I)Z",
       "Lnqa;->p(Ljava/lang/String;Lorg/json/JSONObject;)V",
       "Lorg/json/JSONArray;-><init>()V",
       "Lorg/json/JSONArray;->put(Ljava/lang/Object;)Lorg/json/JSONArray;",
       "Lorg/json/JSONObject;->put(Ljava/lang/String;I)Lorg/json/JSONObject;",
       "Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;",
-      "Los8;->z(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)Lorg/json/JSONObject;",
-      "Lrj2;->k(I)Ljava/lang/String;"
+      "Lrj2;->k(I)Ljava/lang/String;",
+      "Lsqa;->c(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/json/JSONObject;",
+      "Ltga;->F(Lwr;)I",
+      "Lwr;->h()Ljava/lang/String;"
     ],
-    "opcode_count": 87
+    "opcode_count": 127
   },
   {
     "class": "Lv43;",
@@ -9698,41 +9488,6 @@
       "Lm47;->j(Ljava/lang/String;Z)V"
     ],
     "opcode_count": 25
-  },
-  {
-    "class": "Lw46;",
-    "name": "<clinit>",
-    "descriptor": "()V",
-    "component": "deepseek 273.apk",
-    "file": "smali/w46.smali",
-    "line": 16,
-    "score": 3,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      },
-      {
-        "role": "multimodal_audio",
-        "anchors": [
-          "tts"
-        ]
-      },
-      {
-        "role": "account_capability",
-        "anchors": [
-          "quota"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ljava/lang/Object;-><init>()V",
-      "Lm47;-><init>(Ljava/lang/String;Luy3;I)V",
-      "Lm47;->j(Ljava/lang/String;Z)V"
-    ],
-    "opcode_count": 47
   },
   {
     "class": "Lwc0;",
@@ -12218,6 +11973,30 @@
     "opcode_count": 26
   },
   {
+    "class": "Ld31;",
+    "name": "<clinit>",
+    "descriptor": "()V",
+    "component": "deepseek 273.apk",
+    "file": "smali/d31.smali",
+    "line": 16,
+    "score": 2,
+    "roles": [
+      {
+        "role": "session",
+        "anchors": [
+          "session_id",
+          "message_id"
+        ]
+      }
+    ],
+    "invokes": [
+      "Ljava/lang/Object;-><init>()V",
+      "Lm47;-><init>(Ljava/lang/String;Luy3;I)V",
+      "Lm47;->j(Ljava/lang/String;Z)V"
+    ],
+    "opcode_count": 27
+  },
+  {
     "class": "Ldi2;",
     "name": "b",
     "descriptor": "(Lij8;)Lrz3;",
@@ -12452,39 +12231,6 @@
     "opcode_count": 226
   },
   {
-    "class": "Le1a;",
-    "name": "<clinit>",
-    "descriptor": "()V",
-    "component": "deepseek 273.apk",
-    "file": "smali/e1a.smali",
-    "line": 11,
-    "score": 2,
-    "roles": [
-      {
-        "role": "flow_coroutine",
-        "anchors": [
-          "collect"
-        ]
-      },
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ljava/lang/Double;->valueOf(D)Ljava/lang/Double;",
-      "Ljava/util/Arrays;->asList([Ljava/lang/Object;)Ljava/util/List;",
-      "Ljava/util/Collections;->singletonList(Ljava/lang/Object;)Ljava/util/List;",
-      "Lk46;-><init>(Ljava/lang/Object;Ljava/lang/Object;Ljava/util/List;Ljava/util/List;Lk46;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Double;Ljava/util/Map;Ljava/util/List;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Lk46;Lrn7;Lrn7;Lrn7;Lrn7;Ljava/lang/String;Ljava/util/List;Lrn7;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;Lrn7;Lb83;Lwv3;Lwv3;Ljava/lang/Object;Ljava/lang/Object;II)V",
-      "Ll75;-><init>(Ljava/lang/String;Ljava/util/Map;Ljava/util/List;ZLjava/util/Map;ZLjava/lang/String;Ljava/util/List;Ljava/lang/Object;Ljava/lang/Object;Ljava/util/List;I)V",
-      "Llq5;->p1([Lnu6;)Ljava/util/Map;",
-      "Lnu6;-><init>(Ljava/lang/Object;Ljava/lang/Object;)V"
-    ],
-    "opcode_count": 243
-  },
-  {
     "class": "Le38;",
     "name": "<clinit>",
     "descriptor": "()V",
@@ -12671,62 +12417,6 @@
       "Lnu6;-><init>(Ljava/lang/Object;Ljava/lang/Object;)V"
     ],
     "opcode_count": 2251
-  },
-  {
-    "class": "Let3;",
-    "name": "q",
-    "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "component": "deepseek 273.apk",
-    "file": "smali/et3.smali",
-    "line": 144,
-    "score": 2,
-    "roles": [
-      {
-        "role": "session",
-        "anchors": [
-          "session_id"
-        ]
-      },
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "La18;->n(Lc76;Ljava/lang/String;Landroid/net/Uri;Landroid/net/Uri;ZLru3;Lnu6;Lhv3;Lhv3;Lsv3;Lsv3;Lsv3;Ley3;I)V",
-      "Lb10;-><init>(Lhp8;Ljava/lang/String;Ljb1;Lyp1;Ljava/lang/String;Ldo8;Ldb6;Ldb6;Lhf2;)V",
-      "Lcom/tencent/mmkv/MMKV;->q(Ljava/lang/String;Ljava/lang/String;)Z",
-      "Ldb6;->setValue(Ljava/lang/Object;)V",
-      "Lhv3;->v()Ljava/lang/Object;",
-      "Li32;->W0(Ljava/util/List;)Ljava/lang/Object;",
-      "Li32;->b1(Ljava/lang/Iterable;Ljava/lang/CharSequence;Ljava/lang/String;Ljava/lang/String;Lsv3;I)Ljava/lang/String;",
-      "Li32;->k1(Ljava/util/Collection;Ljava/lang/Object;)Ljava/util/ArrayList;",
-      "Li32;->t1(ILjava/util/List;)Ljava/util/List;",
-      "Ljava/lang/Boolean;->booleanValue()Z",
-      "Ljava/lang/Integer;->intValue()I",
-      "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;",
-      "Ljava/lang/Object;->equals(Ljava/lang/Object;)Z",
-      "Ljava/lang/Object;->getClass()Ljava/lang/Class;",
-      "Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;",
-      "Ljava/lang/String;->valueOf(I)Ljava/lang/String;",
-      "Ljb1;->d()Lps8;",
-      "Lnb5;->J(Ljb1;Lyp1;Ljava/lang/String;Lp31;)V",
-      "Lnqa;->p(Ljava/lang/String;Lorg/json/JSONObject;)V",
-      "Lns8;->getValue()Ljava/lang/Object;",
-      "Lorg/json/JSONObject;->put(Ljava/lang/String;I)Lorg/json/JSONObject;",
-      "Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;",
-      "Lpd5;->I(Lg56;Landroid/content/Context;)Ljava/lang/String;",
-      "Lps8;->getValue()Ljava/lang/Object;",
-      "Lrj2;->k(I)Ljava/lang/String;",
-      "Lrv;->a(Ljava/lang/String;)Ljava/util/List;",
-      "Lsqa;->c(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/json/JSONObject;",
-      "Lv9a;->P(Lig2;Lag2;ILwv3;I)Lwr8;",
-      "Lwp1;->d(Ljava/lang/String;Ljava/util/List;)Lpp1;",
-      "Lz65;->D(I)I"
-    ],
-    "opcode_count": 178
   },
   {
     "class": "Lez9;",
@@ -13764,68 +13454,6 @@
     "opcode_count": 257
   },
   {
-    "class": "Li72;",
-    "name": "q",
-    "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "component": "deepseek 273.apk",
-    "file": "smali/i72.smali",
-    "line": 32,
-    "score": 2,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      },
-      {
-        "role": "ui_settings",
-        "anchors": [
-          "Settings"
-        ]
-      }
-    ],
-    "invokes": [
-      "Lc12;-><init>(I)V",
-      "Ley3;->S()Ljava/lang/Object;",
-      "Ley3;->X(IZ)Z",
-      "Ley3;->a0()V",
-      "Ley3;->j(Lqd7;)Ljava/lang/Object;",
-      "Ley3;->k(Lhv3;)V",
-      "Ley3;->k0()V",
-      "Ley3;->l()Loz6;",
-      "Ley3;->q(Z)V",
-      "Ley3;->q0(Ljava/lang/Object;)V",
-      "Ley3;->t0()V",
-      "Lhc5;->d(ZZZZLhv3;Lsv3;Lc76;Ley3;II)V",
-      "Lhe5;->T0(D)J",
-      "Lhe5;->V0(I)J",
-      "Li59;-><init>(I)V",
-      "Liu7;->a(Lgz;Lo9;Ley3;I)Lju7;",
-      "Lj92;->d()Z",
-      "Lj92;->e()V",
-      "Lj92;->f(Ljava/lang/String;)V",
-      "Ljava/lang/Integer;->intValue()I",
-      "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;",
-      "Ljava/lang/Object;->getClass()Ljava/lang/Class;",
-      "Ljt5;->B(Ley3;)J",
-      "Ljt5;->J(Lc76;FFFFI)Lc76;",
-      "Lkf5;->K(IILey3;)Lku6;",
-      "Llx0;->T(Ley3;Lc76;)Lc76;",
-      "Lme4;->a(Lku6;Ljava/lang/String;Lc76;JLey3;II)V",
-      "Lto1;-><init>(I)V",
-      "Luia;->f(Lc76;JLtk0;Ljava/lang/String;Ley3;II)V",
-      "Lul8;->l(Lc76;F)Lc76;",
-      "Lvc5;->d0(ILey3;)Ljava/lang/String;",
-      "Lxd5;->A(Lwv3;Ley3;Ljava/lang/Object;)V",
-      "Lxd5;->y(Ley3;Lsv3;)V",
-      "Lz89;->b(Ljava/lang/String;Lc76;JLvc0;JLjp3;JLi59;JIZIILz99;Ley3;III)V",
-      "Lz99;->a(Lz99;JJLjp3;Lun3;JJLyg5;II)Lz99;",
-      "Lz99;->f(Lz99;JJLjp3;Lhp3;Lun3;JLm69;IIJLyg5;II)Lz99;"
-    ],
-    "opcode_count": 1448
-  },
-  {
     "class": "Ljc5;",
     "name": "a",
     "descriptor": "(Lsm;Lc76;Lz99;Lk;Ley3;II)V",
@@ -14188,45 +13816,6 @@
       "Ljava/util/HashSet;->add(Ljava/lang/Object;)Z"
     ],
     "opcode_count": 70
-  },
-  {
-    "class": "Lm0b;",
-    "name": "w",
-    "descriptor": "(Landroid/content/Context;Landroid/os/Looper;Lhx7;Ljava/lang/Object;Lv04;Lw04;)Llo;",
-    "component": "deepseek 273.apk",
-    "file": "smali/m0b.smali",
-    "line": 29,
-    "score": 2,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      },
-      {
-        "role": "ui_settings",
-        "anchors": [
-          "Settings"
-        ]
-      }
-    ],
-    "invokes": [
-      "Landroid/os/BaseBundle;->putBoolean(Ljava/lang/String;Z)V",
-      "Landroid/os/BaseBundle;->putInt(Ljava/lang/String;I)V",
-      "Landroid/os/BaseBundle;->putString(Ljava/lang/String;Ljava/lang/String;)V",
-      "Landroid/os/Bundle;-><init>()V",
-      "Landroid/os/Bundle;->putParcelable(Ljava/lang/String;Landroid/os/Parcelable;)V",
-      "Lg2b;-><init>(Landroid/content/Context;Landroid/os/Looper;Lhx7;Lf2b;Ls0b;Ls0b;)V",
-      "Lh2b;-><init>(Landroid/content/Context;Landroid/os/Looper;Lhx7;Lcom/google/android/gms/auth/api/signin/GoogleSignInOptions;Ls0b;Ls0b;)V",
-      "Lhj8;-><init>(Landroid/content/Context;Landroid/os/Looper;Lhx7;Landroid/os/Bundle;Lv04;Lw04;)V",
-      "Ljava/lang/Integer;->intValue()I",
-      "Ljava/lang/Object;->getClass()Ljava/lang/Class;",
-      "Lo04;-><init>(Landroid/content/Context;Landroid/os/Looper;ILhx7;Lv04;Lw04;I)V",
-      "Los8;->t(Ljava/lang/Object;)Ljava/lang/ClassCastException;",
-      "Loy4;->w(Landroid/content/Context;Landroid/os/Looper;Lhx7;Ljava/lang/Object;Lv04;Lw04;)Llo;"
-    ],
-    "opcode_count": 84
   },
   {
     "class": "Lmc1;",
@@ -14623,6 +14212,36 @@
     "opcode_count": 26
   },
   {
+    "class": "Lmva;",
+    "name": "c0",
+    "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/String;III)V",
+    "component": "deepseek 273.apk",
+    "file": "smali/mva.smali",
+    "line": 3262,
+    "score": 2,
+    "roles": [
+      {
+        "role": "session",
+        "anchors": [
+          "session_id"
+        ]
+      },
+      {
+        "role": "multimodal_audio",
+        "anchors": [
+          "audio"
+        ]
+      }
+    ],
+    "invokes": [
+      "Lmva;->C(Ljava/lang/String;Lorg/json/JSONObject;)V",
+      "Lorg/json/JSONObject;->put(Ljava/lang/String;I)Lorg/json/JSONObject;",
+      "Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;",
+      "Lsqa;->c(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/json/JSONObject;"
+    ],
+    "opcode_count": 27
+  },
+  {
     "class": "Lmy5;",
     "name": "<clinit>",
     "descriptor": "()V",
@@ -14851,6 +14470,72 @@
       "Ljava/util/Map;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"
     ],
     "opcode_count": 1105
+  },
+  {
+    "class": "Lnb5;",
+    "name": "c",
+    "descriptor": "(Ljb1;Lyp1;Lv56;Ljava/lang/String;Lhv3;Lc76;Lrv;Ldo8;Ley3;I)V",
+    "component": "deepseek 273.apk",
+    "file": "smali/nb5.smali",
+    "line": 3021,
+    "score": 2,
+    "roles": [
+      {
+        "role": "flow_coroutine",
+        "anchors": [
+          "collect"
+        ]
+      },
+      {
+        "role": "multimodal_image",
+        "anchors": [
+          "vision"
+        ]
+      }
+    ],
+    "invokes": [
+      "Lb20;-><init>(ILjava/lang/Object;)V",
+      "Lbn7;->b(Ljava/lang/Class;)Lf15;",
+      "Leb6;-><init>(Ljava/lang/Object;)V",
+      "Leb6;->i1(Ljava/lang/Object;)V",
+      "Let3;-><init>(ZLjb1;Ljava/lang/String;Lhp8;Landroid/content/Context;Lika;Lyp1;Lig2;Ldb6;Lrv;Ldb6;Ldo8;)V",
+      "Ley3;->E()Z",
+      "Ley3;->S()Ljava/lang/Object;",
+      "Ley3;->X(IZ)Z",
+      "Ley3;->a0()V",
+      "Ley3;->c0()V",
+      "Ley3;->f(Ljava/lang/Object;)Z",
+      "Ley3;->g(Z)Z",
+      "Ley3;->g0(I)V",
+      "Ley3;->h(Ljava/lang/Object;)Z",
+      "Ley3;->i0(I)Ley3;",
+      "Ley3;->j(Lqd7;)Ljava/lang/Object;",
+      "Ley3;->q(Z)V",
+      "Ley3;->q0(Ljava/lang/Object;)V",
+      "Ley3;->r()V",
+      "Ley3;->v()Ljk7;",
+      "Lge5;->Q(Ljava/lang/Object;)Lnv6;",
+      "Lge5;->V(Ljava/lang/Object;Ley3;)Ldb6;",
+      "Lhp8;->i()Ln1;",
+      "Lhp8;->isEmpty()Z",
+      "Li08;->b(Lf15;Lev6;Lmf7;)Ljava/lang/Object;",
+      "Li32;->W0(Ljava/util/List;)Ljava/lang/Object;",
+      "Li32;->r1(Ljava/lang/Iterable;Ljava/util/Comparator;)Ljava/util/List;",
+      "Li32;->z1(Ljava/lang/Iterable;)Ljava/util/List;",
+      "Li52;->c0(Lag2;Ley3;)Lig2;",
+      "Li52;->u(Lhv3;Ley3;)V",
+      "Lika;-><init>(Ly97;ZLeb6;)V",
+      "Liv;->b(Lwv3;Ley3;II)V",
+      "Lj92;->d()Z",
+      "Lj92;->e()V",
+      "Lj92;->f(Ljava/lang/String;)V",
+      "Ljava/lang/Boolean;->booleanValue()Z",
+      "Ljava/lang/Boolean;->valueOf(Z)Ljava/lang/Boolean;",
+      "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;",
+      "Ljava/lang/Iterable;->iterator()Ljava/util/Iterator;",
+      "Ljava/lang/Number;->intValue()I"
+    ],
+    "opcode_count": 843
   },
   {
     "class": "Lnc;",
@@ -15470,38 +15155,6 @@
     "opcode_count": 179
   },
   {
-    "class": "Loj5;",
-    "name": "<init>",
-    "descriptor": "(ILjava/lang/Integer;Ljava/lang/String;)V",
-    "component": "deepseek 273.apk",
-    "file": "smali/oj5.smali",
-    "line": 36,
-    "score": 2,
-    "roles": [
-      {
-        "role": "session",
-        "anchors": [
-          "message_id"
-        ]
-      },
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ljava/lang/Object;-><init>()V",
-      "Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;",
-      "Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V",
-      "Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;",
-      "Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;",
-      "Ljava/lang/StringBuilder;->toString()Ljava/lang/String;"
-    ],
-    "opcode_count": 57
-  },
-  {
     "class": "Lon1;",
     "name": "A",
     "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
@@ -15566,43 +15219,6 @@
       "Ljh;->h(Lhf2;)Ljava/lang/Object;"
     ],
     "opcode_count": 1177
-  },
-  {
-    "class": "Lop;",
-    "name": "k",
-    "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "component": "deepseek 273.apk",
-    "file": "smali/op.smali",
-    "line": 2226,
-    "score": 2,
-    "roles": [
-      {
-        "role": "session",
-        "anchors": [
-          "session_id"
-        ]
-      },
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Li32;->W0(Ljava/util/List;)Ljava/lang/Object;",
-      "Ljava/lang/Integer;->intValue()I",
-      "Ljava/lang/String;->valueOf(I)Ljava/lang/String;",
-      "Ljb1;->d()Lps8;",
-      "Lnqa;->p(Ljava/lang/String;Lorg/json/JSONObject;)V",
-      "Lorg/json/JSONObject;->put(Ljava/lang/String;I)Lorg/json/JSONObject;",
-      "Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;",
-      "Lpd5;->I(Lg56;Landroid/content/Context;)Ljava/lang/String;",
-      "Lps8;->getValue()Ljava/lang/Object;",
-      "Lrj2;->k(I)Ljava/lang/String;",
-      "Lsqa;->c(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/json/JSONObject;"
-    ],
-    "opcode_count": 50
   },
   {
     "class": "Lova;",
@@ -16694,6 +16310,48 @@
     "opcode_count": 61
   },
   {
+    "class": "Ltya;",
+    "name": "l",
+    "descriptor": "(Ljava/lang/String;IZZZZLpr8;Ljava/lang/String;Ljava/util/List;Ljava/lang/String;Z)V",
+    "component": "deepseek 273.apk",
+    "file": "smali/tya.smali",
+    "line": 1976,
+    "score": 2,
+    "roles": [
+      {
+        "role": "session",
+        "anchors": [
+          "session_id"
+        ]
+      },
+      {
+        "role": "search_web",
+        "anchors": [
+          "sources"
+        ]
+      }
+    ],
+    "invokes": [
+      "Ljava/lang/Iterable;->iterator()Ljava/util/Iterator;",
+      "Ljava/lang/String;->length()I",
+      "Ljava/lang/String;->toLowerCase(Ljava/util/Locale;)Ljava/lang/String;",
+      "Ljava/util/Collection;->toArray([Ljava/lang/Object;)[Ljava/lang/Object;",
+      "Ljava/util/Iterator;->hasNext()Z",
+      "Ljava/util/Iterator;->next()Ljava/lang/Object;",
+      "Ljava/util/LinkedHashSet;-><init>()V",
+      "Ljava/util/List;->size()I",
+      "Ljava/util/Set;->add(Ljava/lang/Object;)Z",
+      "Lnqa;->p(Ljava/lang/String;Lorg/json/JSONObject;)V",
+      "Lorg/json/JSONArray;-><init>()V",
+      "Lorg/json/JSONArray;->put(Ljava/lang/Object;)Lorg/json/JSONArray;",
+      "Lorg/json/JSONObject;->put(Ljava/lang/String;I)Lorg/json/JSONObject;",
+      "Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;",
+      "Los8;->z(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)Lorg/json/JSONObject;",
+      "Lrj2;->k(I)Ljava/lang/String;"
+    ],
+    "opcode_count": 87
+  },
+  {
     "class": "Lu43;",
     "name": "f",
     "descriptor": "(Ley3;)Lhv3;",
@@ -17063,38 +16721,6 @@
     "opcode_count": 31
   },
   {
-    "class": "Lv56;",
-    "name": "toString",
-    "descriptor": "()Ljava/lang/String;",
-    "component": "deepseek 273.apk",
-    "file": "smali/v56.smali",
-    "line": 1578,
-    "score": 2,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      },
-      {
-        "role": "multimodal_audio",
-        "anchors": [
-          "tts"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;",
-      "Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;",
-      "Ljava/lang/StringBuilder;->append(Z)Ljava/lang/StringBuilder;",
-      "Ljava/lang/StringBuilder;->toString()Ljava/lang/String;",
-      "Ln66;->s(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/StringBuilder;",
-      "Lsqa;->e(Ljava/lang/StringBuilder;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V"
-    ],
-    "opcode_count": 75
-  },
-  {
     "class": "Lv9;",
     "name": "g",
     "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
@@ -17340,6 +16966,35 @@
       "Lz4;-><init>(Ljava/lang/Object;Ljava/lang/Object;Lhf2;I)V"
     ],
     "opcode_count": 133
+  },
+  {
+    "class": "Lw46;",
+    "name": "<clinit>",
+    "descriptor": "()V",
+    "component": "deepseek 273.apk",
+    "file": "smali/w46.smali",
+    "line": 16,
+    "score": 2,
+    "roles": [
+      {
+        "role": "multimodal_audio",
+        "anchors": [
+          "tts"
+        ]
+      },
+      {
+        "role": "account_capability",
+        "anchors": [
+          "quota"
+        ]
+      }
+    ],
+    "invokes": [
+      "Ljava/lang/Object;-><init>()V",
+      "Lm47;-><init>(Ljava/lang/String;Luy3;I)V",
+      "Lm47;->j(Ljava/lang/String;Z)V"
+    ],
+    "opcode_count": 47
   },
   {
     "class": "Lw87;",
@@ -25024,29 +24679,6 @@
     "opcode_count": 557
   },
   {
-    "class": "Lb56;",
-    "name": "<clinit>",
-    "descriptor": "()V",
-    "component": "deepseek 273.apk",
-    "file": "smali/b56.smali",
-    "line": 16,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ljava/lang/Object;-><init>()V",
-      "Lm47;-><init>(Ljava/lang/String;Luy3;I)V",
-      "Lm47;->j(Ljava/lang/String;Z)V"
-    ],
-    "opcode_count": 16
-  },
-  {
     "class": "Lb6a;",
     "name": "b",
     "descriptor": "()Landroid/content/Context;",
@@ -25455,60 +25087,6 @@
       "Lcc2;-><init>(J)V"
     ],
     "opcode_count": 28
-  },
-  {
-    "class": "Lba7;",
-    "name": "q",
-    "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "component": "deepseek 273.apk",
-    "file": "smali/ba7.smali",
-    "line": 38,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Lba7;-><init>(Lg56;I)V",
-      "Ldv8;->a(Ljava/lang/Object;)Ljs;",
-      "Le65;->h(Ley3;Lc76;)V",
-      "Ley3;->X(IZ)Z",
-      "Ley3;->a0()V",
-      "Ley3;->j(Lqd7;)Ljava/lang/Object;",
-      "Ley3;->k(Lhv3;)V",
-      "Ley3;->k0()V",
-      "Ley3;->l()Loz6;",
-      "Ley3;->q(Z)V",
-      "Ley3;->t0()V",
-      "Liu7;->a(Lgz;Lo9;Ley3;I)Lju7;",
-      "Lj92;->d()Z",
-      "Lj92;->e()V",
-      "Lj92;->f(Ljava/lang/String;)V",
-      "Ljava/lang/Integer;->intValue()I",
-      "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;",
-      "Ljava/lang/Object;->getClass()Ljava/lang/Class;",
-      "Ljt5;->B(Ley3;)J",
-      "Ljt5;->H(Lc76;FFI)Lc76;",
-      "Lkf5;->K(IILey3;)Lku6;",
-      "Llx0;->T(Ley3;Lc76;)Lc76;",
-      "Lme4;->a(Lku6;Ljava/lang/String;Lc76;JLey3;II)V",
-      "Lpd5;->H(Lg56;Ley3;)Ljava/lang/String;",
-      "Ltp4;->H(ILew3;Ley3;)Lt62;",
-      "Luk8;->j(Ljs;Lwv3;Ley3;I)V",
-      "Lul8;->l(Lc76;F)Lc76;",
-      "Lul8;->q(Lc76;F)Lc76;",
-      "Lvu2;->getDensity()F",
-      "Lw97;->c(Ley3;)Lz99;",
-      "Lxd5;->A(Lwv3;Ley3;Ljava/lang/Object;)V",
-      "Lxd5;->y(Ley3;Lsv3;)V",
-      "Lyu2;-><init>(FF)V",
-      "Lz89;->b(Ljava/lang/String;Lc76;JLvc0;JLjp3;JLi59;JIZIILz99;Ley3;III)V"
-    ],
-    "opcode_count": 158
   },
   {
     "class": "Lba;",
@@ -30544,30 +30122,6 @@
     "opcode_count": 10
   },
   {
-    "class": "Lcu5;",
-    "name": "<clinit>",
-    "descriptor": "()V",
-    "component": "deepseek 273.apk",
-    "file": "smali/cu5.smali",
-    "line": 11,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ljava/util/Arrays;->asList([Ljava/lang/Object;)Ljava/util/List;",
-      "Ljava/util/Collections;->singletonList(Ljava/lang/Object;)Ljava/util/List;",
-      "Lk46;-><init>(Ljava/lang/Object;Ljava/lang/Object;Ljava/util/List;Ljava/util/List;Lk46;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Double;Ljava/util/Map;Ljava/util/List;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Lk46;Lrn7;Lrn7;Lrn7;Lrn7;Ljava/lang/String;Ljava/util/List;Lrn7;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;Lrn7;Lb83;Lwv3;Lwv3;Ljava/lang/Object;Ljava/lang/Object;II)V",
-      "Ll75;-><init>(Ljava/lang/String;Ljava/util/Map;Ljava/util/List;ZLjava/util/Map;ZLjava/lang/String;Ljava/util/List;Ljava/lang/Object;Ljava/lang/Object;Ljava/util/List;I)V"
-    ],
-    "opcode_count": 91
-  },
-  {
     "class": "Lcx4;",
     "name": "<clinit>",
     "descriptor": "()V",
@@ -30669,30 +30223,6 @@
       "Los8;->y(Ljava/lang/String;)Ljava/util/List;"
     ],
     "opcode_count": 495
-  },
-  {
-    "class": "Lcz4;",
-    "name": "<clinit>",
-    "descriptor": "()V",
-    "component": "deepseek 273.apk",
-    "file": "smali/cz4.smali",
-    "line": 11,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ljava/lang/Double;->valueOf(D)Ljava/lang/Double;",
-      "Ljava/util/Collections;->singletonList(Ljava/lang/Object;)Ljava/util/List;",
-      "Lk46;-><init>(Ljava/lang/Object;Ljava/lang/Object;Ljava/util/List;Ljava/util/List;Lk46;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Double;Ljava/util/Map;Ljava/util/List;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Lk46;Lrn7;Lrn7;Lrn7;Lrn7;Ljava/lang/String;Ljava/util/List;Lrn7;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;Lrn7;Lb83;Lwv3;Lwv3;Ljava/lang/Object;Ljava/lang/Object;II)V",
-      "Ll75;-><init>(Ljava/lang/String;Ljava/util/Map;Ljava/util/List;ZLjava/util/Map;ZLjava/lang/String;Ljava/util/List;Ljava/lang/Object;Ljava/lang/Object;Ljava/util/List;I)V"
-    ],
-    "opcode_count": 77
   },
   {
     "class": "Lcz;",
@@ -31121,29 +30651,6 @@
       "Lsv3;->g(Ljava/lang/Object;)Ljava/lang/Object;"
     ],
     "opcode_count": 389
-  },
-  {
-    "class": "Ld56;",
-    "name": "<clinit>",
-    "descriptor": "()V",
-    "component": "deepseek 273.apk",
-    "file": "smali/d56.smali",
-    "line": 16,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ljava/lang/Object;-><init>()V",
-      "Lm47;->j(Ljava/lang/String;Z)V",
-      "Lnl4;-><init>(Ljava/lang/String;Luy3;)V"
-    ],
-    "opcode_count": 11
   },
   {
     "class": "Ld73;",
@@ -31635,46 +31142,6 @@
       "Ljava/lang/Object;->getClass()Ljava/lang/Class;"
     ],
     "opcode_count": 323
-  },
-  {
-    "class": "Lda7;",
-    "name": "f",
-    "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "component": "deepseek 273.apk",
-    "file": "smali/da7.smali",
-    "line": 62,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Lea7;-><init>(ZLch5;Ljava/util/List;Lwv3;Z)V",
-      "Ley3;->S()Ljava/lang/Object;",
-      "Ley3;->f(Ljava/lang/Object;)Z",
-      "Ley3;->g(Z)Z",
-      "Ley3;->g0(I)V",
-      "Ley3;->h(Ljava/lang/Object;)Z",
-      "Ley3;->q(Z)V",
-      "Ley3;->q0(Ljava/lang/Object;)V",
-      "Lga5;->J(JLey3;I)Lch5;",
-      "Lhz;-><init>(FZLiz;)V",
-      "Li52;->r(Ljava/lang/Object;Ljava/lang/Object;Lwv3;Ley3;)V",
-      "Lj92;->d()Z",
-      "Lj92;->e()V",
-      "Lj92;->f(Ljava/lang/String;)V",
-      "Ljava/lang/Object;->getClass()Ljava/lang/Class;",
-      "Lpb;-><init>(I)V",
-      "Lqj3;-><init>(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Lhf2;I)V",
-      "Lse5;->a(IILey3;II)Lpe5;",
-      "Lul8;->c(Lc76;F)Lc76;",
-      "Lva5;->c(Lc76;Lpe5;Lft6;Lgz;Lo9;Lph3;ZLzd;Lsv3;Ley3;II)V"
-    ],
-    "opcode_count": 131
   },
   {
     "class": "Ldca;",
@@ -32474,6 +31941,33 @@
       "Ljava/lang/UnsupportedOperationException;-><init>(Ljava/lang/String;)V"
     ],
     "opcode_count": 4
+  },
+  {
+    "class": "Le1a;",
+    "name": "<clinit>",
+    "descriptor": "()V",
+    "component": "deepseek 273.apk",
+    "file": "smali/e1a.smali",
+    "line": 11,
+    "score": 1,
+    "roles": [
+      {
+        "role": "flow_coroutine",
+        "anchors": [
+          "collect"
+        ]
+      }
+    ],
+    "invokes": [
+      "Ljava/lang/Double;->valueOf(D)Ljava/lang/Double;",
+      "Ljava/util/Arrays;->asList([Ljava/lang/Object;)Ljava/util/List;",
+      "Ljava/util/Collections;->singletonList(Ljava/lang/Object;)Ljava/util/List;",
+      "Lk46;-><init>(Ljava/lang/Object;Ljava/lang/Object;Ljava/util/List;Ljava/util/List;Lk46;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Double;Ljava/util/Map;Ljava/util/List;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Lk46;Lrn7;Lrn7;Lrn7;Lrn7;Ljava/lang/String;Ljava/util/List;Lrn7;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;Lrn7;Lb83;Lwv3;Lwv3;Ljava/lang/Object;Ljava/lang/Object;II)V",
+      "Ll75;-><init>(Ljava/lang/String;Ljava/util/Map;Ljava/util/List;ZLjava/util/Map;ZLjava/lang/String;Ljava/util/List;Ljava/lang/Object;Ljava/lang/Object;Ljava/util/List;I)V",
+      "Llq5;->p1([Lnu6;)Ljava/util/Map;",
+      "Lnu6;-><init>(Ljava/lang/Object;Ljava/lang/Object;)V"
+    ],
+    "opcode_count": 243
   },
   {
     "class": "Le44;",
@@ -34057,6 +33551,56 @@
       "Lzya;->s(Ljava/lang/Object;)Lrs8;"
     ],
     "opcode_count": 20
+  },
+  {
+    "class": "Let3;",
+    "name": "q",
+    "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+    "component": "deepseek 273.apk",
+    "file": "smali/et3.smali",
+    "line": 144,
+    "score": 1,
+    "roles": [
+      {
+        "role": "session",
+        "anchors": [
+          "session_id"
+        ]
+      }
+    ],
+    "invokes": [
+      "La18;->n(Lc76;Ljava/lang/String;Landroid/net/Uri;Landroid/net/Uri;ZLru3;Lnu6;Lhv3;Lhv3;Lsv3;Lsv3;Lsv3;Ley3;I)V",
+      "Lb10;-><init>(Lhp8;Ljava/lang/String;Ljb1;Lyp1;Ljava/lang/String;Ldo8;Ldb6;Ldb6;Lhf2;)V",
+      "Lcom/tencent/mmkv/MMKV;->q(Ljava/lang/String;Ljava/lang/String;)Z",
+      "Ldb6;->setValue(Ljava/lang/Object;)V",
+      "Lhv3;->v()Ljava/lang/Object;",
+      "Li32;->W0(Ljava/util/List;)Ljava/lang/Object;",
+      "Li32;->b1(Ljava/lang/Iterable;Ljava/lang/CharSequence;Ljava/lang/String;Ljava/lang/String;Lsv3;I)Ljava/lang/String;",
+      "Li32;->k1(Ljava/util/Collection;Ljava/lang/Object;)Ljava/util/ArrayList;",
+      "Li32;->t1(ILjava/util/List;)Ljava/util/List;",
+      "Ljava/lang/Boolean;->booleanValue()Z",
+      "Ljava/lang/Integer;->intValue()I",
+      "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;",
+      "Ljava/lang/Object;->equals(Ljava/lang/Object;)Z",
+      "Ljava/lang/Object;->getClass()Ljava/lang/Class;",
+      "Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;",
+      "Ljava/lang/String;->valueOf(I)Ljava/lang/String;",
+      "Ljb1;->d()Lps8;",
+      "Lnb5;->J(Ljb1;Lyp1;Ljava/lang/String;Lp31;)V",
+      "Lnqa;->p(Ljava/lang/String;Lorg/json/JSONObject;)V",
+      "Lns8;->getValue()Ljava/lang/Object;",
+      "Lorg/json/JSONObject;->put(Ljava/lang/String;I)Lorg/json/JSONObject;",
+      "Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;",
+      "Lpd5;->I(Lg56;Landroid/content/Context;)Ljava/lang/String;",
+      "Lps8;->getValue()Ljava/lang/Object;",
+      "Lrj2;->k(I)Ljava/lang/String;",
+      "Lrv;->a(Ljava/lang/String;)Ljava/util/List;",
+      "Lsqa;->c(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/json/JSONObject;",
+      "Lv9a;->P(Lig2;Lag2;ILwv3;I)Lwr8;",
+      "Lwp1;->d(Ljava/lang/String;Ljava/util/List;)Lpp1;",
+      "Lz65;->D(I)I"
+    ],
+    "opcode_count": 178
   },
   {
     "class": "Leta;",
@@ -36750,32 +36294,6 @@
       "Los8;->z(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)Lorg/json/JSONObject;"
     ],
     "opcode_count": 10
-  },
-  {
-    "class": "Lg56;",
-    "name": "toString",
-    "descriptor": "()Ljava/lang/String;",
-    "component": "deepseek 273.apk",
-    "file": "smali/g56.smali",
-    "line": 328,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V",
-      "Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;",
-      "Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;",
-      "Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;",
-      "Ljava/lang/StringBuilder;->toString()Ljava/lang/String;",
-      "Lxs0;->r(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
-    ],
-    "opcode_count": 25
   },
   {
     "class": "Lg60;",
@@ -40035,6 +39553,62 @@
     "opcode_count": 20
   },
   {
+    "class": "Li72;",
+    "name": "q",
+    "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+    "component": "deepseek 273.apk",
+    "file": "smali/i72.smali",
+    "line": 32,
+    "score": 1,
+    "roles": [
+      {
+        "role": "ui_settings",
+        "anchors": [
+          "Settings"
+        ]
+      }
+    ],
+    "invokes": [
+      "Lc12;-><init>(I)V",
+      "Ley3;->S()Ljava/lang/Object;",
+      "Ley3;->X(IZ)Z",
+      "Ley3;->a0()V",
+      "Ley3;->j(Lqd7;)Ljava/lang/Object;",
+      "Ley3;->k(Lhv3;)V",
+      "Ley3;->k0()V",
+      "Ley3;->l()Loz6;",
+      "Ley3;->q(Z)V",
+      "Ley3;->q0(Ljava/lang/Object;)V",
+      "Ley3;->t0()V",
+      "Lhc5;->d(ZZZZLhv3;Lsv3;Lc76;Ley3;II)V",
+      "Lhe5;->T0(D)J",
+      "Lhe5;->V0(I)J",
+      "Li59;-><init>(I)V",
+      "Liu7;->a(Lgz;Lo9;Ley3;I)Lju7;",
+      "Lj92;->d()Z",
+      "Lj92;->e()V",
+      "Lj92;->f(Ljava/lang/String;)V",
+      "Ljava/lang/Integer;->intValue()I",
+      "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;",
+      "Ljava/lang/Object;->getClass()Ljava/lang/Class;",
+      "Ljt5;->B(Ley3;)J",
+      "Ljt5;->J(Lc76;FFFFI)Lc76;",
+      "Lkf5;->K(IILey3;)Lku6;",
+      "Llx0;->T(Ley3;Lc76;)Lc76;",
+      "Lme4;->a(Lku6;Ljava/lang/String;Lc76;JLey3;II)V",
+      "Lto1;-><init>(I)V",
+      "Luia;->f(Lc76;JLtk0;Ljava/lang/String;Ley3;II)V",
+      "Lul8;->l(Lc76;F)Lc76;",
+      "Lvc5;->d0(ILey3;)Ljava/lang/String;",
+      "Lxd5;->A(Lwv3;Ley3;Ljava/lang/Object;)V",
+      "Lxd5;->y(Ley3;Lsv3;)V",
+      "Lz89;->b(Ljava/lang/String;Lc76;JLvc0;JLjp3;JLi59;JIZIILz99;Ley3;III)V",
+      "Lz99;->a(Lz99;JJLjp3;Lun3;JJLyg5;II)Lz99;",
+      "Lz99;->f(Lz99;JJLjp3;Lhp3;Lun3;JLm69;IIJLyg5;II)Lz99;"
+    ],
+    "opcode_count": 1448
+  },
+  {
     "class": "Li78;",
     "name": "remove",
     "descriptor": "()V",
@@ -40620,30 +40194,6 @@
       "Lru0;->q(Lps8;Ll44;Ley3;II)Ldb6;"
     ],
     "opcode_count": 453
-  },
-  {
-    "class": "Lif7;",
-    "name": "<clinit>",
-    "descriptor": "()V",
-    "component": "deepseek 273.apk",
-    "file": "smali/if7.smali",
-    "line": 11,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ljava/util/Arrays;->asList([Ljava/lang/Object;)Ljava/util/List;",
-      "Ljava/util/Collections;->singletonList(Ljava/lang/Object;)Ljava/util/List;",
-      "Lk46;-><init>(Ljava/lang/Object;Ljava/lang/Object;Ljava/util/List;Ljava/util/List;Lk46;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Double;Ljava/util/Map;Ljava/util/List;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Lk46;Lrn7;Lrn7;Lrn7;Lrn7;Ljava/lang/String;Ljava/util/List;Lrn7;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;Lrn7;Lb83;Lwv3;Lwv3;Ljava/lang/Object;Ljava/lang/Object;II)V",
-      "Ll75;-><init>(Ljava/lang/String;Ljava/util/Map;Ljava/util/List;ZLjava/util/Map;ZLjava/lang/String;Ljava/util/List;Ljava/lang/Object;Ljava/lang/Object;Ljava/util/List;I)V"
-    ],
-    "opcode_count": 102
   },
   {
     "class": "Lih9;",
@@ -45462,6 +45012,39 @@
     "opcode_count": 132
   },
   {
+    "class": "Lm0b;",
+    "name": "w",
+    "descriptor": "(Landroid/content/Context;Landroid/os/Looper;Lhx7;Ljava/lang/Object;Lv04;Lw04;)Llo;",
+    "component": "deepseek 273.apk",
+    "file": "smali/m0b.smali",
+    "line": 29,
+    "score": 1,
+    "roles": [
+      {
+        "role": "ui_settings",
+        "anchors": [
+          "Settings"
+        ]
+      }
+    ],
+    "invokes": [
+      "Landroid/os/BaseBundle;->putBoolean(Ljava/lang/String;Z)V",
+      "Landroid/os/BaseBundle;->putInt(Ljava/lang/String;I)V",
+      "Landroid/os/BaseBundle;->putString(Ljava/lang/String;Ljava/lang/String;)V",
+      "Landroid/os/Bundle;-><init>()V",
+      "Landroid/os/Bundle;->putParcelable(Ljava/lang/String;Landroid/os/Parcelable;)V",
+      "Lg2b;-><init>(Landroid/content/Context;Landroid/os/Looper;Lhx7;Lf2b;Ls0b;Ls0b;)V",
+      "Lh2b;-><init>(Landroid/content/Context;Landroid/os/Looper;Lhx7;Lcom/google/android/gms/auth/api/signin/GoogleSignInOptions;Ls0b;Ls0b;)V",
+      "Lhj8;-><init>(Landroid/content/Context;Landroid/os/Looper;Lhx7;Landroid/os/Bundle;Lv04;Lw04;)V",
+      "Ljava/lang/Integer;->intValue()I",
+      "Ljava/lang/Object;->getClass()Ljava/lang/Class;",
+      "Lo04;-><init>(Landroid/content/Context;Landroid/os/Looper;ILhx7;Lv04;Lw04;I)V",
+      "Los8;->t(Ljava/lang/Object;)Ljava/lang/ClassCastException;",
+      "Loy4;->w(Landroid/content/Context;Landroid/os/Looper;Lhx7;Ljava/lang/Object;Lv04;Lw04;)Llo;"
+    ],
+    "opcode_count": 84
+  },
+  {
     "class": "Lm44;",
     "name": "b",
     "descriptor": "(Landroid/os/Looper;)Landroid/os/Handler;",
@@ -48324,55 +47907,6 @@
     "opcode_count": 323
   },
   {
-    "class": "Lo75;",
-    "name": "l",
-    "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "component": "deepseek 273.apk",
-    "file": "smali/o75.smali",
-    "line": 44,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ley3;->S()Ljava/lang/Object;",
-      "Ley3;->X(IZ)Z",
-      "Ley3;->a0()V",
-      "Ley3;->d(I)Z",
-      "Ley3;->f(Ljava/lang/Object;)Z",
-      "Ley3;->g0(I)V",
-      "Ley3;->j(Lqd7;)Ljava/lang/Object;",
-      "Ley3;->q(Z)V",
-      "Ley3;->q0(Ljava/lang/Object;)V",
-      "Li2;-><init>(Ljava/lang/Object;ZLjava/lang/Object;I)V",
-      "Lj92;->d()Z",
-      "Lj92;->e()V",
-      "Lj92;->f(Ljava/lang/String;)V",
-      "Ljava/lang/Number;->intValue()I",
-      "Ljava/util/ArrayList;->get(I)Ljava/lang/Object;",
-      "Ljava/util/List;->get(I)Ljava/lang/Object;",
-      "Ljava/util/Locale;->getDisplayName(Ljava/util/Locale;)Ljava/lang/String;",
-      "Ll99;->a(Ll99;Ljava/lang/String;Lz99;IJLvu2;I)Le99;",
-      "Lm03;-><init>(F)V",
-      "Lns8;->getValue()Ljava/lang/Object;",
-      "Loy4;->o(Lc76;Ljava/lang/String;ZJLhv3;Ley3;I)V",
-      "Lpd5;->H(Lg56;Ley3;)Ljava/lang/String;",
-      "Lup4;->b(Ljava/lang/Object;Ljava/lang/Object;)Z",
-      "Lvu2;->getDensity()F",
-      "Lw97;->c(Ley3;)Lz99;",
-      "Lxc5;->w(IILey3;)Ll99;",
-      "Lyb5;->d(FLsn0;Lc76;Ley3;I)V",
-      "Lyu2;-><init>(FF)V",
-      "Lyu2;->N(I)F"
-    ],
-    "opcode_count": 217
-  },
-  {
     "class": "Lo78;",
     "name": "remove",
     "descriptor": "()V",
@@ -48894,6 +48428,32 @@
     "opcode_count": 124
   },
   {
+    "class": "Loj5;",
+    "name": "<init>",
+    "descriptor": "(ILjava/lang/Integer;Ljava/lang/String;)V",
+    "component": "deepseek 273.apk",
+    "file": "smali/oj5.smali",
+    "line": 36,
+    "score": 1,
+    "roles": [
+      {
+        "role": "session",
+        "anchors": [
+          "message_id"
+        ]
+      }
+    ],
+    "invokes": [
+      "Ljava/lang/Object;-><init>()V",
+      "Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;",
+      "Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V",
+      "Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;",
+      "Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;",
+      "Ljava/lang/StringBuilder;->toString()Ljava/lang/String;"
+    ],
+    "opcode_count": 57
+  },
+  {
     "class": "Loj9;",
     "name": "<init>",
     "descriptor": "(Ljava/io/File;Ljava/lang/String;Lig2;)V",
@@ -49127,6 +48687,37 @@
       "Lym0;->a(Lc76;Lp9;)Lc76;"
     ],
     "opcode_count": 123
+  },
+  {
+    "class": "Lop;",
+    "name": "k",
+    "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+    "component": "deepseek 273.apk",
+    "file": "smali/op.smali",
+    "line": 2226,
+    "score": 1,
+    "roles": [
+      {
+        "role": "session",
+        "anchors": [
+          "session_id"
+        ]
+      }
+    ],
+    "invokes": [
+      "Li32;->W0(Ljava/util/List;)Ljava/lang/Object;",
+      "Ljava/lang/Integer;->intValue()I",
+      "Ljava/lang/String;->valueOf(I)Ljava/lang/String;",
+      "Ljb1;->d()Lps8;",
+      "Lnqa;->p(Ljava/lang/String;Lorg/json/JSONObject;)V",
+      "Lorg/json/JSONObject;->put(Ljava/lang/String;I)Lorg/json/JSONObject;",
+      "Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;",
+      "Lpd5;->I(Lg56;Landroid/content/Context;)Ljava/lang/String;",
+      "Lps8;->getValue()Ljava/lang/Object;",
+      "Lrj2;->k(I)Ljava/lang/String;",
+      "Lsqa;->c(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/json/JSONObject;"
+    ],
+    "opcode_count": 50
   },
   {
     "class": "Lor1;",
@@ -50567,34 +50158,6 @@
       "Landroid/os/AsyncTask;->cancel(Z)Z"
     ],
     "opcode_count": 15
-  },
-  {
-    "class": "Lpt5;",
-    "name": "<clinit>",
-    "descriptor": "()V",
-    "component": "deepseek 273.apk",
-    "file": "smali/pt5.smali",
-    "line": 11,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ljava/lang/Double;->valueOf(D)Ljava/lang/Double;",
-      "Ljava/util/Arrays;->asList([Ljava/lang/Object;)Ljava/util/List;",
-      "Ljava/util/Collections;->singletonList(Ljava/lang/Object;)Ljava/util/List;",
-      "Lk46;-><init>(Ljava/lang/Object;Ljava/lang/Object;Ljava/util/List;Ljava/util/List;Lk46;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Double;Ljava/util/Map;Ljava/util/List;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Lk46;Lrn7;Lrn7;Lrn7;Lrn7;Ljava/lang/String;Ljava/util/List;Lrn7;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;Lrn7;Lb83;Lwv3;Lwv3;Ljava/lang/Object;Ljava/lang/Object;II)V",
-      "Ll75;-><init>(Ljava/lang/String;Ljava/util/Map;Ljava/util/List;ZLjava/util/Map;ZLjava/lang/String;Ljava/util/List;Ljava/lang/Object;Ljava/lang/Object;Ljava/util/List;I)V",
-      "Llq5;->p1([Lnu6;)Ljava/util/Map;",
-      "Lm46;-><init>()V",
-      "Lnu6;-><init>(Ljava/lang/Object;Ljava/lang/Object;)V"
-    ],
-    "opcode_count": 154
   },
   {
     "class": "Lpu2;",
@@ -53390,32 +52953,6 @@
     "opcode_count": 31
   },
   {
-    "class": "Lra3;",
-    "name": "<clinit>",
-    "descriptor": "()V",
-    "component": "deepseek 273.apk",
-    "file": "smali/ra3.smali",
-    "line": 11,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ljava/lang/Double;->valueOf(D)Ljava/lang/Double;",
-      "Ljava/util/Arrays;->asList([Ljava/lang/Object;)Ljava/util/List;",
-      "Lk46;-><init>(Ljava/lang/Object;Ljava/lang/Object;Ljava/util/List;Ljava/util/List;Lk46;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Double;Ljava/util/Map;Ljava/util/List;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Lk46;Lrn7;Lrn7;Lrn7;Lrn7;Ljava/lang/String;Ljava/util/List;Lrn7;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;Lrn7;Lb83;Lwv3;Lwv3;Ljava/lang/Object;Ljava/lang/Object;II)V",
-      "Ll75;-><init>(Ljava/lang/String;Ljava/util/Map;Ljava/util/List;ZLjava/util/Map;ZLjava/lang/String;Ljava/util/List;Ljava/lang/Object;Ljava/lang/Object;Ljava/util/List;I)V",
-      "Llq5;->p1([Lnu6;)Ljava/util/Map;",
-      "Lnu6;-><init>(Ljava/lang/Object;Ljava/lang/Object;)V"
-    ],
-    "opcode_count": 201
-  },
-  {
     "class": "Lrc1;",
     "name": "f",
     "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
@@ -54219,64 +53756,6 @@
       "Lru0;->p(Lki3;Ljava/lang/Object;Lhg5;Lag2;Ley3;I)Ldb6;"
     ],
     "opcode_count": 33
-  },
-  {
-    "class": "Lru7;",
-    "name": "<clinit>",
-    "descriptor": "()V",
-    "component": "deepseek 273.apk",
-    "file": "smali/ru7.smali",
-    "line": 11,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Lfya;->Z(Ljava/lang/Object;)Ljava/util/List;",
-      "Lfya;->a0([Ljava/lang/Object;)Ljava/util/List;",
-      "Ljava/lang/Double;->valueOf(D)Ljava/lang/Double;",
-      "Lk46;-><init>(Ljava/lang/Object;Ljava/lang/Object;Ljava/util/List;Ljava/util/List;Lk46;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Double;Ljava/util/Map;Ljava/util/List;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Lk46;Lrn7;Lrn7;Lrn7;Lrn7;Ljava/lang/String;Ljava/util/List;Lrn7;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;Lrn7;Lb83;Lwv3;Lwv3;Ljava/lang/Object;Ljava/lang/Object;II)V",
-      "Ll46;-><init>(Ljava/lang/String;)V",
-      "Ll75;-><init>(Ljava/lang/String;Ljava/util/Map;Ljava/util/List;ZLjava/util/Map;ZLjava/lang/String;Ljava/util/List;Ljava/lang/Object;Ljava/lang/Object;Ljava/util/List;I)V",
-      "Llq5;->p1([Lnu6;)Ljava/util/Map;",
-      "Lmq5;->n1(Lnu6;)Ljava/util/Map;",
-      "Lwe5;->G(Ljava/lang/Object;Ljava/lang/Object;)Lnu6;"
-    ],
-    "opcode_count": 3096
-  },
-  {
-    "class": "Lrv;",
-    "name": "a",
-    "descriptor": "(Ljava/lang/String;)Ljava/util/List;",
-    "component": "deepseek 273.apk",
-    "file": "smali/rv.smali",
-    "line": 37,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Lcom/tencent/mmkv/MMKV;->j(Ljava/lang/String;)Ljava/lang/String;",
-      "Ljava/lang/Iterable;->iterator()Ljava/util/Iterator;",
-      "Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;",
-      "Ljava/util/ArrayList;-><init>()V",
-      "Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z",
-      "Ljava/util/Iterator;->hasNext()Z",
-      "Ljava/util/Iterator;->next()Ljava/lang/Object;",
-      "Llx8;->v0(Ljava/lang/CharSequence;[C)Ljava/util/List;",
-      "Lsx8;->V(Ljava/lang/String;)Ljava/lang/Integer;"
-    ],
-    "opcode_count": 34
   },
   {
     "class": "Lrv;",
@@ -55937,29 +55416,6 @@
       "Lm47;->j(Ljava/lang/String;Z)V"
     ],
     "opcode_count": 12
-  },
-  {
-    "class": "Lt12;",
-    "name": "<clinit>",
-    "descriptor": "()V",
-    "component": "deepseek 273.apk",
-    "file": "smali/t12.smali",
-    "line": 11,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ljava/util/Collections;->singletonList(Ljava/lang/Object;)Ljava/util/List;",
-      "Lk46;-><init>(Ljava/lang/Object;Ljava/lang/Object;Ljava/util/List;Ljava/util/List;Lk46;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Double;Ljava/util/Map;Ljava/util/List;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Lk46;Lrn7;Lrn7;Lrn7;Lrn7;Ljava/lang/String;Ljava/util/List;Lrn7;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;Lrn7;Lb83;Lwv3;Lwv3;Ljava/lang/Object;Ljava/lang/Object;II)V",
-      "Ll75;-><init>(Ljava/lang/String;Ljava/util/Map;Ljava/util/List;ZLjava/util/Map;ZLjava/lang/String;Ljava/util/List;Ljava/lang/Object;Ljava/lang/Object;Ljava/util/List;I)V"
-    ],
-    "opcode_count": 69
   },
   {
     "class": "Lt3b;",
@@ -58155,31 +57611,6 @@
     "opcode_count": 62
   },
   {
-    "class": "Luy5;",
-    "name": "toString",
-    "descriptor": "()Ljava/lang/String;",
-    "component": "deepseek 273.apk",
-    "file": "smali/uy5.smali",
-    "line": 287,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V",
-      "Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;",
-      "Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;",
-      "Ljava/lang/StringBuilder;->toString()Ljava/lang/String;",
-      "Lsqa;->e(Ljava/lang/StringBuilder;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V"
-    ],
-    "opcode_count": 23
-  },
-  {
     "class": "Lv22;",
     "name": "<clinit>",
     "descriptor": "()V",
@@ -58308,6 +57739,32 @@
       "Lup4;->b(Ljava/lang/Object;Ljava/lang/Object;)Z"
     ],
     "opcode_count": 36
+  },
+  {
+    "class": "Lv56;",
+    "name": "toString",
+    "descriptor": "()Ljava/lang/String;",
+    "component": "deepseek 273.apk",
+    "file": "smali/v56.smali",
+    "line": 1578,
+    "score": 1,
+    "roles": [
+      {
+        "role": "multimodal_audio",
+        "anchors": [
+          "tts"
+        ]
+      }
+    ],
+    "invokes": [
+      "Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;",
+      "Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;",
+      "Ljava/lang/StringBuilder;->append(Z)Ljava/lang/StringBuilder;",
+      "Ljava/lang/StringBuilder;->toString()Ljava/lang/String;",
+      "Ln66;->s(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/StringBuilder;",
+      "Lsqa;->e(Ljava/lang/StringBuilder;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V"
+    ],
+    "opcode_count": 75
   },
   {
     "class": "Lv60;",
@@ -59891,81 +59348,6 @@
     "opcode_count": 212
   },
   {
-    "class": "Lw97;",
-    "name": "a",
-    "descriptor": "(Ley3;)Lzl0;",
-    "component": "deepseek 273.apk",
-    "file": "smali/w97.smali",
-    "line": 118,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "La18;->i(FJ)Lzl0;",
-      "Ley3;->j(Lqd7;)Ljava/lang/Object;",
-      "Lj92;->d()Z",
-      "Lj92;->e()V",
-      "Lj92;->f(Ljava/lang/String;)V"
-    ],
-    "opcode_count": 30
-  },
-  {
-    "class": "Lw97;",
-    "name": "b",
-    "descriptor": "(Ley3;)J",
-    "component": "deepseek 273.apk",
-    "file": "smali/w97.smali",
-    "line": 249,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ley3;->j(Lqd7;)Ljava/lang/Object;",
-      "Lj92;->d()Z",
-      "Lj92;->e()V",
-      "Lj92;->f(Ljava/lang/String;)V"
-    ],
-    "opcode_count": 25
-  },
-  {
-    "class": "Lw97;",
-    "name": "c",
-    "descriptor": "(Ley3;)Lz99;",
-    "component": "deepseek 273.apk",
-    "file": "smali/w97.smali",
-    "line": 360,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ley3;->j(Lqd7;)Ljava/lang/Object;",
-      "Lhe5;->V0(I)J",
-      "Lj92;->d()Z",
-      "Lj92;->e()V",
-      "Lj92;->f(Ljava/lang/String;)V",
-      "Lz99;->f(Lz99;JJLjp3;Lhp3;Lun3;JLm69;IIJLyg5;II)Lz99;"
-    ],
-    "opcode_count": 46
-  },
-  {
     "class": "Lwca;",
     "name": "j",
     "descriptor": "()Landroid/net/Uri;",
@@ -60073,30 +59455,6 @@
       "Lz65;->e(Ljava/lang/Object;Ljava/lang/Object;Leg5;Lsv3;Ley3;I)V"
     ],
     "opcode_count": 367
-  },
-  {
-    "class": "Lwh8;",
-    "name": "<clinit>",
-    "descriptor": "()V",
-    "component": "deepseek 273.apk",
-    "file": "smali/wh8.smali",
-    "line": 11,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ljava/util/Arrays;->asList([Ljava/lang/Object;)Ljava/util/List;",
-      "Ljava/util/Collections;->singletonList(Ljava/lang/Object;)Ljava/util/List;",
-      "Lk46;-><init>(Ljava/lang/Object;Ljava/lang/Object;Ljava/util/List;Ljava/util/List;Lk46;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Double;Ljava/util/Map;Ljava/util/List;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Lk46;Lrn7;Lrn7;Lrn7;Lrn7;Ljava/lang/String;Ljava/util/List;Lrn7;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;Lrn7;Lb83;Lwv3;Lwv3;Ljava/lang/Object;Ljava/lang/Object;II)V",
-      "Ll75;-><init>(Ljava/lang/String;Ljava/util/Map;Ljava/util/List;ZLjava/util/Map;ZLjava/lang/String;Ljava/util/List;Ljava/lang/Object;Ljava/lang/Object;Ljava/util/List;I)V"
-    ],
-    "opcode_count": 75
   },
   {
     "class": "Lwm9;",
@@ -62824,173 +62182,6 @@
     "opcode_count": 25
   },
   {
-    "class": "Lyb5;",
-    "name": "c",
-    "descriptor": "(Lg56;Lhv3;Lc76;ZLey3;I)V",
-    "component": "deepseek 273.apk",
-    "file": "smali/yb5.smali",
-    "line": 2254,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Lba7;-><init>(Lg56;I)V",
-      "Ley3;->X(IZ)Z",
-      "Ley3;->a0()V",
-      "Ley3;->f(Ljava/lang/Object;)Z",
-      "Ley3;->g(Z)Z",
-      "Ley3;->h(Ljava/lang/Object;)Z",
-      "Ley3;->i0(I)Ley3;",
-      "Ley3;->v()Ljk7;",
-      "Lfx;-><init>(Lg56;Lhv3;Lc76;ZI)V",
-      "Lj92;->d()Z",
-      "Lj92;->e()V",
-      "Lj92;->f(Ljava/lang/String;)V",
-      "Ltp4;->H(ILew3;Ley3;)Lt62;",
-      "Lul8;->e(Lc76;F)Lc76;",
-      "Lvz8;->b(Lhv3;Lc76;ZLmd8;JJFLzl0;Lca6;Lt62;Ley3;II)V",
-      "Lw97;->a(Ley3;)Lzl0;",
-      "Lw97;->b(Ley3;)J"
-    ],
-    "opcode_count": 94
-  },
-  {
-    "class": "Lyb5;",
-    "name": "d",
-    "descriptor": "(FLsn0;Lc76;Ley3;I)V",
-    "component": "deepseek 273.apk",
-    "file": "smali/yb5.smali",
-    "line": 2635,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Laa7;-><init>(FLsn0;Lc76;I)V",
-      "Ley3;->X(IZ)Z",
-      "Ley3;->a0()V",
-      "Ley3;->c(F)Z",
-      "Ley3;->f(Ljava/lang/Object;)Z",
-      "Ley3;->i0(I)Ley3;",
-      "Ley3;->v()Ljk7;",
-      "Lj92;->d()Z",
-      "Lj92;->e()V",
-      "Lj92;->f(Ljava/lang/String;)V",
-      "Ltp4;->H(ILew3;Ley3;)Lt62;",
-      "Lul8;->e(Lc76;F)Lc76;",
-      "Lvz8;->a(Lc76;Lmd8;JJFLzl0;Lt62;Ley3;II)V",
-      "Lw97;->a(Ley3;)Lzl0;",
-      "Lw97;->b(Ley3;)J",
-      "Lzl2;-><init>(FILjava/lang/Object;)V"
-    ],
-    "opcode_count": 75
-  },
-  {
-    "class": "Lyb5;",
-    "name": "e",
-    "descriptor": "(Leb6;Ljava/util/List;Lwv3;Lc76;ZLwv3;Ley3;I)V",
-    "component": "deepseek 273.apk",
-    "file": "smali/yb5.smali",
-    "line": 2942,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ldm0;->c(Leb6;Lc76;Ly93;Lsc3;Ljava/lang/String;Lt62;Ley3;I)V",
-      "Ley3;->X(IZ)Z",
-      "Ley3;->a0()V",
-      "Ley3;->f(Ljava/lang/Object;)Z",
-      "Ley3;->g(Z)Z",
-      "Ley3;->h(Ljava/lang/Object;)Z",
-      "Ley3;->i0(I)Ley3;",
-      "Ley3;->v()Ljk7;",
-      "Lfa0;-><init>(Leb6;Ljava/util/List;Lwv3;Lc76;ZLwv3;I)V",
-      "Lj92;->d()Z",
-      "Lj92;->e()V",
-      "Lj92;->f(Ljava/lang/String;)V",
-      "Loo4;-><init>(J)V",
-      "Lru0;->a0(FFLjava/lang/Object;I)Lcr8;",
-      "Lsc3;->a(Lsc3;)Lsc3;",
-      "Lt93;->c(Lpg3;I)Ly93;",
-      "Lt93;->d(Lpg3;I)Ly93;",
-      "Lt93;->e(Lpg3;I)Lsc3;",
-      "Lt93;->g(Lpg3;I)Lsc3;",
-      "Ltp4;->H(ILew3;Ley3;)Lt62;",
-      "Ly93;->a(Ly93;)Ly93;",
-      "Lz97;-><init>(Ljava/util/List;Lwv3;Lc76;ZLwv3;)V"
-    ],
-    "opcode_count": 162
-  },
-  {
-    "class": "Lyb5;",
-    "name": "f",
-    "descriptor": "(Ljava/util/List;Lwv3;Lc76;ZLwv3;ZLey3;I)V",
-    "component": "deepseek 273.apk",
-    "file": "smali/yb5.smali",
-    "line": 3607,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Lca7;-><init>(Ljava/util/List;Lwv3;Lc76;ZLwv3;ZII)V",
-      "Lcq1;-><init>(ILjava/lang/Object;Ljava/lang/Object;)V",
-      "Lda7;-><init>(ZLjava/util/List;Ljava/util/Set;Lwv3;Lwv3;Z)V",
-      "Ldg9;->g()Z",
-      "Leea;->s(Ldg9;Lc76;Lpg3;Lsv3;Lt62;Ley3;I)V",
-      "Ley3;->S()Ljava/lang/Object;",
-      "Ley3;->X(IZ)Z",
-      "Ley3;->a0()V",
-      "Ley3;->e(J)Z",
-      "Ley3;->f(Ljava/lang/Object;)Z",
-      "Ley3;->g(Z)Z",
-      "Ley3;->h(Ljava/lang/Object;)Z",
-      "Ley3;->i0(I)Ley3;",
-      "Ley3;->q0(Ljava/lang/Object;)V",
-      "Ley3;->v()Ljk7;",
-      "Lge5;->V(Ljava/lang/Object;Ley3;)Ldb6;",
-      "Lj32;->B0(Ljava/lang/Iterable;I)I",
-      "Lj92;->d()Z",
-      "Lj92;->e()V",
-      "Lj92;->f(Ljava/lang/String;)V",
-      "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;",
-      "Ljava/lang/Iterable;->iterator()Ljava/util/Iterator;",
-      "Ljava/util/ArrayList;-><init>(I)V",
-      "Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z",
-      "Ljava/util/Iterator;->hasNext()Z",
-      "Ljava/util/Iterator;->next()Ljava/lang/Object;",
-      "Ljava/util/LinkedHashSet;-><init>()V",
-      "Ljava/util/List;->isEmpty()Z",
-      "Llv6;-><init>(J)V",
-      "Llx0;->d0(Ljava/lang/Object;Ljava/lang/String;Ley3;I)Ldg9;",
-      "Lru0;->c0(IILx53;I)Lsk9;",
-      "Ltp4;->H(ILew3;Ley3;)Lt62;"
-    ],
-    "opcode_count": 202
-  },
-  {
     "class": "Lyb;",
     "name": "run",
     "descriptor": "()V",
@@ -63089,30 +62280,6 @@
       "Landroid/content/res/Resources$Theme;->hashCode()I"
     ],
     "opcode_count": 7
-  },
-  {
-    "class": "Lyh6;",
-    "name": "<clinit>",
-    "descriptor": "()V",
-    "component": "deepseek 273.apk",
-    "file": "smali/yh6.smali",
-    "line": 11,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ljava/util/Arrays;->asList([Ljava/lang/Object;)Ljava/util/List;",
-      "Ljava/util/Collections;->singletonList(Ljava/lang/Object;)Ljava/util/List;",
-      "Lk46;-><init>(Ljava/lang/Object;Ljava/lang/Object;Ljava/util/List;Ljava/util/List;Lk46;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Double;Ljava/util/Map;Ljava/util/List;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Lk46;Lrn7;Lrn7;Lrn7;Lrn7;Ljava/lang/String;Ljava/util/List;Lrn7;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;Lrn7;Lb83;Lwv3;Lwv3;Ljava/lang/Object;Ljava/lang/Object;II)V",
-      "Ll75;-><init>(Ljava/lang/String;Ljava/util/Map;Ljava/util/List;ZLjava/util/Map;ZLjava/lang/String;Ljava/util/List;Ljava/lang/Object;Ljava/lang/Object;Ljava/util/List;I)V"
-    ],
-    "opcode_count": 99
   },
   {
     "class": "Lyh;",
@@ -64009,33 +63176,6 @@
     "opcode_count": 306
   },
   {
-    "class": "Lz97;",
-    "name": "f",
-    "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "component": "deepseek 273.apk",
-    "file": "smali/z97.smali",
-    "line": 56,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ldg9;->g()Z",
-      "Lj92;->d()Z",
-      "Lj92;->e()V",
-      "Lj92;->f(Ljava/lang/String;)V",
-      "Ljava/lang/Object;->getClass()Ljava/lang/Class;",
-      "Lml;->b()Ldg9;",
-      "Lyb5;->f(Ljava/util/List;Lwv3;Lc76;ZLwv3;ZLey3;I)V"
-    ],
-    "opcode_count": 28
-  },
-  {
     "class": "Lz98;",
     "name": "a",
     "descriptor": "(Ljava/lang/Class;)Ljava/lang/Object;",
@@ -64098,34 +63238,6 @@
       "Lz99;->c()J"
     ],
     "opcode_count": 131
-  },
-  {
-    "class": "Lz9a;",
-    "name": "<clinit>",
-    "descriptor": "()V",
-    "component": "deepseek 273.apk",
-    "file": "smali/z9a.smali",
-    "line": 11,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ljava/lang/Double;->valueOf(D)Ljava/lang/Double;",
-      "Ljava/util/Arrays;->asList([Ljava/lang/Object;)Ljava/util/List;",
-      "Ljava/util/Collections;->singletonList(Ljava/lang/Object;)Ljava/util/List;",
-      "Lk46;-><init>(Ljava/lang/Object;Ljava/lang/Object;Ljava/util/List;Ljava/util/List;Lk46;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Double;Ljava/util/Map;Ljava/util/List;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Lk46;Lrn7;Lrn7;Lrn7;Lrn7;Ljava/lang/String;Ljava/util/List;Lrn7;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;Lrn7;Lb83;Lwv3;Lwv3;Ljava/lang/Object;Ljava/lang/Object;II)V",
-      "Ll75;-><init>(Ljava/lang/String;Ljava/util/Map;Ljava/util/List;ZLjava/util/Map;ZLjava/lang/String;Ljava/util/List;Ljava/lang/Object;Ljava/lang/Object;Ljava/util/List;I)V",
-      "Llq5;->p1([Lnu6;)Ljava/util/Map;",
-      "Lm46;-><init>()V",
-      "Lnu6;-><init>(Ljava/lang/Object;Ljava/lang/Object;)V"
-    ],
-    "opcode_count": 610
   },
   {
     "class": "Lzc;",
@@ -64347,54 +63459,6 @@
       "Lm47;->j(Ljava/lang/String;Z)V"
     ],
     "opcode_count": 16
-  },
-  {
-    "class": "Lzl2;",
-    "name": "q",
-    "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-    "component": "deepseek 273.apk",
-    "file": "smali/zl2.smali",
-    "line": 62,
-    "score": 1,
-    "roles": [
-      {
-        "role": "prompt_pipeline",
-        "anchors": [
-          "prompt"
-        ]
-      }
-    ],
-    "invokes": [
-      "Ley3;->X(IZ)Z",
-      "Ley3;->a0()V",
-      "Ley3;->k(Lhv3;)V",
-      "Ley3;->k0()V",
-      "Ley3;->l()Loz6;",
-      "Ley3;->q(Z)V",
-      "Ley3;->t0()V",
-      "Lj92;->d()Z",
-      "Lj92;->e()V",
-      "Lj92;->f(Ljava/lang/String;)V",
-      "Ljava/lang/Integer;->intValue()I",
-      "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;",
-      "Ljava/lang/Object;->getClass()Ljava/lang/Class;",
-      "Ljt5;->B(Ley3;)J",
-      "Ljt5;->H(Lc76;FFI)Lc76;",
-      "Llx0;->T(Ley3;Lc76;)Lc76;",
-      "Loy4;->l(Lc76;FLey3;I)V",
-      "Ltm0;->a(Lc76;Ley3;I)V",
-      "Ltm0;->d(Lp9;Z)Lvt5;",
-      "Ltp4;->y(ILey3;Z)Lqg5;",
-      "Luia;->u(Lc76;Lsn0;Lmd8;I)Lc76;",
-      "Lul8;->e(Lc76;F)Lc76;",
-      "Lul8;->q(Lc76;F)Lc76;",
-      "Lwv3;->q(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-      "Lxd5;->A(Lwv3;Ley3;Ljava/lang/Object;)V",
-      "Lxd5;->y(Ley3;Lsv3;)V",
-      "Lz65;->D(I)I",
-      "Lzya;->e0(Lc76;Lh6a;)Lc76;"
-    ],
-    "opcode_count": 162
   },
   {
     "class": "Lzl9;",

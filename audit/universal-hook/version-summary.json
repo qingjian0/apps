@@ -86,7 +86,11 @@
     "class_count": 14906,
     "method_count": 71243,
     "call_edge_count": 453718,
-    "candidate_method_count": 2261,
+    "field_read_count": 152946,
+    "field_write_count": 70534,
+    "methods_with_control_flow": 27309,
+    "control_flow_branch_count": 250308,
+    "candidate_method_count": 2233,
     "native_libraries": [
       {
         "component": "deepseek271.apk",
@@ -277,7 +281,11 @@
     "class_count": 15055,
     "method_count": 72258,
     "call_edge_count": 462894,
-    "candidate_method_count": 2291,
+    "field_read_count": 156175,
+    "field_write_count": 71761,
+    "methods_with_control_flow": 27804,
+    "control_flow_branch_count": 256989,
+    "candidate_method_count": 2263,
     "native_libraries": [
       {
         "component": "deepseek-2-7-2.apk",
@@ -468,7 +476,11 @@
     "class_count": 13043,
     "method_count": 64557,
     "call_edge_count": 400184,
-    "candidate_method_count": 1913,
+    "field_read_count": 133829,
+    "field_write_count": 61032,
+    "methods_with_control_flow": 24387,
+    "control_flow_branch_count": 221348,
+    "candidate_method_count": 1886,
     "native_libraries": [
       {
         "component": "deepseek 273.apk",
@@ -1242,7 +1254,11 @@
     "class_count": 15370,
     "method_count": 73611,
     "call_edge_count": 472017,
-    "candidate_method_count": 2311,
+    "field_read_count": 158420,
+    "field_write_count": 72875,
+    "methods_with_control_flow": 28351,
+    "control_flow_branch_count": 261392,
+    "candidate_method_count": 2283,
     "native_libraries": [
       {
         "component": "component-2-split_config.arm64_v8a.apk",
@@ -1433,7 +1449,11 @@
     "class_count": 15054,
     "method_count": 72257,
     "call_edge_count": 463096,
-    "candidate_method_count": 2290,
+    "field_read_count": 156189,
+    "field_write_count": 71813,
+    "methods_with_control_flow": 27803,
+    "control_flow_branch_count": 257263,
+    "candidate_method_count": 2262,
     "native_libraries": [
       {
         "component": "DeepSeek_2.7.5.apk",

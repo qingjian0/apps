@@ -85,7 +85,11 @@
   "class_count": 15055,
   "method_count": 72258,
   "call_edge_count": 462894,
-  "candidate_method_count": 2291,
+  "field_read_count": 156175,
+  "field_write_count": 71761,
+  "methods_with_control_flow": 27804,
+  "control_flow_branch_count": 256989,
+  "candidate_method_count": 2263,
   "native_libraries": [
     {
       "component": "deepseek-2-7-2.apk",

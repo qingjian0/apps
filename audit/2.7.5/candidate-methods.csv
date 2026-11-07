@@ -3,9 +3,9 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lnw3;","e","(Lyu1;Ljava/lang/Long;)Lb70;",7,"request_route|pow|session","smali/nw3.smali",974
 "2.7.5","DeepSeek_2.7.5.apk","Lpv1;","a","(Lpv1;Lbia;Lec3;)Ljava/lang/Object;",7,"sse_dispatch|serialization|session|multimodal_audio","smali/pv1.smali",181
 "2.7.5","DeepSeek_2.7.5.apk","Ltz0;","z","(Ljava/lang/Object;)Ljava/lang/Object;",7,"request_route|pow|session","smali/tz0.smali",1954
-"2.7.5","DeepSeek_2.7.5.apk","Lag;","z","(Ljava/lang/Object;)Ljava/lang/Object;",6,"serialization|session|prompt_pipeline|multimodal_image|multimodal_audio","smali_classes3/ag.smali",3055
 "2.7.5","DeepSeek_2.7.5.apk","Ld9;","run","()V",6,"attachment_file|search_web|storage_sync|ui_settings","smali/d9.smali",1139
 "2.7.5","DeepSeek_2.7.5.apk","Lzp;","run","()V",6,"agent_planning|attachment_file|search_web|storage_sync|ui_settings","smali/zp.smali",64
+"2.7.5","DeepSeek_2.7.5.apk","Lag;","z","(Ljava/lang/Object;)Ljava/lang/Object;",5,"serialization|session|multimodal_image|multimodal_audio","smali_classes3/ag.smali",3055
 "2.7.5","DeepSeek_2.7.5.apk","Lbpc;","d","(Lcom/bytedance/services/apm/api/HttpResponse;)Z",5,"flow_coroutine|attachment_file|search_web|storage_sync|ui_settings","smali/bpc.smali",904
 "2.7.5","DeepSeek_2.7.5.apk","Lh05;","run","()V",5,"attachment_file|search_web|storage_sync|ui_settings","smali/h05.smali",775
 "2.7.5","DeepSeek_2.7.5.apk","Lh45;","<clinit>","()V",5,"flow_coroutine|multimodal_audio|storage_sync|account_capability","smali/h45.smali",11
@@ -20,12 +20,9 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lgn3;","t","(Lxq7;Lfk7;Lzx9;Lbab;Lgn8;Lv15;I)V",4,"search_web|ui_settings","smali_classes3/gn3.smali",18191
 "2.7.5","DeepSeek_2.7.5.apk","Lgo3;","<clinit>","()V",4,"request_route","smali/go3.smali",11
 "2.7.5","DeepSeek_2.7.5.apk","Libc;","run","()V",4,"attachment_file|search_web|storage_sync|ui_settings","smali/ibc.smali",38
-"2.7.5","DeepSeek_2.7.5.apk","Lilc;","m","(Ljava/lang/String;Lyr;Ljava/lang/String;Ljava/lang/String;IILec3;)Ljava/lang/Object;",4,"session|prompt_pipeline|multimodal_audio","smali/ilc.smali",3242
-"2.7.5","DeepSeek_2.7.5.apk","Lilc;","q","(Ljava/lang/String;IJLjava/lang/String;Lzs;ZZLjava/lang/String;Ljava/util/List;Lb92;Ljda;)V",4,"session|prompt_pipeline|multimodal_audio|search_web","smali/ilc.smali",1983
 "2.7.5","DeepSeek_2.7.5.apk","Lji;","q","(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",4,"session|search_web|ui_settings","smali/ji.smali",118
 "2.7.5","DeepSeek_2.7.5.apk","Lmab;","<clinit>","()V",4,"session|multimodal_audio","smali/mab.smali",16
 "2.7.5","DeepSeek_2.7.5.apk","Lonc;","c","(Lorg/json/JSONObject;)V",4,"attachment_file|search_web|storage_sync|ui_settings","smali/onc.smali",170
-"2.7.5","DeepSeek_2.7.5.apk","Loy1;","<clinit>","()V",4,"session|prompt_pipeline|multimodal_audio","smali/oy1.smali",16
 "2.7.5","DeepSeek_2.7.5.apk","Lr9b;","a","()V",4,"session|multimodal_audio|account_capability","smali/r9b.smali",114
 "2.7.5","DeepSeek_2.7.5.apk","Lrmc;","a","(Lorg/json/JSONObject;)Z",4,"agent_planning|search_web|storage_sync|ui_settings","smali/rmc.smali",68
 "2.7.5","DeepSeek_2.7.5.apk","Lrq;","q","(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",4,"session|search_web","smali/rq.smali",2661
@@ -49,7 +46,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","","run","()V",3,"search_web|storage_sync|ui_settings","smali/com/tencent/mm/opensdk/openapi/BaseWXApiImplV10$1.smali",49
 "2.7.5","DeepSeek_2.7.5.apk","","sendPayReq","(Landroid/content/Context;Landroid/os/Bundle;)Z",3,"search_web|storage_sync|ui_settings","smali/com/tencent/mm/opensdk/openapi/BaseWXApiImplV10.smali",4487
 "2.7.5","DeepSeek_2.7.5.apk","La6;","q","(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",3,"search_web|ui_settings","smali/a6.smali",680
-"2.7.5","DeepSeek_2.7.5.apk","Lai7;","<clinit>","()V",3,"prompt_pipeline|multimodal_audio|account_capability","smali/ai7.smali",16
 "2.7.5","DeepSeek_2.7.5.apk","Lanc;","a","(Lhr5;Landroid/content/Context;Ljava/lang/String;)Lcom/bytedance/applog/store/kv/IKVStore;",3,"search_web|storage_sync|ui_settings","smali/anc.smali",31
 "2.7.5","DeepSeek_2.7.5.apk","Lanc;","c","(Landroid/content/SharedPreferences;Ljava/lang/String;)V",3,"search_web|storage_sync|ui_settings","smali/anc.smali",456
 "2.7.5","DeepSeek_2.7.5.apk","Landroidx/credentials/playservices/CredentialProviderPlayServicesImpl;","onClearCredential","(Lqw2;Landroid/os/CancellationSignal;Ljava/util/concurrent/Executor;Lze3;)V",3,"search_web|storage_sync|ui_settings","smali/androidx/credentials/playservices/CredentialProviderPlayServicesImpl.smali",378
@@ -152,7 +148,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lf27;","k0","(Ljava/io/File;Ljava/io/File;)Ljava/io/File;",3,"search_web|storage_sync|ui_settings","smali_classes3/f27.smali",16084
 "2.7.5","DeepSeek_2.7.5.apk","Lfmc;","c","()Z",3,"search_web|storage_sync|ui_settings","smali/fmc.smali",151
 "2.7.5","DeepSeek_2.7.5.apk","Lfmc;","f","()J",3,"search_web|storage_sync|ui_settings","smali/fmc.smali",2656
-"2.7.5","DeepSeek_2.7.5.apk","Lfu0;","V","(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/String;III)V",3,"session|prompt_pipeline|multimodal_audio","smali_classes3/fu0.smali",2637
 "2.7.5","DeepSeek_2.7.5.apk","Lfuc;","j1","(Landroid/content/Context;Ljava/lang/String;)Landroid/content/SharedPreferences;",3,"search_web|storage_sync|ui_settings","smali/fuc.smali",103
 "2.7.5","DeepSeek_2.7.5.apk","Lgj;","j","(Ljava/lang/Object;)Ljava/lang/Object;",3,"session|search_web|ui_settings","smali/gj.smali",2424
 "2.7.5","DeepSeek_2.7.5.apk","Lgoc;","a","(Leec;Ljava/util/ArrayList;Z)Luoc;",3,"search_web|storage_sync|ui_settings","smali/goc.smali",87
@@ -167,7 +162,8 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Liec;","b","()V",3,"search_web|storage_sync|ui_settings","smali/iec.smali",191
 "2.7.5","DeepSeek_2.7.5.apk","Liec;","c","(Ljava/io/File;IJ)V",3,"search_web|storage_sync|ui_settings","smali/iec.smali",319
 "2.7.5","DeepSeek_2.7.5.apk","Lil0;","o","(Lv15;)Ljy4;",3,"agent_tool|tool_registry_execution|search_web","smali/il0.smali",138
-"2.7.5","DeepSeek_2.7.5.apk","Lilc;","p","(Ljava/lang/String;IZZZZLjda;Ljava/lang/String;Ljava/util/List;Ljava/lang/String;ZLjava/lang/String;)V",3,"session|prompt_pipeline|search_web","smali/ilc.smali",1544
+"2.7.5","DeepSeek_2.7.5.apk","Lilc;","m","(Ljava/lang/String;Lyr;Ljava/lang/String;Ljava/lang/String;IILec3;)Ljava/lang/Object;",3,"session|multimodal_audio","smali/ilc.smali",3242
+"2.7.5","DeepSeek_2.7.5.apk","Lilc;","q","(Ljava/lang/String;IJLjava/lang/String;Lzs;ZZLjava/lang/String;Ljava/util/List;Lb92;Ljda;)V",3,"session|multimodal_audio|search_web","smali/ilc.smali",1983
 "2.7.5","DeepSeek_2.7.5.apk","Lk23;","t0","(IILjava/lang/String;Ljava/lang/String;)V",3,"session|search_web","smali_classes3/k23.smali",37021
 "2.7.5","DeepSeek_2.7.5.apk","Lke7;","<clinit>","()V",3,"multimodal_image|attachment_file","smali/ke7.smali",11
 "2.7.5","DeepSeek_2.7.5.apk","Lkwc;","u","()V",3,"search_web|storage_sync|ui_settings","smali/kwc.smali",1979
@@ -175,9 +171,9 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lmc7;","g","()V",3,"search_web|storage_sync|ui_settings","smali/mc7.smali",1064
 "2.7.5","DeepSeek_2.7.5.apk","Lmc7;","i","()Z",3,"search_web|storage_sync|ui_settings","smali/mc7.smali",1436
 "2.7.5","DeepSeek_2.7.5.apk","Ln4;","w","()Ljava/lang/Object;",3,"session|attachment_file|ui_settings","smali/n4.smali",121
-"2.7.5","DeepSeek_2.7.5.apk","Lo67;","d","(Ly62;Lom2;Lcj7;Ljava/lang/String;Ljy4;Lfk7;ZJLlw;Lu9a;Lv15;II)V",3,"flow_coroutine|prompt_pipeline|multimodal_image","smali/o67.smali",5251
 "2.7.5","DeepSeek_2.7.5.apk","Loc2;","d","(Lhc2;Lzs;)V",3,"session|search_web","smali/oc2.smali",852
 "2.7.5","DeepSeek_2.7.5.apk","Lonc;","g","()V",3,"search_web|storage_sync|ui_settings","smali/onc.smali",558
+"2.7.5","DeepSeek_2.7.5.apk","Loy1;","<clinit>","()V",3,"session|multimodal_audio","smali/oy1.smali",16
 "2.7.5","DeepSeek_2.7.5.apk","Lp0;","q","(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",3,"session|ui_settings","smali/p0.smali",51
 "2.7.5","DeepSeek_2.7.5.apk","Lp3;","<init>","(I)V",3,"search_web|storage_sync|ui_settings","smali/p3.smali",107
 "2.7.5","DeepSeek_2.7.5.apk","Lpkc;","<init>","(Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;)V",3,"search_web|storage_sync|ui_settings","smali/pkc.smali",18
@@ -186,7 +182,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lpkc;","getAll","()Ljava/util/Map;",3,"search_web|storage_sync|ui_settings","smali/pkc.smali",274
 "2.7.5","DeepSeek_2.7.5.apk","Lpkc;","remove","(Ljava/lang/String;)Lcom/bytedance/applog/store/kv/IKVStore;",3,"search_web|storage_sync|ui_settings","smali/pkc.smali",444
 "2.7.5","DeepSeek_2.7.5.apk","Lpnc;","a","()V",3,"search_web|storage_sync|ui_settings","smali/pnc.smali",295
-"2.7.5","DeepSeek_2.7.5.apk","Lpx1;","<clinit>","()V",3,"session|prompt_pipeline","smali/px1.smali",16
 "2.7.5","DeepSeek_2.7.5.apk","Lq15;","w","()Ljava/lang/Object;",3,"serialization|multimodal_image|attachment_file","smali/q15.smali",63
 "2.7.5","DeepSeek_2.7.5.apk","Lq7;","j","(Ljava/lang/Object;)Ljava/lang/Object;",3,"session|attachment_file|ui_settings","smali/q7.smali",177
 "2.7.5","DeepSeek_2.7.5.apk","Lqf9;","C","(Ldc3;Ljava/lang/Object;)Ljava/lang/Object;",3,"flow_coroutine|agent_planning","smali_classes3/qf9.smali",99
@@ -256,6 +251,7 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","La7b;","<clinit>","()V",2,"session","smali/a7b.smali",16
 "2.7.5","DeepSeek_2.7.5.apk","Laf7;","z","(Ljava/lang/Object;)Ljava/lang/Object;",2,"multimodal_audio|search_web","smali/af7.smali",1544
 "2.7.5","DeepSeek_2.7.5.apk","Lafb;","r","(Landroid/content/Context;Lqr4;Landroid/content/res/Resources;I)Landroid/graphics/Typeface;",2,"search_web|ui_settings","smali/afb.smali",561
+"2.7.5","DeepSeek_2.7.5.apk","Lai7;","<clinit>","()V",2,"multimodal_audio|account_capability","smali/ai7.smali",16
 "2.7.5","DeepSeek_2.7.5.apk","Lal0;","<clinit>","()V",2,"agent_tool|tool_registry_execution","smali/al0.smali",16
 "2.7.5","DeepSeek_2.7.5.apk","Landroidx/compose/ui/platform/AbstractComposeView;","d","()V",2,"search_web|ui_settings","smali/androidx/compose/ui/platform/AbstractComposeView.smali",613
 "2.7.5","DeepSeek_2.7.5.apk","Landroidx/compose/ui/platform/AndroidComposeView;","<init>","(Landroid/content/Context;Lt53;)V",2,"search_web|ui_settings","smali/androidx/compose/ui/platform/AndroidComposeView.smali",577
@@ -267,7 +263,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lb8c;","u","(Lt71;ILjava/lang/String;)V",2,"session","smali/b8c.smali",4482
 "2.7.5","DeepSeek_2.7.5.apk","Lb8c;","w","(Lt71;IJ)V",2,"session","smali/b8c.smali",4767
 "2.7.5","DeepSeek_2.7.5.apk","Lbq7;","f","()Lqsb;",2,"ui_settings","smali/bq7.smali",635
-"2.7.5","DeepSeek_2.7.5.apk","Lbr6;","<init>","(ILjava/lang/Integer;Ljava/lang/String;)V",2,"session|prompt_pipeline","smali/br6.smali",38
 "2.7.5","DeepSeek_2.7.5.apk","Lbs4;","toString","()Ljava/lang/String;",2,"search_web|ui_settings","smali/bs4.smali",475
 "2.7.5","DeepSeek_2.7.5.apk","Lc41;","u0","(Ll86;Ljava/lang/String;)V",2,"serialization","smali/c41.smali",27954
 "2.7.5","DeepSeek_2.7.5.apk","Lc49;","w","()Ljava/lang/Object;",2,"serialization|ui_settings","smali/c49.smali",32
@@ -276,7 +271,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lc54;","o","(ILv15;)Ljy4;",2,"agent_tool|tool_registry_execution","smali/c54.smali",723
 "2.7.5","DeepSeek_2.7.5.apk","Lc65;","<clinit>","()V",2,"flow_coroutine|storage_sync","smali/c65.smali",11
 "2.7.5","DeepSeek_2.7.5.apk","Lc75;","w","()Ljava/lang/Object;",2,"ui_settings","smali/c75.smali",38
-"2.7.5","DeepSeek_2.7.5.apk","Lcj7;","toString","()Ljava/lang/String;",2,"prompt_pipeline|multimodal_audio","smali/cj7.smali",1845
 "2.7.5","DeepSeek_2.7.5.apk","Lcm9;","<clinit>","()V",2,"session","smali/cm9.smali",16
 "2.7.5","DeepSeek_2.7.5.apk","Lcn/fly/verify/dz;","b","(Landroid/content/Context;)Ljava/lang/String;",2,"agent_planning|ui_settings","smali/cn/fly/verify/dz.smali",160
 "2.7.5","DeepSeek_2.7.5.apk","Lcom/bytedance/apm/agent/v2/instrumentation/FragmentTimeAgent;","access$200","(ZLjava/lang/String;JJ)V",2,"agent_planning","smali/com/bytedance/apm/agent/v2/instrumentation/FragmentTimeAgent.smali",117
@@ -308,7 +302,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Leea;","c","(Lay2;Ldc3;)Ljava/lang/Object;",2,"serialization|multimodal_audio","smali_classes3/eea.smali",614
 "2.7.5","DeepSeek_2.7.5.apk","Lelb;","j","(Ljava/lang/Object;)Ljava/lang/Object;",2,"session","smali/elb.smali",68
 "2.7.5","DeepSeek_2.7.5.apk","Leq;","onReady","()V",2,"flow_coroutine|attachment_file","smali/eq.smali",3853
-"2.7.5","DeepSeek_2.7.5.apk","Lf43;","q","(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",2,"prompt_pipeline|ui_settings","smali/f43.smali",32
 "2.7.5","DeepSeek_2.7.5.apk","Lfi7;","<clinit>","()V",2,"multimodal_image|attachment_file","smali/fi7.smali",16
 "2.7.5","DeepSeek_2.7.5.apk","Lfk5;","z","(Ljava/lang/Object;)Ljava/lang/Object;",2,"session","smali_classes3/fk5.smali",2032
 "2.7.5","DeepSeek_2.7.5.apk","Lfl0;","<clinit>","()V",2,"agent_tool|tool_registry_execution","smali/fl0.smali",16
@@ -323,6 +316,7 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lfu0;","Q","(Ljava/lang/String;ILjava/lang/String;ZLjava/lang/String;I[Ljava/lang/String;Ljava/lang/String;)V",2,"session","smali_classes3/fu0.smali",2064
 "2.7.5","DeepSeek_2.7.5.apk","Lfu0;","T","(Ljava/lang/String;IIIIZLjava/lang/String;)V",2,"session","smali_classes3/fu0.smali",2417
 "2.7.5","DeepSeek_2.7.5.apk","Lfu0;","U","(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Ljava/lang/Integer;Ljava/lang/String;I)V",2,"session|multimodal_audio","smali_classes3/fu0.smali",2524
+"2.7.5","DeepSeek_2.7.5.apk","Lfu0;","V","(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/String;III)V",2,"session|multimodal_audio","smali_classes3/fu0.smali",2637
 "2.7.5","DeepSeek_2.7.5.apk","Lfu0;","u","(Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",2,"session","smali_classes3/fu0.smali",8530
 "2.7.5","DeepSeek_2.7.5.apk","Lfu0;","x","(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Integer;ILjava/lang/String;)V",2,"session","smali_classes3/fu0.smali",8787
 "2.7.5","DeepSeek_2.7.5.apk","Lfu0;","z","(Ljava/lang/String;I[Ljava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;)V",2,"session|attachment_file","smali_classes3/fu0.smali",9031
@@ -331,12 +325,10 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lgi5;","l","(Leh5;Lmdb;Lec3;)Ljava/lang/Object;",2,"serialization","smali/gi5.smali",1085
 "2.7.5","DeepSeek_2.7.5.apk","Lgk0;","z","(Ljava/lang/Object;)Ljava/lang/Object;",2,"sse_transport|serialization","smali/gk0.smali",735
 "2.7.5","DeepSeek_2.7.5.apk","Lgn3;","u","(Lly4;ZLjy4;Ljy4;Ljy4;Ljy4;Ljy4;Ljy4;Ljy4;Ljy4;Ljy4;Ljy4;ZLjy4;Lpmb;ZZLl78;Lfk7;Lv15;II)V",2,"search_web|ui_settings","smali_classes3/gn3.smali",21721
-"2.7.5","DeepSeek_2.7.5.apk","Lgq8;","q","(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",2,"session|prompt_pipeline","smali/gq8.smali",110
 "2.7.5","DeepSeek_2.7.5.apk","Lgx2;","w","()Ljava/lang/Object;",2,"multimodal_audio|attachment_file","smali/gx2.smali",38
 "2.7.5","DeepSeek_2.7.5.apk","Lh0a;","<clinit>","()V",2,"session","smali/h0a.smali",16
 "2.7.5","DeepSeek_2.7.5.apk","Lh50;","j","(Ljava/lang/Object;)Ljava/lang/Object;",2,"session","smali/h50.smali",157
 "2.7.5","DeepSeek_2.7.5.apk","Lh82;","u","(Lq12;)V",2,"session|attachment_file","smali/h82.smali",8446
-"2.7.5","DeepSeek_2.7.5.apk","Lhq8;","q","(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",2,"session|prompt_pipeline","smali/hq8.smali",56
 "2.7.5","DeepSeek_2.7.5.apk","Lhx1;","<clinit>","()V",2,"session","smali/hx1.smali",16
 "2.7.5","DeepSeek_2.7.5.apk","Lhx2;","b","()[J",2,"multimodal_audio|attachment_file","smali/hx2.smali",593
 "2.7.5","DeepSeek_2.7.5.apk","Lhx2;","y","(Lf46;ILjava/lang/String;Ljava/lang/String;)V",2,"multimodal_audio|attachment_file","smali/hx2.smali",4818
@@ -346,7 +338,7 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lil0;","q","(ILv15;)Ljy4;",2,"agent_tool|tool_registry_execution","smali/il0.smali",370
 "2.7.5","DeepSeek_2.7.5.apk","Lilc;","n","(Lzs;Lyr;Ljava/lang/String;)V",2,"session","smali/ilc.smali",936
 "2.7.5","DeepSeek_2.7.5.apk","Lilc;","o","(Lzs;Lyr;Ljava/lang/String;)V",2,"session","smali/ilc.smali",1240
-"2.7.5","DeepSeek_2.7.5.apk","Liuc;","F","(Landroid/content/Context;Landroid/os/Looper;Lff9;Ljava/lang/Object;Lp45;Lq45;)Lip;",2,"prompt_pipeline|ui_settings","smali/iuc.smali",29
+"2.7.5","DeepSeek_2.7.5.apk","Lilc;","p","(Ljava/lang/String;IZZZZLjda;Ljava/lang/String;Ljava/util/List;Ljava/lang/String;ZLjava/lang/String;)V",2,"session|search_web","smali/ilc.smali",1544
 "2.7.5","DeepSeek_2.7.5.apk","Liv1;","c","(Lfda;)V",2,"session","smali/iv1.smali",233
 "2.7.5","DeepSeek_2.7.5.apk","Liz1;","w","()Ljava/lang/Object;",2,"session|attachment_file","smali/iz1.smali",80
 "2.7.5","DeepSeek_2.7.5.apk","Ljcb;","a","(Ljcb;Lec3;)Ljava/lang/Enum;",2,"serialization|multimodal_audio","smali/jcb.smali",223
@@ -361,7 +353,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Llj1;","q","(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",2,"search_web|ui_settings","smali/lj1.smali",38
 "2.7.5","DeepSeek_2.7.5.apk","Llq2;","z","(Ljava/lang/Object;)Ljava/lang/Object;",2,"sse_dispatch|flow_coroutine","smali/lq2.smali",2353
 "2.7.5","DeepSeek_2.7.5.apk","Llr0;","j","(Ljava/lang/Object;)Ljava/lang/Object;",2,"session|attachment_file","smali/lr0.smali",2933
-"2.7.5","DeepSeek_2.7.5.apk","Lltb;","<clinit>","()V",2,"flow_coroutine|prompt_pipeline","smali/ltb.smali",11
 "2.7.5","DeepSeek_2.7.5.apk","Llv4;","h","(Lh26;)Lbb6;",2,"serialization|attachment_file","smali/lv4.smali",97
 "2.7.5","DeepSeek_2.7.5.apk","Lm07;","h","(Ltqa;Lxq7;Ljy4;Lv15;I)V",2,"search_web|ui_settings","smali_classes3/m07.smali",7040
 "2.7.5","DeepSeek_2.7.5.apk","Lm0;","j","(Ljava/lang/Object;)Ljava/lang/Object;",2,"search_web|ui_settings","smali_classes3/m0.smali",2175
@@ -372,6 +363,7 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lnk2;","n0","(Ljava/lang/String;)V",2,"session","smali/nk2.smali",13541
 "2.7.5","DeepSeek_2.7.5.apk","Lnx2;","<init>","()V",2,"multimodal_audio|attachment_file","smali/nx2.smali",11
 "2.7.5","DeepSeek_2.7.5.apk","Lo46;","e","(Lbb6;Ljava/lang/Object;)V",2,"serialization","smali_classes3/o46.smali",1498
+"2.7.5","DeepSeek_2.7.5.apk","Lo67;","d","(Ly62;Lom2;Lcj7;Ljava/lang/String;Ljy4;Lfk7;ZJLlw;Lu9a;Lv15;II)V",2,"flow_coroutine|multimodal_image","smali/o67.smali",5251
 "2.7.5","DeepSeek_2.7.5.apk","Lof2;","k","(Lts9;Lec3;)Ljava/lang/Object;",2,"request_route|pow","smali/of2.smali",936
 "2.7.5","DeepSeek_2.7.5.apk","Loq1;","c","(Lgf5;Lsg5;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lec3;)Ljava/lang/Object;",2,"pow","smali/oq1.smali",2124
 "2.7.5","DeepSeek_2.7.5.apk","Lpf2;","<clinit>","()V",2,"session","smali/pf2.smali",16
@@ -379,6 +371,7 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lpo3;","<clinit>","()V",2,"search_web|ui_settings","smali/po3.smali",11
 "2.7.5","DeepSeek_2.7.5.apk","Lpp5;","<clinit>","()V",2,"session","smali/pp5.smali",16
 "2.7.5","DeepSeek_2.7.5.apk","Lppc;","c","(Lorg/json/JSONObject;)V",2,"flow_coroutine|attachment_file","smali/ppc.smali",242
+"2.7.5","DeepSeek_2.7.5.apk","Lpx1;","<clinit>","()V",2,"session","smali/px1.smali",16
 "2.7.5","DeepSeek_2.7.5.apk","Lqi2;","q","(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",2,"session|attachment_file","smali/qi2.smali",74
 "2.7.5","DeepSeek_2.7.5.apk","Lqu;","a","(Ljava/lang/String;)Z",2,"search_web|ui_settings","smali/qu.smali",41
 "2.7.5","DeepSeek_2.7.5.apk","Lr3;","c","(Lfv1;Ldc3;)Ljava/lang/Object;",2,"sse_dispatch|serialization","smali/r3.smali",3013
@@ -684,7 +677,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lata;","<init>","(Landroid/content/Context;Lly4;Lt11;)V",1,"multimodal_audio","smali/ata.smali",32
 "2.7.5","DeepSeek_2.7.5.apk","Lau9;","<clinit>","()V",1,"multimodal_audio","smali/au9.smali",16
 "2.7.5","DeepSeek_2.7.5.apk","Law9;","<clinit>","()V",1,"multimodal_audio","smali/aw9.smali",16
-"2.7.5","DeepSeek_2.7.5.apk","Lb47;","<clinit>","()V",1,"prompt_pipeline","smali/b47.smali",11
 "2.7.5","DeepSeek_2.7.5.apk","Lb5;","b","(Lig2;Ldc3;)Ljava/lang/Object;",1,"session","smali/b5.smali",5003
 "2.7.5","DeepSeek_2.7.5.apk","Lb8c;","<init>","(Landroid/content/Context;)V",1,"ui_settings","smali/b8c.smali",592
 "2.7.5","DeepSeek_2.7.5.apk","Lb8c;","b","(Landroid/app/Activity;)Landroid/graphics/Rect;",1,"search_web","smali/b8c.smali",2647
@@ -729,13 +721,13 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lbpc;","b","(Lorg/json/JSONObject;)V",1,"attachment_file","smali/bpc.smali",414
 "2.7.5","DeepSeek_2.7.5.apk","Lbq;","k","(Le6a;Li2;IIZZ)Lfy0;",1,"flow_coroutine","smali/bq.smali",941
 "2.7.5","DeepSeek_2.7.5.apk","Lbq;","n","(Landroid/view/View;Landroid/graphics/Rect;)V",1,"search_web","smali/bq.smali",4460
+"2.7.5","DeepSeek_2.7.5.apk","Lbr6;","<init>","(ILjava/lang/Integer;Ljava/lang/String;)V",1,"session","smali/br6.smali",38
 "2.7.5","DeepSeek_2.7.5.apk","Lbr9;","<clinit>","()V",1,"storage_sync","smali_classes3/br9.smali",14
 "2.7.5","DeepSeek_2.7.5.apk","Lbta;","w","()Ljava/lang/Object;",1,"flow_coroutine","smali/bta.smali",44
 "2.7.5","DeepSeek_2.7.5.apk","Lbuc;","o","()Lorg/json/JSONObject;",1,"session","smali/buc.smali",295
 "2.7.5","DeepSeek_2.7.5.apk","Lbx2;","j","(Lb39;Lsz5;Le6a;)Le6a;",1,"flow_coroutine","smali_classes3/bx2.smali",3918
 "2.7.5","DeepSeek_2.7.5.apk","Lc1;","remove","()V",1,"flow_coroutine","smali_classes3/c1.smali",728
 "2.7.5","DeepSeek_2.7.5.apk","Lc27;","b","(Ljava/lang/String;Ljh7;Ljy4;Lv15;I)V",1,"ui_settings","smali/c27.smali",1575
-"2.7.5","DeepSeek_2.7.5.apk","Lc3c;","<clinit>","()V",1,"prompt_pipeline","smali/c3c.smali",11
 "2.7.5","DeepSeek_2.7.5.apk","Lc41;","u","(Ltm6;Lin6;Ljy4;Lv15;I)V",1,"ui_settings","smali/c41.smali",27615
 "2.7.5","DeepSeek_2.7.5.apk","Lc6;","e","(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",1,"ui_settings","smali/c6.smali",56
 "2.7.5","DeepSeek_2.7.5.apk","Lc90;","toString","()Ljava/lang/String;",1,"storage_sync","smali_classes3/c90.smali",651
@@ -782,6 +774,7 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lcfa;","e","(Laa4;Ljava/lang/Object;)V",1,"serialization","smali/cfa.smali",125
 "2.7.5","DeepSeek_2.7.5.apk","Lchc;","<clinit>","()V",1,"flow_coroutine","smali/chc.smali",21
 "2.7.5","DeepSeek_2.7.5.apk","Lcj7;","b","(ZLv15;)Lq88;",1,"multimodal_image","smali/cj7.smali",800
+"2.7.5","DeepSeek_2.7.5.apk","Lcj7;","toString","()Ljava/lang/String;",1,"multimodal_audio","smali/cj7.smali",1845
 "2.7.5","DeepSeek_2.7.5.apk","Lcja;","f","()Ljava/lang/String;",1,"account_capability","smali_classes3/cja.smali",147
 "2.7.5","DeepSeek_2.7.5.apk","Lcm5;","w","()Ljava/lang/Object;",1,"session","smali/cm5.smali",71
 "2.7.5","DeepSeek_2.7.5.apk","Lcn/fly/commons/ad;","a","(Ljava/lang/String;Ljava/lang/Class;Lcn/fly/commons/e;)Ljava/lang/Object;",1,"search_web","smali/cn/fly/commons/ad.smali",284
@@ -1238,6 +1231,7 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lf27;","b","(Ljava/io/File;ILx59;IJLjy4;Lv15;I)V",1,"storage_sync","smali_classes3/f27.smali",10082
 "2.7.5","DeepSeek_2.7.5.apk","Lf27;","z0","(Ljava/lang/String;)V",1,"agent_planning","smali_classes3/f27.smali",20438
 "2.7.5","DeepSeek_2.7.5.apk","Lf3b;","<clinit>","()V",1,"storage_sync","smali/f3b.smali",11
+"2.7.5","DeepSeek_2.7.5.apk","Lf43;","q","(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",1,"ui_settings","smali/f43.smali",32
 "2.7.5","DeepSeek_2.7.5.apk","Lf46;","clear","()V",1,"flow_coroutine","smali_classes3/f46.smali",74
 "2.7.5","DeepSeek_2.7.5.apk","Lf46;","compute","(Ljava/lang/Object;Ljava/util/function/BiFunction;)Ljava/lang/Object;",1,"flow_coroutine","smali_classes3/f46.smali",94
 "2.7.5","DeepSeek_2.7.5.apk","Lf46;","computeIfAbsent","(Ljava/lang/Object;Ljava/util/function/Function;)Ljava/lang/Object;",1,"flow_coroutine","smali_classes3/f46.smali",114
@@ -1272,9 +1266,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lfq3;","a","(Ljv4;I)Lr32;",1,"search_web","smali/fq3.smali",35
 "2.7.5","DeepSeek_2.7.5.apk","Lfq7;","c","(Lbq7;Z)V",1,"ui_settings","smali/fq7.smali",581
 "2.7.5","DeepSeek_2.7.5.apk","Lfq7;","e","(Lbq7;)V",1,"ui_settings","smali/fq7.smali",1224
-"2.7.5","DeepSeek_2.7.5.apk","Lfq8;","a","(Lv15;)Loq0;",1,"prompt_pipeline","smali/fq8.smali",118
-"2.7.5","DeepSeek_2.7.5.apk","Lfq8;","b","(Lv15;)J",1,"prompt_pipeline","smali/fq8.smali",249
-"2.7.5","DeepSeek_2.7.5.apk","Lfq8;","c","(Lv15;)Liya;",1,"prompt_pipeline","smali/fq8.smali",360
 "2.7.5","DeepSeek_2.7.5.apk","Lfr0;","j","(Landroid/content/Context;Lau3;)Lu0c;",1,"search_web","smali/fr0.smali",207
 "2.7.5","DeepSeek_2.7.5.apk","Lfsb;","a","(Landroid/view/ViewConfiguration;Landroid/content/Context;)F",1,"search_web","smali/fsb.smali",74
 "2.7.5","DeepSeek_2.7.5.apk","Lfu0;","O","(Ljava/lang/String;Z)V",1,"session","smali_classes3/fu0.smali",1913
@@ -1291,7 +1282,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lg37;","A","(Lni7;Lv15;)Ljava/lang/String;",1,"ui_settings","smali/g37.smali",19
 "2.7.5","DeepSeek_2.7.5.apk","Lg37;","a","(Ljy4;Lv15;I)V",1,"attachment_file","smali/g37.smali",745
 "2.7.5","DeepSeek_2.7.5.apk","Lg37;","t","(Landroid/content/Context;)Z",1,"ui_settings","smali/g37.smali",4008
-"2.7.5","DeepSeek_2.7.5.apk","Lg3a;","<clinit>","()V",1,"prompt_pipeline","smali/g3a.smali",11
 "2.7.5","DeepSeek_2.7.5.apk","Lg47;","E0","(J)Z",1,"ui_settings","smali/g47.smali",519
 "2.7.5","DeepSeek_2.7.5.apk","Lg73;","a","(Landroid/os/Looper;)Landroid/os/Handler;",1,"storage_sync","smali/g73.smali",7
 "2.7.5","DeepSeek_2.7.5.apk","Lg87;","onPngBase64Exported","(Ljava/lang/String;Ljava/lang/String;I)V",1,"multimodal_image","smali/g87.smali",51
@@ -1329,6 +1319,7 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lgn4;","d","()V",1,"search_web","smali/gn4.smali",1071
 "2.7.5","DeepSeek_2.7.5.apk","Lgnc;","b","()Z",1,"flow_coroutine","smali/gnc.smali",356
 "2.7.5","DeepSeek_2.7.5.apk","Lgp2;","<clinit>","()V",1,"session","smali/gp2.smali",16
+"2.7.5","DeepSeek_2.7.5.apk","Lgq8;","q","(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",1,"session","smali/gq8.smali",110
 "2.7.5","DeepSeek_2.7.5.apk","Lgt9;","a","(ZLdc3;)Ljava/lang/Object;",1,"serialization","smali/gt9.smali",107
 "2.7.5","DeepSeek_2.7.5.apk","Lgtc;","<init>","(Lrkc;Landroid/content/Context;Lhr5;)V",1,"attachment_file","smali/gtc.smali",47
 "2.7.5","DeepSeek_2.7.5.apk","Lgv4;","<clinit>","()V",1,"search_web","smali/gv4.smali",16
@@ -1370,6 +1361,7 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lhp8;","<clinit>","()V",1,"storage_sync","smali/hp8.smali",11
 "2.7.5","DeepSeek_2.7.5.apk","Lhpc;","b","(Ljava/lang/Object;Ljic;)V",1,"attachment_file","smali/hpc.smali",180
 "2.7.5","DeepSeek_2.7.5.apk","Lhpc;","d","()V",1,"attachment_file","smali/hpc.smali",1426
+"2.7.5","DeepSeek_2.7.5.apk","Lhq8;","q","(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",1,"session","smali/hq8.smali",56
 "2.7.5","DeepSeek_2.7.5.apk","Lhr5;","b","()Ljava/lang/String;",1,"agent_planning","smali/hr5.smali",482
 "2.7.5","DeepSeek_2.7.5.apk","Lhs1;","remove","()V",1,"flow_coroutine","smali_classes3/hs1.smali",194
 "2.7.5","DeepSeek_2.7.5.apk","Lhs;","<init>","(Llw;)V",1,"multimodal_audio","smali/hs.smali",13
@@ -1397,15 +1389,14 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lie5;","a","(Ljava/util/List;Ljava/lang/String;Lec3;)Ljava/lang/Object;",1,"serialization","smali/ie5.smali",56
 "2.7.5","DeepSeek_2.7.5.apk","Lie8;","q","(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",1,"ui_settings","smali/ie8.smali",54
 "2.7.5","DeepSeek_2.7.5.apk","Lif9;","<clinit>","()V",1,"agent_planning","smali/if9.smali",11
-"2.7.5","DeepSeek_2.7.5.apk","Lii7;","<clinit>","()V",1,"prompt_pipeline","smali/ii7.smali",16
 "2.7.5","DeepSeek_2.7.5.apk","Lijb;","q","(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",1,"attachment_file","smali/ijb.smali",38
 "2.7.5","DeepSeek_2.7.5.apk","Lin2;","j","(Ljava/lang/Object;)Ljava/lang/Object;",1,"session","smali/in2.smali",64
 "2.7.5","DeepSeek_2.7.5.apk","Lin8;","toString","()Ljava/lang/String;",1,"ui_settings","smali/in8.smali",2348
 "2.7.5","DeepSeek_2.7.5.apk","Lip6;","<init>","(Landroid/widget/ListView;)V",1,"search_web","smali/ip6.smali",69
-"2.7.5","DeepSeek_2.7.5.apk","Liq2;","toString","()Ljava/lang/String;",1,"prompt_pipeline","smali/iq2.smali",123
 "2.7.5","DeepSeek_2.7.5.apk","Lir4;","a","(Landroid/content/Context;Ljava/util/List;)Lo89;",1,"search_web","smali/ir4.smali",52
 "2.7.5","DeepSeek_2.7.5.apk","Lir4;","b","(Landroid/content/pm/PackageManager;Ljr4;Landroid/content/res/Resources;)Landroid/content/pm/ProviderInfo;",1,"search_web","smali/ir4.smali",293
 "2.7.5","DeepSeek_2.7.5.apk","Lit6;","d","(Ljy4;Lv15;I)V",1,"ui_settings","smali/it6.smali",4346
+"2.7.5","DeepSeek_2.7.5.apk","Liuc;","F","(Landroid/content/Context;Landroid/os/Looper;Lff9;Ljava/lang/Object;Lp45;Lq45;)Lip;",1,"ui_settings","smali/iuc.smali",29
 "2.7.5","DeepSeek_2.7.5.apk","Liw8;","toString","()Ljava/lang/String;",1,"ui_settings","smali/iw8.smali",292
 "2.7.5","DeepSeek_2.7.5.apk","Liy8;","f","(IIILfy8;Loc4;)V",1,"agent_planning","smali_classes3/iy8.smali",1286
 "2.7.5","DeepSeek_2.7.5.apk","Liya;","toString","()Ljava/lang/String;",1,"ui_settings","smali/iya.smali",2068
@@ -1421,7 +1412,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lj26;","<init>","(Lyr9;)V",1,"serialization","smali_classes3/j26.smali",13
 "2.7.5","DeepSeek_2.7.5.apk","Lj27;","b","(ILiya;Lfk7;ZZZLkn7;Ljy4;Lv15;I)V",1,"search_web","smali/j27.smali",1219
 "2.7.5","DeepSeek_2.7.5.apk","Lj30;","a","(Ldc3;)Ljava/lang/Object;",1,"search_web","smali/j30.smali",44
-"2.7.5","DeepSeek_2.7.5.apk","Lj66;","<clinit>","()V",1,"prompt_pipeline","smali/j66.smali",11
 "2.7.5","DeepSeek_2.7.5.apk","Lj85;","<init>","(Landroid/os/Handler;Landroid/content/Context;Lcom/hcaptcha/sdk/HCaptchaConfig;La85;Lu75;Lcom/hcaptcha/sdk/HCaptchaWebView;)V",1,"ui_settings","smali/j85.smali",15
 "2.7.5","DeepSeek_2.7.5.apk","Lj89;","<init>","(Landroid/content/res/ColorStateList;Landroid/content/res/Configuration;Landroid/content/res/Resources$Theme;)V",1,"search_web","smali/j89.smali",15
 "2.7.5","DeepSeek_2.7.5.apk","Lj;","w","()Ljava/lang/Object;",1,"session","smali/j.smali",55
@@ -1492,7 +1482,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lkdb;","c","(Lbx2;Ljava/lang/Class;Lycb;)Lrz5;",1,"search_web","smali/kdb.smali",1504
 "2.7.5","DeepSeek_2.7.5.apk","Lkh2;","<clinit>","()V",1,"session","smali/kh2.smali",16
 "2.7.5","DeepSeek_2.7.5.apk","Lki0;","<clinit>","()V",1,"multimodal_audio","smali/ki0.smali",11
-"2.7.5","DeepSeek_2.7.5.apk","Lki7;","<clinit>","()V",1,"prompt_pipeline","smali/ki7.smali",16
 "2.7.5","DeepSeek_2.7.5.apk","Lkic;","a","(Ljava/io/File;Lcom/apm/insight/CrashType;Ljava/lang/String;JJ)Lfic;",1,"attachment_file","smali/kic.smali",1647
 "2.7.5","DeepSeek_2.7.5.apk","Lkic;","c","(Lug9;)Lorg/json/JSONObject;",1,"attachment_file","smali/kic.smali",175
 "2.7.5","DeepSeek_2.7.5.apk","Lkic;","f","(Z)V",1,"attachment_file","smali/kic.smali",3682
@@ -1503,7 +1492,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lkq7;","g","(I)Lbq7;",1,"ui_settings","smali/kq7.smali",2876
 "2.7.5","DeepSeek_2.7.5.apk","Lkq7;","o","(Ljava/lang/Object;Ler7;)V",1,"ui_settings","smali/kq7.smali",4512
 "2.7.5","DeepSeek_2.7.5.apk","Lkq7;","p","(IZZ)Z",1,"ui_settings","smali/kq7.smali",4733
-"2.7.5","DeepSeek_2.7.5.apk","Lkq8;","e","(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",1,"prompt_pipeline","smali/kq8.smali",62
 "2.7.5","DeepSeek_2.7.5.apk","Lks4;","a","(Landroid/content/Context;)I",1,"search_web","smali/ks4.smali",33
 "2.7.5","DeepSeek_2.7.5.apk","Lksa;","<clinit>","()V",1,"ui_settings","smali_classes3/ksa.smali",29
 "2.7.5","DeepSeek_2.7.5.apk","Lkt4;","<clinit>","()V",1,"storage_sync","smali/kt4.smali",11
@@ -1550,13 +1538,13 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Llp;","g","(Landroid/os/Looper;)Landroid/os/Handler;",1,"storage_sync","smali/lp.smali",2543
 "2.7.5","DeepSeek_2.7.5.apk","Llp;","h","(Landroid/os/Looper;)Landroid/os/Handler;",1,"storage_sync","smali/lp.smali",2558
 "2.7.5","DeepSeek_2.7.5.apk","Llq4;","k1","()V",1,"ui_settings","smali/lq4.smali",147
-"2.7.5","DeepSeek_2.7.5.apk","Llq8;","q","(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",1,"prompt_pipeline","smali/lq8.smali",38
 "2.7.5","DeepSeek_2.7.5.apk","Llr0;","a","(Ljava/lang/Object;)Ljava/lang/Object;",1,"search_web","smali/lr0.smali",66
 "2.7.5","DeepSeek_2.7.5.apk","Llr3;","<clinit>","()V",1,"ui_settings","smali_classes3/lr3.smali",39
 "2.7.5","DeepSeek_2.7.5.apk","Llr3;","a","(Ljava/lang/Object;[Ljava/lang/Character$UnicodeBlock;Ljava/lang/String;)V",1,"ui_settings","smali_classes3/lr3.smali",956
 "2.7.5","DeepSeek_2.7.5.apk","Llsc;","f","(Landroid/view/View;Z)Lvrc;",1,"search_web","smali/lsc.smali",493
 "2.7.5","DeepSeek_2.7.5.apk","Llt;","attachBaseContext","(Landroid/content/Context;)V",1,"search_web","smali/lt.smali",148
 "2.7.5","DeepSeek_2.7.5.apk","Llt;","onConfigurationChanged","(Landroid/content/res/Configuration;)V",1,"search_web","smali/lt.smali",1405
+"2.7.5","DeepSeek_2.7.5.apk","Lltb;","<clinit>","()V",1,"flow_coroutine","smali/ltb.smali",11
 "2.7.5","DeepSeek_2.7.5.apk","Llv7;","D1","(JFLly4;Li65;)V",1,"ui_settings","smali/lv7.smali",1731
 "2.7.5","DeepSeek_2.7.5.apk","Llv7;","E","(J)J",1,"ui_settings","smali/lv7.smali",2105
 "2.7.5","DeepSeek_2.7.5.apk","Llv7;","G1","(Li47;)V",1,"ui_settings","smali/lv7.smali",3170
@@ -1567,7 +1555,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Llv7;","n","(J)J",1,"ui_settings","smali/lv7.smali",11586
 "2.7.5","DeepSeek_2.7.5.apk","Llv7;","p","(J)J",1,"ui_settings","smali/lv7.smali",11814
 "2.7.5","DeepSeek_2.7.5.apk","Llw7;","toString","()Ljava/lang/String;",1,"serialization","smali_classes3/lw7.smali",251
-"2.7.5","DeepSeek_2.7.5.apk","Llw;","a","(Ljava/lang/String;)Ljava/util/List;",1,"prompt_pipeline","smali/lw.smali",37
 "2.7.5","DeepSeek_2.7.5.apk","Llw;","b","(Lnb6;)V",1,"serialization","smali/lw.smali",178
 "2.7.5","DeepSeek_2.7.5.apk","Llx9;","b","(Lvmb;)V",1,"ui_settings","smali/lx9.smali",663
 "2.7.5","DeepSeek_2.7.5.apk","Lm07;","e","(Ljg9;Lw33;Lv15;I)V",1,"ui_settings","smali_classes3/m07.smali",4645
@@ -1657,7 +1644,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lnda;","h","(Ljava/lang/Object;)V",1,"agent_planning","smali_classes3/nda.smali",47
 "2.7.5","DeepSeek_2.7.5.apk","Lne;","q","(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",1,"ui_settings","smali/ne.smali",108
 "2.7.5","DeepSeek_2.7.5.apk","Lng;","<init>","(Ljava/lang/String;Liya;Ljava/util/List;Ljava/util/List;Lyq4;Lzt3;Z)V",1,"ui_settings","smali/ng.smali",38
-"2.7.5","DeepSeek_2.7.5.apk","Lni7;","toString","()Ljava/lang/String;",1,"prompt_pipeline","smali/ni7.smali",336
 "2.7.5","DeepSeek_2.7.5.apk","Lnp4;","b","(Landroid/view/View;Ljava/lang/Integer;Landroid/graphics/Rect;)Z",1,"ui_settings","smali/np4.smali",175
 "2.7.5","DeepSeek_2.7.5.apk","Lnpc;","r","(Landroid/content/Context;)F",1,"search_web","smali/npc.smali",2301
 "2.7.5","DeepSeek_2.7.5.apk","Lnqb;","<clinit>","()V",1,"storage_sync","smali/nqb.smali",11
@@ -1687,7 +1673,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Loa2;","a","(Loa2;Lnb7;Lzs;Lhb7;ZZLec3;)Ljava/lang/Object;",1,"session","smali/oa2.smali",102
 "2.7.5","DeepSeek_2.7.5.apk","Loa8;","w","()Ljava/lang/Object;",1,"search_web","smali/oa8.smali",80
 "2.7.5","DeepSeek_2.7.5.apk","Lob0;","z","(Ljava/lang/Object;)Ljava/lang/Object;",1,"serialization","smali/ob0.smali",1835
-"2.7.5","DeepSeek_2.7.5.apk","Loc9;","<clinit>","()V",1,"prompt_pipeline","smali/oc9.smali",11
 "2.7.5","DeepSeek_2.7.5.apk","Lod;","b","()Lek7;",1,"ui_settings","smali/od.smali",57
 "2.7.5","DeepSeek_2.7.5.apk","Loe2;","z","(Ljava/lang/Object;)Ljava/lang/Object;",1,"session","smali/oe2.smali",2026
 "2.7.5","DeepSeek_2.7.5.apk","Loec;","b","(Lwac;)V",1,"storage_sync","smali/oec.smali",179
@@ -1699,7 +1684,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lolc;","l","()Lorg/json/JSONObject;",1,"session","smali/olc.smali",559
 "2.7.5","DeepSeek_2.7.5.apk","Lom6;","<clinit>","()V",1,"multimodal_audio","smali/om6.smali",11
 "2.7.5","DeepSeek_2.7.5.apk","Loq1;","a","(Lgf5;Lsg5;Liq1;Lzy4;Ljava/lang/String;Ljava/util/concurrent/atomic/AtomicReference;Lec3;)Ljava/lang/Object;",1,"pow","smali/oq1.smali",115
-"2.7.5","DeepSeek_2.7.5.apk","Loq8;","e","(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",1,"prompt_pipeline","smali/oq8.smali",68
 "2.7.5","DeepSeek_2.7.5.apk","Lor6;","a","(Lv15;)Lrsb;",1,"ui_settings","smali/or6.smali",48
 "2.7.5","DeepSeek_2.7.5.apk","Lot9;","<clinit>","()V",1,"multimodal_audio","smali/ot9.smali",16
 "2.7.5","DeepSeek_2.7.5.apk","Lov4;","e","()V",1,"search_web","smali/ov4.smali",2068
@@ -1714,10 +1698,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lp46;","<clinit>","()V",1,"serialization","smali_classes3/p46.smali",16
 "2.7.5","DeepSeek_2.7.5.apk","Lp52;","<init>","(Lad3;Ljava/lang/String;ILf0;)V",1,"storage_sync","smali/p52.smali",28
 "2.7.5","DeepSeek_2.7.5.apk","Lp53;","c","(Ljava/lang/String;Lfk7;IIILiya;Lv15;II)V",1,"ui_settings","smali/p53.smali",698
-"2.7.5","DeepSeek_2.7.5.apk","Lp67;","d","(Lni7;Ljy4;Lfk7;ZJLv15;I)V",1,"prompt_pipeline","smali/p67.smali",4996
-"2.7.5","DeepSeek_2.7.5.apk","Lp67;","e","(FLks0;Lfk7;JLv15;I)V",1,"prompt_pipeline","smali/p67.smali",5459
-"2.7.5","DeepSeek_2.7.5.apk","Lp67;","f","(Lro7;Ljava/util/List;Lzy4;Lfk7;ZJLzy4;Lv15;I)V",1,"prompt_pipeline","smali/p67.smali",5862
-"2.7.5","DeepSeek_2.7.5.apk","Lp67;","g","(Ljava/util/List;Lzy4;Lfk7;ZJLzy4;ZLv15;I)V",1,"prompt_pipeline","smali/p67.smali",6627
 "2.7.5","DeepSeek_2.7.5.apk","Lp67;","h","(Ll9a;Ljy4;Lv15;I)V",1,"ui_settings","smali/p67.smali",7539
 "2.7.5","DeepSeek_2.7.5.apk","Lp94;","add","(Ljava/lang/Object;)V",1,"flow_coroutine","smali_classes3/p94.smali",37
 "2.7.5","DeepSeek_2.7.5.apk","Lp94;","remove","()V",1,"flow_coroutine","smali_classes3/p94.smali",129
@@ -1732,7 +1712,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lpf8;","remove","()V",1,"flow_coroutine","smali_classes3/pf8.smali",280
 "2.7.5","DeepSeek_2.7.5.apk","Lpf;","onViewDetachedFromWindow","(Landroid/view/View;)V",1,"ui_settings","smali/pf.smali",148
 "2.7.5","DeepSeek_2.7.5.apk","Lpgc;","c","()Z",1,"flow_coroutine","smali/pgc.smali",172
-"2.7.5","DeepSeek_2.7.5.apk","Lpk3;","q","(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",1,"prompt_pipeline","smali/pk3.smali",62
 "2.7.5","DeepSeek_2.7.5.apk","Lpl0;","<clinit>","()V",1,"storage_sync","smali/pl0.smali",11
 "2.7.5","DeepSeek_2.7.5.apk","Lpnc;","d","(Lorg/json/JSONObject;Z)V",1,"session","smali/pnc.smali",44
 "2.7.5","DeepSeek_2.7.5.apk","Lpu;","b","(Landroid/widget/TextView;)Ljava/lang/String;",1,"ui_settings","smali/pu.smali",52
@@ -1741,7 +1720,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lpv1;","d","(Lpv1;Lmu1;)V",1,"session","smali/pv1.smali",2110
 "2.7.5","DeepSeek_2.7.5.apk","Lpv1;","e","(Lpv1;ILwt3;Lec3;)Ljava/lang/Object;",1,"session","smali/pv1.smali",2279
 "2.7.5","DeepSeek_2.7.5.apk","Lpv1;","g","(Lpv1;Lvv1;)V",1,"session","smali/pv1.smali",3498
-"2.7.5","DeepSeek_2.7.5.apk","Lpv7;","<clinit>","()V",1,"prompt_pipeline","smali/pv7.smali",11
 "2.7.5","DeepSeek_2.7.5.apk","Lpw9;","w","()Ljava/lang/Object;",1,"ui_settings","smali/pw9.smali",32
 "2.7.5","DeepSeek_2.7.5.apk","Lpx2;","toString","()Ljava/lang/String;",1,"serialization","smali/px2.smali",266
 "2.7.5","DeepSeek_2.7.5.apk","Lpx9;","<clinit>","()V",1,"ui_settings","smali/px9.smali",16
@@ -1782,7 +1760,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lqkb;","<clinit>","()V",1,"agent_planning","smali_classes3/qkb.smali",13
 "2.7.5","DeepSeek_2.7.5.apk","Lqmc;","e","(Ljava/util/ArrayList;I)V",1,"flow_coroutine","smali/qmc.smali",2312
 "2.7.5","DeepSeek_2.7.5.apk","Lqoc;","j1","()V",1,"flow_coroutine","smali/qoc.smali",139
-"2.7.5","DeepSeek_2.7.5.apk","Lqq8;","m","(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",1,"prompt_pipeline","smali/qq8.smali",44
 "2.7.5","DeepSeek_2.7.5.apk","Lqr6;","add","(Ljava/lang/Object;)Z",1,"flow_coroutine","smali/qr6.smali",75
 "2.7.5","DeepSeek_2.7.5.apk","Lqr6;","addAll","(Ljava/util/Collection;)Z",1,"flow_coroutine","smali/qr6.smali",95
 "2.7.5","DeepSeek_2.7.5.apk","Lqr6;","clear","()V",1,"flow_coroutine","smali/qr6.smali",115
@@ -1844,7 +1821,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lru;","l","(I)V",1,"search_web","smali/ru.smali",2947
 "2.7.5","DeepSeek_2.7.5.apk","Lrub;","c","(Lrub;Lkc5;Landroid/graphics/SurfaceTexture;)Z",1,"multimodal_audio","smali/rub.smali",27
 "2.7.5","DeepSeek_2.7.5.apk","Lrw1;","z","(Ljava/lang/Object;)Ljava/lang/Object;",1,"attachment_file","smali/rw1.smali",373
-"2.7.5","DeepSeek_2.7.5.apk","Lry2;","<clinit>","()V",1,"prompt_pipeline","smali/ry2.smali",11
 "2.7.5","DeepSeek_2.7.5.apk","Ls03;","<clinit>","()V",1,"agent_planning","smali_classes3/s03.smali",22
 "2.7.5","DeepSeek_2.7.5.apk","Ls06;","D","()Ljava/lang/String;",1,"flow_coroutine","smali_classes3/s06.smali",32
 "2.7.5","DeepSeek_2.7.5.apk","Ls07;","<clinit>","()V",1,"search_web","smali/s07.smali",11
@@ -1937,7 +1913,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lt9;","i","(ILandroid/content/Context;)I",1,"search_web","smali/t9.smali",182
 "2.7.5","DeepSeek_2.7.5.apk","Lt9;","onCreate","(Landroid/os/Bundle;)V",1,"search_web","smali/t9.smali",594
 "2.7.5","DeepSeek_2.7.5.apk","Lt9c;","<init>","(Landroid/app/Activity;Ljava/lang/String;Ljava/lang/String;Ljava/lang/ref/ReferenceQueue;)V",1,"search_web","smali/t9c.smali",17
-"2.7.5","DeepSeek_2.7.5.apk","Ltb4;","<clinit>","()V",1,"prompt_pipeline","smali/tb4.smali",11
 "2.7.5","DeepSeek_2.7.5.apk","Ltdb;","A","(Ljava/lang/Object;)Ljava/util/Map;",1,"flow_coroutine","smali_classes3/tdb.smali",360
 "2.7.5","DeepSeek_2.7.5.apk","Ltdb;","B","(Ljava/lang/Object;)Ljava/util/Set;",1,"flow_coroutine","smali_classes3/tdb.smali",435
 "2.7.5","DeepSeek_2.7.5.apk","Ltdb;","H","(Ljava/lang/String;)Ljava/lang/String;",1,"flow_coroutine","smali_classes3/tdb.smali",1926
@@ -2064,7 +2039,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lv6c;","n","(Landroid/content/Context;)Lp07;",1,"attachment_file","smali/v6c.smali",2144
 "2.7.5","DeepSeek_2.7.5.apk","Lv7;","<clinit>","()V",1,"storage_sync","smali/v7.smali",11
 "2.7.5","DeepSeek_2.7.5.apk","Lv7c;","d","(Lyc9;)Z",1,"attachment_file","smali/v7c.smali",99
-"2.7.5","DeepSeek_2.7.5.apk","Lv97;","toString","()Ljava/lang/String;",1,"prompt_pipeline","smali/v97.smali",287
 "2.7.5","DeepSeek_2.7.5.apk","Lvc7;","<clinit>","()V",1,"session","smali/vc7.smali",16
 "2.7.5","DeepSeek_2.7.5.apk","Lvc9;","<clinit>","()V",1,"storage_sync","smali/vc9.smali",11
 "2.7.5","DeepSeek_2.7.5.apk","Lvcc;","e","()Lwjc;",1,"agent_planning","smali/vcc.smali",2699
@@ -2134,7 +2108,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lwq9;","<clinit>","()V",1,"flow_coroutine","smali/wq9.smali",11
 "2.7.5","DeepSeek_2.7.5.apk","Lwtc;","o","()Lorg/json/JSONObject;",1,"session","smali/wtc.smali",1101
 "2.7.5","DeepSeek_2.7.5.apk","Lwu5;","remove","()V",1,"flow_coroutine","smali_classes3/wu5.smali",37
-"2.7.5","DeepSeek_2.7.5.apk","Lwv8;","<clinit>","()V",1,"prompt_pipeline","smali/wv8.smali",11
 "2.7.5","DeepSeek_2.7.5.apk","Lwx2;","serializer","()Lbb6;",1,"multimodal_audio","smali/wx2.smali",33
 "2.7.5","DeepSeek_2.7.5.apk","Lwx5;","<clinit>","()V",1,"attachment_file","smali/wx5.smali",11
 "2.7.5","DeepSeek_2.7.5.apk","Lwx6;","b","(Lv8;Lw5;Lv15;I)V",1,"ui_settings","smali/wx6.smali",5044
@@ -2146,7 +2119,6 @@ version,component,class,method,descriptor,score,roles,file,line
 "2.7.5","DeepSeek_2.7.5.apk","Lx17;","B","(Lyr9;)I",1,"flow_coroutine","smali/x17.smali",125
 "2.7.5","DeepSeek_2.7.5.apk","Lx36;","c","()Ljava/lang/String;",1,"search_web","smali/x36.smali",294
 "2.7.5","DeepSeek_2.7.5.apk","Lx44;","l","(Ljava/lang/String;Lh26;Liv1;)V",1,"serialization","smali/x44.smali",244
-"2.7.5","DeepSeek_2.7.5.apk","Lx47;","<clinit>","()V",1,"prompt_pipeline","smali/x47.smali",11
 "2.7.5","DeepSeek_2.7.5.apk","Lx5;","<init>","(Llw;)V",1,"serialization","smali/x5.smali",13
 "2.7.5","DeepSeek_2.7.5.apk","Lx5b;","toString","()Ljava/lang/String;",1,"agent_planning","smali/x5b.smali",275
 "2.7.5","DeepSeek_2.7.5.apk","Lx62;","j","(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",1,"session","smali/x62.smali",711
