@@ -166,11 +166,11 @@ def main():
         raise SystemExit(f"No DEX methods recovered from {src.name}; apktool exit status and input package layout require investigation")
     # Keep the complete method inventory compressed in the repository; no source dump or raw logs are copied.
     with gzip.open(out/"methods.jsonl.gz","wt",encoding="utf-8") as f:
-        for m in all_methods: f.write(json.dumps(m,separators=(",",":"),ensure_ascii=False)+"\n")
+        for m in all_methods: f.write(json.dumps(m,separators=(",",":"),ensure_ascii=True)+"\n")
     with gzip.open(out/"classes.jsonl.gz","wt",encoding="utf-8") as f:
-        for c in all_classes: f.write(json.dumps(c,separators=(",",":"),ensure_ascii=False)+"\n")
+        for c in all_classes: f.write(json.dumps(c,separators=(",",":"),ensure_ascii=True)+"\n")
     with gzip.open(out/"call-edges.jsonl.gz","wt",encoding="utf-8") as f:
-        for e in all_edges: f.write(json.dumps(e,separators=(",",":"),ensure_ascii=False)+"\n")
+        for e in all_edges: f.write(json.dumps(e,separators=(",",":"),ensure_ascii=True)+"\n")
     candidates=[]
     for m in all_methods:
         roles=m.get("roles",[])
@@ -189,6 +189,6 @@ def main():
     (out/"summary.json").write_text(json.dumps(summary,indent=2,ensure_ascii=False))
     (out/"hook-candidates.json").write_text(json.dumps(candidates,indent=2,ensure_ascii=False))
     (out/"candidate-methods.csv").write_text("version,component,class,method,descriptor,score,roles,file,line\n"+"".join(
-      ",".join(json.dumps(v,ensure_ascii=False) for v in [a.version,c["component"],c["class"],c["name"],c["descriptor"],c["score"],"|".join(x["role"] for x in c["roles"]),c["file"],c["line"]])+"\n" for c in candidates))
+      ",".join(json.dumps(v,ensure_ascii=True) for v in [a.version,c["component"],c["class"],c["name"],c["descriptor"],c["score"],"|".join(x["role"] for x in c["roles"]),c["file"],c["line"]])+"\n" for c in candidates))
     print(json.dumps({k:summary[k] for k in ("version_label","source_sha256","dex_count","class_count","method_count","call_edge_count","candidate_method_count")},ensure_ascii=False))
 if __name__=="__main__": main()
