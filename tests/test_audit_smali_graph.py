@@ -94,6 +94,14 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertEqual(1, cfg["unresolved_target_count"])
         self.assertIn(":missing", cfg["unresolved_targets"])
 
+    def test_truncated_edge_inventory_marks_cfg_incomplete(self):
+        body = ["    if-eqz v0, :end" for _ in range(130)]
+        body += [":end", "    return-void"]
+        cfg = AUDIT.build_smali_cfg(body)
+        self.assertGreater(cfg["edge_count"], 256)
+        self.assertTrue(cfg["edges_truncated"])
+        self.assertFalse(cfg["complete"])
+
     def test_exception_handler_edges_are_explicit(self):
         body = [
             "    :try_start_0",
