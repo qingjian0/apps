@@ -9,6 +9,7 @@ from scripts.aggregate_deepseek_hook_audit import (
     prepared_method,
     prepared_similarity,
     project_candidate,
+    similarity,
     version_identity,
 )
 
@@ -149,6 +150,15 @@ class CandidateProjectionTest(unittest.TestCase):
             "roles": [{"role": "request_route", "anchors": ["unknown-right"]}],
             "opcode_histogram": {"invoke-virtual": 4}})
         self.assertEqual(0.0, prepared_similarity(left, right))
+
+    def test_legacy_similarity_uses_semantic_evidence_gate(self):
+        left = {"class": "La;", "name": "x", "descriptor": "()V",
+            "roles": [{"role": "request_route", "anchors": ["unknown-left"]}],
+            "opcode_histogram": {"invoke-virtual": 4}}
+        right = {"class": "Lb;", "name": "y", "descriptor": "()V",
+            "roles": [{"role": "request_route", "anchors": ["unknown-right"]}],
+            "opcode_histogram": {"invoke-virtual": 4}}
+        self.assertEqual(0.0, similarity(left, right))
 
     def test_prepared_similarity_is_stable_for_identical_candidates(self):
         method = {
