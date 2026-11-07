@@ -88,6 +88,8 @@ jobs:
             "interrupt_and_send_enabled", "sse_first_delta", "sse_auto_resume",
             "x-ds-sse-heartbeat-timeout-secs", "executeAutoResumeStreamFlow"
           ]
+          def simple_name(descriptor):
+            return descriptor.rsplit("/", 1)[-1].removeprefix("L").rstrip(";")
           classes = {}
           method_rows = []
           call_rows = []
@@ -112,7 +114,7 @@ jobs:
                              "access": st.split(".method",1)[1].split(m.group(1),1)[0].strip(),
                              "file": str(p.relative_to(smroot)), "line": no}
                   method_rows.append(current)
-                  if cls and cls.rsplit("/",1)[-1].rstrip(";") in candidates:
+                  if cls and simple_name(cls) in candidates:
                     classes.setdefault(cls, {"class":cls,"file":str(p.relative_to(smroot)),
                       "super":super_cls,"interfaces":interfaces,"methods":[]})
                     classes[cls]["methods"].append({k:current[k] for k in
@@ -124,8 +126,8 @@ jobs:
                 if m:
                   target = m.group(1)
                   owner = target.split(";->",1)[0] + ";"
-                  if owner.rsplit("/",1)[-1].rstrip(";") in candidates or (
-                      current["class"] and current["class"].rsplit("/",1)[-1].rstrip(";") in candidates):
+                  if simple_name(owner) in candidates or (
+                      current["class"] and simple_name(current["class"]) in candidates):
                     call_rows.append({"caller":current["class"]+"->"+current["descriptor"],
                       "target":target,"file":str(p.relative_to(smroot)),"line":no})
           diag = (out/"jadx.stdout.log").read_text(errors="replace") + (out/"jadx.stderr.log").read_text(errors="replace")
@@ -146,16 +148,8 @@ jobs:
               for term in terms:
                 if term in line and len(hits[term]) < 100:
                   hits[term].append({"file":str(p.relative_to(src)),"line":i,"text":line.strip()[:240]})
-          manifest = {}
-          mp = smroot/"AndroidManifest.xml"
-          if mp.exists():
-            try:
-              root = ET.parse(mp).getroot()
-              ns = "{http://schemas.android.com/apk/res/android}"
-              manifest = {"package":root.attrib.get("package"),
-                "versionCode":root.attrib.get(ns+"versionCode"),
-                "versionName":root.attrib.get(ns+"versionName")}
-            except Exception as e: manifest = {"parse_error":str(e)}
+          manifest = {"status":"binary_manifest_not_decoded_by_apktool_resource-skip_mode",
+                      "note":"Manifest metadata is intentionally omitted rather than misreported as a malformed XML document."}
           summary = {"apk":apk.name,"bytes":apk.stat().st_size,
             "sha256":hashlib.sha256(apk.read_bytes()).hexdigest(),"manifest":manifest,
             "dex":dex,"dex_count":len(dex),"jadx_exit":int((out/"jadx.exit-code").read_text().strip()),
@@ -163,7 +157,11 @@ jobs:
             "java_files":len(java_files),"smali_files":smali_count,"method_declarations":len(method_rows),
             "candidate_classes_found":len(classes),"candidate_methods":sum(len(v["methods"]) for v in classes.values()),
             "candidate_call_sites":len(call_rows),"native":native,"matches":{k:len(v) for k,v in hits.items()}}
+          expected = {"ly1", "zn3", "jw3", "y60"}
+          found = {simple_name(k) for k in classes}
+          missing = sorted(expected - found)
           if not dex or not smali_count: raise SystemExit("DEX/smali inventory is empty; refusing to publish")
+          if missing: raise SystemExit("Runtime-observed candidates missing from DEX inventory: " + ", ".join(missing))
           (out/"summary.json").write_text(json.dumps(summary,indent=2))
           (out/"candidate-class-descriptors.json").write_text(json.dumps(classes,indent=2))
           (out/"candidate-call-sites.json").write_text(json.dumps(call_rows,indent=2))
@@ -183,7 +181,8 @@ jobs:
             "Candidate names originate from the 2.7.2 runtime observer log in the repository README.",
             "This report records exact DEX descriptors and call sites where found; it does not assign business semantics from obfuscated names alone.",
             "A missing candidate is not proof of absence because class loading, split DEX, and JADX/DEX parsing can be incomplete.","",
-            "## Candidate class inventory",""
+            "## Candidate class inventory","",
+            "The four runtime-observed request/transport/continuation classes must be present in this APK. Their exact descriptors below are the version-local anchor; class names are never reused as cross-version identity.",""
           ]
           for desc,obj in sorted(classes.items()):
             report.append(f"### {desc}")
