@@ -131,8 +131,8 @@
     "incomplete_dataflow_call_sites": 149926,
     "truncated_callsite_methods": 135,
     "edge_count": 325607,
-    "stored_edge_count": 200000,
-    "edges_truncated": true
+    "stored_edge_count": 325607,
+    "edges_truncated": false
   },
   "interprocedural_points_to": {
     "resolved_call_contexts": 200000,
