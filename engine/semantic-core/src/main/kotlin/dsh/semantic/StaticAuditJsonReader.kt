@@ -11,7 +11,7 @@ import kotlinx.serialization.json.intOrNull
 class StaticAuditJsonReader(private val mapper: StaticEvidenceMapper = StaticEvidenceMapper()) {
     private val json = Json { ignoreUnknownKeys = true }
 
-    fun readLine(line: String, host: HostFingerprint): List<SemanticCandidate> {
+    fun readLine(line: String, host: HostFingerprint, anchorFrequency: Map<String, Int> = emptyMap()): List<SemanticCandidate> {
         val obj = json.parseToJsonElement(line).jsonObject
         val owner = obj.string("class") ?: return emptyList()
         val name = obj.string("name") ?: return emptyList()
@@ -28,7 +28,14 @@ class StaticAuditJsonReader(private val mapper: StaticEvidenceMapper = StaticEvi
         val record = StaticMethodRecord(owner, name, descriptor, parsed.first, parsed.second,
             invokes, obj["opcode_count"]?.jsonPrimitive?.intOrNull ?: 0, roles,
             isStatic = access.split(' ').contains("static"))
-        return mapper.map(host, record)
+        return mapper.map(host, record, anchorFrequency)
+    }
+
+    fun anchorKeys(line: String): List<String> {
+        val obj = json.parseToJsonElement(line).jsonObject
+        return obj["roles"]?.jsonArray?.flatMap { role ->
+            role.jsonObject["anchors"]?.jsonArray?.mapNotNull { it.jsonPrimitive.contentOrNull }.orEmpty()
+        }?.distinct().orEmpty()
     }
 
     private fun kotlinx.serialization.json.JsonObject.string(key: String): String? =
