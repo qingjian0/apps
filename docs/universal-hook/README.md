@@ -6,6 +6,14 @@
 
 “通用通杀”在工程上定义为：**同一套语义解析器和 Hook 生命周期管理器，能够在不同宿主版本中自动定位同一业务角色；每个版本可以有独立的候选描述符，但不需要人工维护一套完全独立的 Hook 代码。** 不承诺一个固定类名/方法名适配所有版本。
 
+## 新一代引擎架构
+
+- [Runtime Semantic Hook Engine 架构与验收规范](ENGINE-ARCHITECTURE.md)
+- [Kotlin Semantic Core](../../engine/semantic-core/)：当前实现候选证据多样性、歧义拒绝、宿主指纹约束和幂等 HookCoordinator（平台 HookBackend 尚未接入）。
+- [Semantic Core CI](../../.github/workflows/deepseek-semantic-core-ci.yml)：独立构建与单元测试，不与 API 项目 CI 共享工作流。
+
+当前 Kotlin 核心是第一阶段原型，不代表 APK 自动语义发现、LSPosed 安装或设备端功能闭环已完成。详见架构文档的状态和验收标准。
+
 ## 仓库输入清单
 
 | 输入 | 身份/证据 | 处理方式 |
