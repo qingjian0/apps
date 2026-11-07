@@ -302,7 +302,7 @@ def analyze_register_use_def(body_lines):
 
 
 
-def analyze_register_dataflow(body_lines, cfg):
+def analyze_register_dataflow(body_lines, cfg, parameter_registers=()):
     """Conservative intraprocedural reaching-definitions over the recovered CFG."""
     executable=[]
     for line_no,line in enumerate(body_lines,1):
@@ -337,12 +337,19 @@ def analyze_register_dataflow(body_lines, cfg):
             predecessors[edge["to"]].add(edge["from"])
     definitions=[]; defs_by_instruction={}
     all_defs_by_register=collections.defaultdict(set)
+    entry_definitions=set()
+    for reg in parameter_registers:
+        ident="entry:{}".format(reg)
+        definitions.append({"id":ident,"register":reg,"instruction":-1,
+                            "line":0,"opcode":"method-parameter","kind":"parameter"})
+        all_defs_by_register[reg].add(ident)
+        entry_definitions.add(ident)
     for ins in executable:
         current=set()
         for reg in ins["writes"]:
             ident="d{}:{}".format(ins["index"],reg)
             definitions.append({"id":ident,"register":reg,"instruction":ins["index"],
-                                "line":ins["line"],"opcode":ins["opcode"]})
+                                "line":ins["line"],"opcode":ins["opcode"],"kind":"instruction"})
             current.add(ident); all_defs_by_register[reg].add(ident)
         defs_by_instruction[ins["index"]]=current
     gen={b["id"]:set() for b in blocks}; kill={b["id"]:set() for b in blocks}
@@ -363,6 +370,8 @@ def analyze_register_dataflow(body_lines, cfg):
         for block in blocks:
             bid=block["id"]
             new_in=set().union(*(outgoing[p] for p in predecessors[bid])) if predecessors[bid] else set()
+            if bid==min(b["id"] for b in blocks):
+                new_in.update(entry_definitions)
             new_out=gen[bid]|(new_in-kill[bid])
             if new_in!=incoming[bid] or new_out!=outgoing[bid]:
                 incoming[bid]=new_in; outgoing[bid]=new_out; changed=True
@@ -384,6 +393,7 @@ def analyze_register_dataflow(body_lines, cfg):
     return {"complete":complete,"reason":None if complete else
             ("unknown-opcodes" if not known else "incomplete-cfg-or-nonconvergence"),
             "instruction_count":len(executable),"definition_count":len(definitions),
+            "parameter_definition_count":len(entry_definitions),
             "use_count":len(uses),"ambiguous_use_count":ambiguous,
             "unresolved_use_count":unresolved,"iterations":iterations,
             "definitions":definitions[:256],"definitions_truncated":len(definitions)>256,
