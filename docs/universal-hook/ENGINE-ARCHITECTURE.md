@@ -388,6 +388,6 @@ and non-convergent analysis fail closed.
 
 ### Kotlin Semantic Core 诊断接入
 
-`StaticAuditCli` 现在可选读取 `interprocedural-points-to.jsonl.gz`。只有当 summary 明确标记 `records_truncated=false`、`recursive_fixed_point=false`、`runtime_identity_proven=false)，且每条记录的 method identity、`one-callsite-context` scope 与非运行时证明标记均通过校验时，才计入 Kotlin graph diagnostics。
+`StaticAuditCli` 现在可选读取 `interprocedural-points-to.jsonl.gz`。只有当 summary 明确标记 `records_truncated=false`、`recursive_fixed_point=false`、`runtime_identity_proven=false)，且每条记录的 method identity、`bounded-call-string-context` scope 与非运行时证明标记均通过校验时，才计入 Kotlin graph diagnostics。
 
 该索引只增加 `interproceduralContextualReceivers`、`interproceduralSingletonContextReceivers` 和 `interproceduralPointsToLoaded` 统计，不产生 `DATA_FLOW` 证据、不增加 Resolver 分数，也不改变 HookCoordinator 授权。截断、缺失、格式异常或 schema 不匹配时整体不加载。新增 Kotlin 测试验证完整索引只进入诊断统计、截断索引 fail-closed，且静态 Points-to 不会单独升级为 DATA_FLOW。
