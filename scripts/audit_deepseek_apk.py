@@ -62,17 +62,20 @@ def run(cmd,log):
     pathlib.Path(log).write_text(p.stdout,errors="replace")
     return p.returncode
 
-def aapt_badging(aapt, apk, log_path):
-    if not aapt: return {}
-    p=subprocess.run([aapt,"dump","badging",str(apk)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,errors="replace")
-    pathlib.Path(log_path).write_text(p.stdout,errors="replace")
-    result={"aapt_exit":p.returncode}
-    line=next((x for x in p.stdout.splitlines() if x.startswith("package: ")), "")
+def parse_aapt_badging(output, exit_code=0):
+    result={"aapt_exit":exit_code}
+    line=next((x for x in output.splitlines() if x.startswith("package: ")), "")
     if line:
         for key in ("name","versionCode","versionName","split"):
             m=re.search(r"(?:^|\s)"+re.escape(key)+r"='([^']*)'",line)
             if m: result[{"name":"package","versionCode":"version_code","versionName":"version_name","split":"split"}[key]]=m.group(1) or None
     return result
+
+def aapt_badging(aapt, apk, log_path):
+    if not aapt: return {}
+    p=subprocess.run([aapt,"dump","badging",str(apk)],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,errors="replace")
+    pathlib.Path(log_path).write_text(p.stdout,errors="replace")
+    return parse_aapt_badging(p.stdout,p.returncode)
 
 def signing_certificate(apksigner, apk, log_path):
     if not apksigner: return {}
