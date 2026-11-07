@@ -562,9 +562,27 @@ def analyze_object_points_to(body_lines, cfg, owner, method_name, descriptor,
         return {"complete":False,"reason":"instruction-index-mismatch-or-unknown-opcode",
                 "field_receivers":[],"same_instance_groups":[]}
     predecessors={b["id"]:set() for b in blocks}
+    successors={b["id"]:set() for b in blocks}
     for edge in cfg.get("edges",[]):
         if edge["from"] in predecessors and edge["to"] in predecessors:
             predecessors[edge["to"]].add(edge["from"])
+            successors[edge["from"]].add(edge["to"])
+    cyclic_blocks=set()
+    for start in successors:
+        pending=list(successors[start]); visited=set()
+        while pending:
+            current=pending.pop()
+            if current==start:
+                cyclic_blocks.add(start)
+                break
+            if current in visited:
+                continue
+            visited.add(current)
+            pending.extend(successors.get(current,()))
+    cyclic_allocation_count=sum(
+        1 for ins in executable
+        if ins["opcode"].startswith("new-instance")
+        and block_by_instruction[ins["index"]] in cyclic_blocks)
     method_key=owner+"->"+method_name+descriptor
     entry_points={reg:{"param:{}:{}".format(method_key,reg)}
                   for reg in object_parameter_registers_for_method(access,descriptor)}
@@ -590,8 +608,12 @@ def analyze_object_points_to(body_lines, cfg, owner, method_name, descriptor,
             match=re.search(r"\bnew-instance\s+([vp]\d+)\s*,\s*(L[^;]+;)",line)
             if match:
                 dest,allocated_type=match.groups()
-                new_points[dest]={"alloc:{}#{}:{}".format(method_key,index,allocated_type)}
-                new_unknown.discard(dest)
+                if block_by_instruction[index] in cyclic_blocks:
+                    new_points[dest]=set()
+                    new_unknown.add(dest)
+                else:
+                    new_points[dest]={"alloc:{}#{}:{}".format(method_key,index,allocated_type)}
+                    new_unknown.discard(dest)
             else:
                 for dest in ins["writes"]:
                     new_points[dest]=set(); new_unknown.add(dest)
@@ -683,6 +705,7 @@ def analyze_object_points_to(body_lines, cfg, owner, method_name, descriptor,
         for (field,identity),indices in groups.items() if len(set(indices))>1
     ]
     return {"complete":True,"reason":None,"iterations":iterations,
+            "cyclic_allocation_site_count":cyclic_allocation_count,
             "field_receivers":receiver_facts,
             "same_instance_groups":same_instance_groups,
             "singleton_receiver_count":sum(x["identity_status"]=="singleton" for x in receiver_facts),
