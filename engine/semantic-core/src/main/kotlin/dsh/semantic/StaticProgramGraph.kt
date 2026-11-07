@@ -18,7 +18,11 @@ data class MethodGraphFacts(
     val branchCount: Int,
     val labelCount: Int,
     val returnCount: Int,
-    val throwCount: Int
+    val throwCount: Int,
+    val cfgBlockCount: Int = 0,
+    val cfgEdgeCount: Int = 0,
+    val cfgUnresolvedTargetCount: Int = 0,
+    val cfgComplete: Boolean = false
 )
 
 data class ClassGraphFacts(val descriptor: String, val superDescriptor: String?, val interfaces: Set<String>)
@@ -86,13 +90,15 @@ class StaticProgramGraph private constructor(
                 (0.52 + minOf(0.32, linkedFields.coerceAtMost(7) * 0.045) + minOf(0.11, fieldAnchorHits.size * 0.055)).coerceAtMost(0.95)
             )
         }
-        if (facts != null && facts.branchCount + facts.labelCount > 0) {
-            val weight = (0.42 + minOf(0.35, facts.branchCount.coerceAtMost(8) * 0.035) +
-                if (facts.labelCount > 0) 0.08 else 0.0).coerceAtMost(0.9)
+        // Only a resolved CFG contributes control-flow evidence. Legacy branch/label
+        // counters are retained for diagnostics, never promoted into a graph claim.
+        if (facts != null && facts.cfgComplete && facts.cfgBlockCount > 0) {
+            val weight = (0.48 + minOf(0.30, facts.cfgEdgeCount.coerceAtMost(20) * 0.015) +
+                minOf(0.12, facts.cfgBlockCount.coerceAtMost(12) * 0.01)).coerceAtMost(0.90)
             evidence += Evidence(
                 EvidenceFamily.CONTROL_FLOW,
-                "branches=" + facts.branchCount + ";labels=" + facts.labelCount +
-                    ";returns=" + facts.returnCount + ";throws=" + facts.throwCount,
+                "cfg=complete;blocks=" + facts.cfgBlockCount + ";edges=" + facts.cfgEdgeCount +
+                    ";branches=" + facts.branchCount + ";returns=" + facts.returnCount + ";throws=" + facts.throwCount,
                 weight
             )
         }
@@ -147,7 +153,11 @@ class StaticProgramGraph private constructor(
                         cfg?.get("branch_count")?.jsonPrimitive?.intOrNull ?: 0,
                         cfg?.get("label_count")?.jsonPrimitive?.intOrNull ?: 0,
                         cfg?.get("return_count")?.jsonPrimitive?.intOrNull ?: 0,
-                        cfg?.get("throw_count")?.jsonPrimitive?.intOrNull ?: 0
+                        cfg?.get("throw_count")?.jsonPrimitive?.intOrNull ?: 0,
+                        cfg?.get("cfg")?.jsonObject?.get("block_count")?.jsonPrimitive?.intOrNull ?: 0,
+                        cfg?.get("cfg")?.jsonObject?.get("edge_count")?.jsonPrimitive?.intOrNull ?: 0,
+                        cfg?.get("cfg")?.jsonObject?.get("unresolved_target_count")?.jsonPrimitive?.intOrNull ?: 0,
+                        cfg?.get("cfg")?.jsonObject?.get("complete")?.jsonPrimitive?.contentOrNull?.toBooleanStrictOrNull() ?: false
                     )
                     readFields.forEach { readers.getOrPut(it) { mutableSetOf() }.add(id) }
                     writeFields.forEach { writers.getOrPut(it) { mutableSetOf() }.add(id) }
