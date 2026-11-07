@@ -1,6 +1,7 @@
 package dsh.semantic
 
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -156,7 +157,7 @@ class StaticProgramGraph private constructor(
             valueEdgesPath: String? = null,
             summaryPath: String? = null,
             pointsToPath: String? = null,
-            onMethodRecord: ((String) -> Unit)? = null
+            onMethodRecord: ((JsonObject) -> Unit)? = null
         ): StaticProgramGraph {
             val callers = mutableMapOf<String, MutableSet<String>>()
             val callees = mutableMapOf<String, MutableSet<String>>()
@@ -174,7 +175,7 @@ class StaticProgramGraph private constructor(
             BufferedReader(InputStreamReader(GZIPInputStream(FileInputStream(methodsPath)), Charsets.UTF_8)).use { input ->
                 input.lineSequence().forEach { line ->
                     val obj = json.parseToJsonElement(line).jsonObject
-                    onMethodRecord?.invoke(line)
+                    onMethodRecord?.invoke(obj)
                     val owner = obj["class"]?.jsonPrimitive?.contentOrNull ?: return@forEach
                     val name = obj["name"]?.jsonPrimitive?.contentOrNull ?: return@forEach
                     val descriptor = obj["descriptor"]?.jsonPrimitive?.contentOrNull ?: return@forEach
