@@ -740,6 +740,29 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertEqual(0, graph["summary"]["return_identity_propagations"])
         self.assertGreaterEqual(graph["summary"]["return_identity_unknown_count"], 1)
 
+    def test_interprocedural_points_to_cuts_recursive_return_summary_composition(self):
+        body = [
+            "    invoke-static {}, Lx/Recursive;->make()Lx/Thing;",
+            "    move-result-object v0",
+            "    return-object v0",
+        ]
+        cfg = AUDIT.build_smali_cfg(body)
+        invokes = AUDIT.extract_invoke_sites(body)
+        pts = AUDIT.analyze_object_points_to(
+            body, cfg, "Lx/Recursive;", "make", "()Lx/Thing;",
+            "static", [], invokes)
+        method = {
+            "class": "Lx/Recursive;", "name": "make",
+            "descriptor": "()Lx/Thing;", "component": "base",
+            "invoke_sites": invokes, "invoke_sites_truncated": False,
+            "invoke_sites_incomplete": False, "object_points_to": pts,
+            "control_flow": {"branch_count": 0, "return_count": 1, "cfg": cfg},
+        }
+        graph = AUDIT.build_interprocedural_points_to_graph([method])
+        self.assertGreaterEqual(graph["summary"]["return_summary_recursive_cuts"], 1)
+        self.assertFalse(graph["summary"]["context_expansion_complete"])
+        self.assertFalse(graph["summary"]["recursive_fixed_point"])
+
     def test_interprocedural_points_to_cuts_recursive_contexts_fail_closed(self):
         body = [
             "    invoke-static {p0}, Lx/Recursive;->step(Lx/Thing;)V",
