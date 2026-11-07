@@ -334,5 +334,32 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         self.assertEqual([], graph["edges"])
 
 
+    def test_field_slot_index_groups_exact_field_without_claiming_instance_identity(self):
+        methods = [
+            {
+                "class": "Lx/Writer;", "name": "write", "descriptor": "()V",
+                "component": "base",
+                "field_access_sites": [{
+                    "field": "Lx/State;->value:Ljava/lang/String;", "access": "write",
+                    "instruction": 2, "line": 3, "opcode": "iput-object",
+                    "value_register": "v0", "object_register": "p1", "static": False,
+                }],
+            },
+            {
+                "class": "Lx/Reader;", "name": "read", "descriptor": "()V",
+                "component": "base",
+                "field_access_sites": [{
+                    "field": "Lx/State;->value:Ljava/lang/String;", "access": "read",
+                    "instruction": 1, "line": 2, "opcode": "iget-object",
+                    "value_register": "v0", "object_register": "p1", "static": False,
+                }],
+            },
+        ]
+        groups = AUDIT.build_field_slot_index(methods)
+        self.assertEqual(1, len(groups))
+        self.assertEqual(1, groups[0]["cross_method_pair_count"])
+        self.assertFalse(groups[0]["instance_identity_confirmed"])
+
+
 if __name__ == "__main__":
     unittest.main()
