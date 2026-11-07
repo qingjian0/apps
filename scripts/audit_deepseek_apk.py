@@ -522,6 +522,12 @@ def build_interprocedural_value_graph(methods):
     edges=[]; unresolved_calls=0; ambiguous_calls=0; resolved_calls=0
     argument_edges=0; return_edges=0; unresolved_arguments=0; unresolved_returns=0
     incomplete_dataflow_calls=0; truncated_callsite_methods=0
+    total_edge_count=0
+    def append_edge(edge):
+        nonlocal total_edge_count
+        total_edge_count+=1
+        if len(edges)<200000:
+            edges.append(edge)
     for caller in methods:
         caller_key=caller["_semantic_key"]
         caller_flow=caller.get("register_dataflow",{})
@@ -583,7 +589,7 @@ def build_interprocedural_value_graph(methods):
                     unresolved_arguments+=1
                     continue
                 for source_id in reaching:
-                    edges.append({"kind":"argument","from_method":caller_key,
+                    append_edge({"kind":"argument","from_method":caller_key,
                                   "from_definition":source_id,"to_method":callee["_semantic_key"],
                                   "to_parameter":formal_id,"actual_register":actual_reg,
                                   "formal_register":formal_reg,"call_instruction":site["instruction"],
@@ -598,7 +604,7 @@ def build_interprocedural_value_graph(methods):
                     unresolved_returns+=1
                 for return_use in return_uses:
                     for source_id in return_use["reaching_definitions"]:
-                        edges.append({"kind":"return","from_method":callee["_semantic_key"],
+                        append_edge({"kind":"return","from_method":callee["_semantic_key"],
                                       "from_definition":source_id,"to_method":caller_key,
                                       "to_definition":caller_result_id,
                                       "call_instruction":site["instruction"],
@@ -608,16 +614,15 @@ def build_interprocedural_value_graph(methods):
                         return_edges+=1
     for method in methods:
         method.pop("_semantic_key",None)
-    total_edges=len(edges)
-    return {"edges":edges[:200000],"summary":{"resolved_call_sites":resolved_calls,
+    return {"edges":edges,"summary":{"resolved_call_sites":resolved_calls,
             "unresolved_call_sites":unresolved_calls,"ambiguous_call_sites":ambiguous_calls,
             "argument_edges":argument_edges,"return_edges":return_edges,
             "unresolved_argument_mappings":unresolved_arguments,
             "unresolved_return_mappings":unresolved_returns,
             "incomplete_dataflow_call_sites":incomplete_dataflow_calls,
             "truncated_callsite_methods":truncated_callsite_methods,
-            "edge_count":total_edges,"stored_edge_count":min(total_edges,200000),
-            "edges_truncated":total_edges>200000}}
+            "edge_count":total_edge_count,"stored_edge_count":len(edges),
+            "edges_truncated":total_edge_count>200000}
 
 
 def build_field_slot_index(methods):
@@ -638,9 +643,10 @@ def build_field_slot_index(methods):
     for field in sorted(groups):
         group=groups[field]
         if group["writers"] and group["readers"]:
-            group["cross_method_pair_count"]=sum(
-                1 for writer in group["writers"] for reader in group["readers"]
-                if writer["method"]!=reader["method"])
+            writer_methods={writer["method"] for writer in group["writers"]}
+            reader_methods={reader["method"] for reader in group["readers"]}
+            group["cross_method_pair_count"]=(
+                len(writer_methods)*len(reader_methods)-len(writer_methods & reader_methods))
             group["instance_identity_confirmed"]=False
             records.append(group)
     return records
@@ -846,7 +852,10 @@ def main():
       "register_dataflow_unresolved_use_count":sum(m.get("register_dataflow",{}).get("unresolved_use_count",0) for m in all_methods),
       "parameter_definition_count":sum(m.get("register_dataflow",{}).get("parameter_definition_count",0) for m in all_methods),
       "invoke_site_count":sum(len(m.get("invoke_sites",[])) for m in all_methods),
+      "invoke_site_truncated_methods":sum(1 for m in all_methods if m.get("invoke_sites_truncated")),
       "field_access_site_count":sum(len(m.get("field_access_sites",[])) for m in all_methods),
+      "field_access_site_truncated_methods":sum(1 for m in all_methods if m.get("field_access_sites_truncated")),
+      "register_dataflow_evidence_truncated_methods":sum(1 for m in all_methods if m.get("register_dataflow",{}).get("reason")=="evidence-truncated"),
       "field_slot_group_count":len(field_slot_index),
       "field_slot_cross_method_pair_count":sum(x["cross_method_pair_count"] for x in field_slot_index),
       "field_instance_identity_confirmed":False,
