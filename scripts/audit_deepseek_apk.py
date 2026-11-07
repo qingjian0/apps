@@ -937,7 +937,7 @@ def build_interprocedural_value_graph(methods):
             "edges_truncated":total_edge_count>MAX_INTERPROCEDURAL_VALUE_EDGES}}
 
 
-def build_interprocedural_points_to_graph(methods, max_call_depth=4):
+def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records=200000):
     """Build bounded call-string contexts for receiver and direct return identity projection.
 
     Return values are propagated only across straight-line caller methods, and only
@@ -965,7 +965,15 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4):
     return_propagations=return_unknowns=return_unresolved=0
     recursive_contexts_cut=depth_contexts_cut=0
     records_truncated=False
-    record_limit=200000
+    if max_records < 1:
+        raise ValueError("max_records must be positive")
+    record_limit=max_records
+    roots_with_roles=sum(bool(m.get("roles")) for m in roots)
+    queue_states_enqueued=len(queue)
+    queue_states_processed=0
+    duplicate_context_states_skipped=0
+    call_context_records_dropped=0
+    receiver_records_dropped=0
     seen_contexts=set()
 
     def substitute(identity,method_key,bindings,context_id,contextualize_allocations=True):
@@ -1107,6 +1115,7 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4):
 
     while queue:
         state=queue.popleft()
+        queue_states_processed+=1
         caller=state["method"]
         caller_key=caller["_points_to_key"]
         caller_pts=caller.get("object_points_to",{})
@@ -1221,6 +1230,7 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4):
                 })
             else:
                 records_truncated=True
+                call_context_records_dropped+=1
                 continue
             resolved+=1
             for fact in callee_pts.get("field_receivers",[]):
@@ -1250,6 +1260,7 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4):
                     })
                 else:
                     records_truncated=True
+                    receiver_records_dropped+=1
                 if status=="singleton":
                     singleton_context_receivers+=1
             if callee_key in state["path"]:
@@ -1261,8 +1272,10 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4):
                 continue
             next_state_id=(callee_key,context_id)
             if next_state_id in seen_contexts:
+                duplicate_context_states_skipped+=1
                 continue
             seen_contexts.add(next_state_id)
+            queue_states_enqueued+=1
             queue.append({
                 "method":callee,"context_id":context_id,
                 "bindings":resolved_bindings,"register_overrides":{},
@@ -1300,6 +1313,7 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4):
                 })
             else:
                 records_truncated=True
+                receiver_records_dropped+=1
             if status=="singleton":
                 singleton_context_receivers+=1
     for method in methods:
@@ -1320,6 +1334,14 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4):
             "return_summary_depth_cuts":return_summary_depth_cuts,
             "records_truncated":records_truncated,
             "record_limit":record_limit,
+            "root_method_count":len(roots),
+            "semantic_candidate_root_count":roots_with_roles,
+            "queue_states_enqueued":queue_states_enqueued,
+            "queue_states_processed":queue_states_processed,
+            "unique_context_states":len(seen_contexts),
+            "duplicate_context_states_skipped":duplicate_context_states_skipped,
+            "call_context_records_dropped":call_context_records_dropped,
+            "receiver_records_dropped":receiver_records_dropped,
             "max_call_depth":max_call_depth,
             "recursive_contexts_cut":recursive_contexts_cut,
             "depth_contexts_cut":depth_contexts_cut,
