@@ -18,12 +18,12 @@
       "jadx_exit_code": 3,
       "jadx_errors": 304,
       "native_library_count": 11,
-      "native_library_bytes": 0,
+      "native_library_bytes": 7544592,
       "profile_descriptor_validation": {
         "status": "manually_verified_against_all_smali_archive",
         "artifact_run_id": 42338674344,
         "classes_verified": 14,
-        "methods_verified": 18
+        "methods_verified": 16
       }
     },
     "dynamic_runtime": {
