@@ -74,7 +74,7 @@ class StaticProgramGraph private constructor(
             val topology = "incoming=" + incoming.size + ";outgoing=" + outgoing.size + ";framework-outgoing=" + frameworkCalls +
                 ";neighbor-rare-anchor-hits=" + neighborAnchorHits.size + ";anchors=" + neighborAnchorHits.sorted().joinToString(",")
             val weight = (0.42 + minOf(0.36, (incoming.size + outgoing.size).coerceAtMost(18) * 0.02) +
-                if (frameworkCalls > 0) 0.06 else 0.0 + minOf(0.14, neighborAnchorHits.size * 0.07)).coerceAtMost(0.98)
+                (if (frameworkCalls > 0) 0.06 else 0.0) + minOf(0.14, neighborAnchorHits.size * 0.07)).coerceAtMost(0.98)
             evidence += Evidence(EvidenceFamily.CALL_GRAPH, topology, weight)
         }
         val linkedFields = linkedReads + linkedWrites
