@@ -1,180 +1,420 @@
-# apps
+# DeepSeek APK / 运行链路分析归档
 
-> 项目架构与可演化性分析记录。本文将此前对本仓库的分析结论集中保存在 README，避免后续重复从零梳理。
+> 本仓库用于保存 DeepSeek Android APK、运行探针日志及其逆向分析记录。当前分析目标限定为 **DeepSeek 官方 Android 宿主应用**，重点是版本识别、Agent 请求构造、网络传输、流式 continuation/callback 链，以及可用于后续 Hook 的稳定边界。
 >
-> **记录性质：** 历史分析归档，不等同于本次对仓库当前 HEAD 的重新审计。下文涉及的实现结论应在后续代码变更或决策前，结合当前源码与测试重新核验。
+> **证据等级约定**
+> - **日志直接证实**：日志中存在明确的类名、方法签名、调用栈或事件计数。
+> - **强推断**：由多个调用栈和对象关系共同支持，但尚未通过 APK 静态反编译确认语义。
+> - **未确认**：当前日志没有足够证据，不得写成已定位。
+>
+> 本文是基于当前仓库文件与日志的分析归档，不把混淆类名臆测成业务语义，也不把未检查的 APK 二进制说成已完成反编译。
 
-## 1. 分析范围
+## 1. 仓库材料盘点
 
-此前分析主要围绕平台核心与应用层的边界、领域对象、推理 Pipeline、状态更新、预测与校准机制，以及跨领域扩展能力展开。
+当前 `main` 分支文件：
 
-重点检查的架构区域：
+| 文件 | 大小 | 当前可确认内容 |
+|---|---:|---|
+| `DeepSeek_2.7.5.apk` | 22,210,268 bytes | DeepSeek 2.7.5 APK；本轮尚未完成二进制静态反编译 |
+| `deepseek 273.apk` | 14,211,169 bytes | DeepSeek 2.7.3 APK；本轮尚未完成二进制静态反编译 |
+| `dsprobe.log` | 12,320 bytes / 50 行 | 模块启动、宿主版本识别、Hook 安装与失败日志 |
+| `deekseep_vision.log` | 6,440,972 bytes / 19,747 行 | `OPEN_NATIVE_CALL_OBSERVER` 的请求构造、传输、continuation 和 callback 观测 |
+| `README.md` | 本文件 | 分析归档 |
 
-- `core/`：平台核心能力与通用领域逻辑。
-- `core/kernel/`：平台运行时与基础机制。
-- `core/reasoning/`：推理流程相关能力。
-- `core/world/`：世界状态及其更新模型。
-- `apps/`：具体业务应用，例如基金分析与占卜领域应用。
-- `agents/`：领域 Evidence Producer、引擎及 Agent 侧能力。
-- `providers/`：外部数据源、领域规则及 Provider 适配。
+当前文件树中**没有 2.7.2 APK**，但运行日志记录的宿主为 `2.7.2/code289-cn`。因此，2.7.2 的版本识别和映射问题只能先依据运行日志分析，不能与本仓库 APK 做同版本静态交叉验证。
 
-以上目录和职责是此前分析所使用的架构视图；目录现状及边界是否仍一致，需要以当前分支源码为准。
+## 2. 核心结论
 
-## 2. 核心数据模型与 Pipeline
+1. 已从运行日志定位到请求对象：`ly1`，实现接口 `wu1`。
+2. 已定位到两层传输调用：`zn3.o(wu1, Long) -> y60` 和 `jw3.g(wu1, Long) -> y60`。
+3. 已定位到返回对象上的 continuation 方法：`y60.b(fl4, yb3) -> Object`；返回对象 `y60` 实现接口 `el4`。
+4. 请求构造调用栈可追到 `mr2.h → jr2.m → jr2.y → mw1.e → mw1.y → ly1.<init>`。这是日志中的调用栈反向还原结果，方向按“外层调用者到被调用者”排列。
+5. continuation 内部存在大量双回调对象。当前观测到 21 个 callback 类、9,578 次 callback-enter；其中 944 次以异常结束，8,634 次正常结束。
+6. 另一份启动日志显示宿主识别为 `2.7.2/code289-cn`，但功能 Hook 安装选择了 `2.7.1 full mode`，同时触发 code257 Canvas 类映射失败。版本路由/映射混用是当前最高优先级问题。
+7. 当前证据足以建立请求—传输—continuation 的 Hook 入口候选，但**还不能声称已识别 HTTP endpoint、序列化器、SSE/JSON 解析器或 Agent 工具执行语义**。
 
-此前分析记录涉及以下核心对象：
+## 3. 运行时启动与 Hook 安装链
 
-| 对象 | 职责（此前分析中的理解） |
-|---|---|
-| Observation | 记录外部观测及其来源、时间、类型、值与置信信息 |
-| Evidence | 将观测整理为可用于推理的证据，表达领域、强度和方向 |
-| Hypothesis | 表达候选解释及其置信度 |
-| Prediction | 记录针对目标对象和时间范围的预测 |
-| Outcome | 保存实际结果及验证信息 |
-| TransitionRule | 描述证据触发世界状态变化的规则 |
-| WorldState / MacroState | 表达系统当前世界状态及其宏观因子 |
-
-此前梳理的主流程：
+`dsprobe.log` 中可直接确认的启动事件顺序：
 
 ```text
-Observation
-    ↓
-EvidenceProducer
-    ↓
-Evidence
-    ↓
-HypothesisProducer
-    ↓
-Hypothesis
-    ↓
-WorldUpdater
-    ↓
-WorldState
-    ↓
-PredictionEngine
-    ↓
-Prediction
-    ↓
-OutcomeVerifier
-    ↓
-VerificationResult
-    ↓
-TransitionCalibrator
-    ↓
-TransitionLibrary
+模块加载
+  ├─ native dual-root capture: ComposeView.setContent
+  ├─ Activity font-scale Hook
+  └─ module loaded (universal)
+       package=com.deepseek.chat
+       hostGeneration=2.7.2/code289-cn
+          ↓
+Cold start: license verified
+          ↓
+installAllFeatureHooks (authorized)
+          ↓
+选择 2.7.1 full mode via HostRemap (classes=7636)
+          ├─ v271 page_show dispatcher 未找到
+          │    └─ fallback: always-visible entry
+          ├─ 2.7.2 navigation controller capture
+          │    └─ class=p16
+          └─ code257 agent tool-log Canvas renderer
+               └─ ClassNotFoundException:
+                  deekseep unmapped mf6
+          ↓
+installAllFeatureHooks failed
+          ↓
+lifecycle bootstrap 再次尝试安装
+          ↓
+activity lifecycle callbacks registered
+          ↓
+captured DeepSeek native root
+  content=zy1
+          ↓
+后续 lifecycle / 多次安装重试
+          └─ 同一 mf6 映射错误再次出现
 ```
 
-其中，外部数据采集属于非确定性边界；证据生成、状态更新、预测和结果验证应尽可能采用可复现的规则或确定性计算。此前分析将 HypothesisProducer 的模型推理视为主要的非确定性环节，并要求保留规则降级路径。
+### 3.1 版本路由异常
 
-## 3. 已记录的架构优势
+日志原文包含：
 
-以下为此前分析得出的正向结论，尚不代表当前 HEAD 已重新验证：
+- `module loaded (universal), package=com.deepseek.chat, hostGeneration=2.7.2/code289-cn`
+- `installAllFeatureHooks: 2.7.1 full mode via HostRemap classes=7636`
+- `2.7.2/code289-cn navigation controller capture installed class=p16`
+- `code257 agent tool-log Canvas renderer unavailable`
+- `ClassNotFoundException: Didn't find class "deekseep unmapped mf6"`
 
-1. **核心与应用层分离。** 基金、占卜等领域能力被设计为应用或领域扩展，而不是直接成为平台核心的一部分。
-2. **Pipeline 方向清晰。** Observation、Evidence、Hypothesis、Prediction、Outcome 等对象形成前向处理链。
-3. **状态更新职责集中。** 此前设计由 WorldUpdater 负责应用证据或假设对 WorldState 的影响。
-4. **预测职责集中。** PredictionEngine 负责生成预测，避免多个模块各自写入预测结果。
-5. **校准职责集中。** TransitionCalibrator 负责根据验证结果更新规则或知识。
-6. **Provider 可替换。** LLM Provider 的替换原则上应通过配置和适配层完成，不应迫使核心推理流程依赖某个具体模型供应商。
+这说明至少存在三个版本标识同时参与运行：
 
-## 4. 可演化性压力测试记录
-
-此前分析使用了以下场景检查平台扩展时是否需要侵入核心：
-
-| 场景 | 此前分析结论 | 备注 |
+| 标识 | 日志所示含义 | 风险 |
 |---|---|---|
-| 新增 Crypto 应用 | 基本通过 | 增加应用、领域 EvidenceProducer 和交易所 Provider；目标是不修改 core |
-| 替换 LLM Provider | 通过（设计层面） | 通过配置替换 HypothesisProducer 使用的模型客户端 |
-| 删除 Divination | 基本通过 | 移除领域应用及其规则后，通用 Pipeline 应继续工作 |
-| 跨到 Medical Diagnosis | 部分通过 | 通用对象和 Pipeline 可复用，但 MacroState 的金融因子构成形成障碍 |
+| 2.7.2/code289-cn | 宿主实际识别结果 | 当前运行目标 |
+| 2.7.1 full mode | 功能 Hook 所选配置 | 与宿主版本不一致 |
+| code257 | Agent tool-log Canvas 相关映射标签 | 与 code289 宿主不匹配的可能性高 |
 
-### 4.1 跨领域模型的主要瓶颈：MacroState
+**判断：** 这不是单纯一个 Canvas View 找不到的问题。更可能是宿主 generation 检测结果、HostRemap 选择结果和功能 Hook 使用的映射版本没有统一。需要检查版本识别到 Hook 安装之间的配置传递，不能通过给 `mf6` 随便补一个类名来掩盖问题。
 
-此前分析发现，`core/world/MacroState` 的七个因子采用了金融市场语义，例如风险偏好、流动性等。
+### 3.2 优先审计的模块边界
 
-这会导致医疗诊断等非金融领域无法自然表达自己的宏观状态，例如炎症指标或心血管风险。
+以下是根据日志暴露出的职责划分提出的源码审计目标，不代表这些源码文件已存在于本仓库：
 
-此前记录过两种处理方向：
+- `HostGenerationDetector`：宿主包名、版本名、versionCode / code 标识识别。
+- `HostProfileSelector`：将识别结果映射到唯一 Host Profile。
+- `HostRemap`：类名、方法签名和版本映射表选择。
+- `HookRegistry`：Hook 定义及其适用版本约束。
+- `HookInstallCoordinator`：启动期与 Activity lifecycle 阶段的安装编排、去重和失败隔离。
 
-- **短期绕行：** 将领域专属状态放在 AppState 或领域扩展数据中，避免非金融应用强行使用金融因子。
-- **长期改进：** 将 MacroState 改为可扩展、带领域 schema 或因子定义的状态模型，同时维持核心状态更新契约的稳定。
+建议版本选择以宿主实际包名 + versionCode + build/code 标识为联合键；不得在 code289 未命中时静默降级到 2.7.1 或 code257 的完整映射集。未知版本应进入明确的只读/诊断状态。
 
-**建议：** 将领域中立的状态容器与具体领域因子定义分离。不要让平台核心直接依赖基金分析的固定因子集合。该改动应通过独立设计评审和兼容性测试实施，而不是仅修改文档后视为已解决。
+## 4. 请求构造调用链
 
-## 5. 已记录的问题与风险
+`deekseep_vision.log` 中记录了 2 个请求构造器候选：
 
-### 5.1 Calibration 幂等性存在文档与实现矛盾
+```java
+ly1.<init>(
+  int, String, Integer, String, List,
+  boolean, boolean, String, boolean, String, String
+)
 
-此前分析记录指出：
+ly1.<init>(
+  String, Integer, String, ArrayList,
+  boolean, boolean, String, boolean, String, String, int
+)
+```
 
-- `TransitionCalibrator.calibrate()` 采用追加历史记录的方式保存校准结果。
-- 对同一 `VerificationResult` 重复执行时，可能再次追加记录。
-- 但此前的 `PROTOCOLS.md §9.3` 声称校准操作是幂等的。
+本次实际触发的是第二个构造器，日志记录到 4 次构造事件。请求对象结构：
 
-如果没有基于稳定标识进行去重，重复回放可能改变 `accuracy_history` 长度，并导致置信度被重复更新。
+```text
+ly1 implements wu1
+fields:
+  Companion : ky1
+  a : String
+  b : Integer
+  c : String
+  d : List
+  e : boolean
+  f : boolean
+  g : String
+  h : boolean
+  i : String
+  j : String
+  k : String
+  l : qh6[]
+```
 
-**建议修复方向：**
+请求工厂候选：
 
-1. 为校准输入定义稳定唯一标识，例如 `prediction_id + verification_id`。
-2. 在追加前检查该结果是否已经处理。
-3. 重复提交相同验证结果时返回既有结果，不重复更新统计量。
-4. 增加重复调用、进程重启后重放、乱序输入和并发提交测试。
-5. 让协议文档、实现与测试对幂等语义保持一致。
+- `mw1.y(Object) -> Object`
+- `mw1.e(Object, Object, Object) -> Object`
+- `jr2.y(Object) -> Object`
+- `jr2.m(Object, Object, Object, Object) -> Object`
+- `mr2.h(ys, ds2, nr2, String, long, boolean, xr, xr, xr, vy4, hy4, xy4, zb3) -> Object`
 
-在完成代码与测试核验前，此项应保持为历史风险记录，不能标记为已修复。
+日志中的构造器调用栈为：
 
-### 5.2 领域语义泄漏
+```text
+mr2.h
+  → jr2.m
+    → jr2.y
+      → mw1.e
+        → mw1.y
+          → ly1.<init>(...)
+```
 
-MacroState 的固定金融因子说明：即使领域对象和 Pipeline 看起来通用，领域语义仍可能通过状态模型泄漏到 core。
+**Hook 优先级：**
 
-后续审查应特别检查：
+1. `ly1.<init>`：确认请求对象字段赋值、构造器重载和请求参数来源。
+2. `mr2.h / jr2.m / jr2.y / mw1.e / mw1.y`：逐层确认工厂职责，避免把任一候选直接认定为唯一入口。
+3. `zn3.o`：作为请求对象进入传输层的首选观察点。
 
-- 核心枚举、固定字段和默认值是否隐含单一业务领域。
-- 通用对象是否真正允许领域扩展，而不只是把领域数据塞进无约束字典。
-- 删除某个 App 后，是否仍存在对该 App 的隐式导入、默认配置或规则引用。
-- 新增领域时，是否必须修改核心代码或核心数据库 schema。
+日志只记录了参数类型/对象形状，没有保存用户消息正文、凭据或完整请求体。当前不能仅凭字段名 `a-l` 为每个字段赋予业务含义。
 
-### 5.3 Replay 与外部副作用边界
+## 5. 网络传输调用链
 
-确定性重放不应重复触发外部采集、交易、通知或其他不可逆副作用。应区分：
+这是当前最明确、可直接用于后续 Hook 验证的链路：
 
-- 可重放的领域状态计算；
-- 需要通过事件 ID、幂等键或 Outbox 等机制控制的副作用；
-- 只能作为历史事实读取、不能在 Replay 中再次执行的外部动作。
+```text
+ly1 (implements wu1)
+      │
+      ▼
+zn3.o(wu1, Long) -> y60
+  role = transport-dispatch
+      │ parent
+      ▼
+jw3.g(wu1, Long) -> y60
+  role = transport-low-level
+      │
+      ▼
+y60 (implements el4)
+  fields: a:int, b:Object
+  continuation method:
+      y60.b(fl4, yb3) -> Object
+```
 
-## 6. 后续审计与验收清单
+日志明确记录：
 
-后续继续维护本仓库时，建议按以下顺序复核：
+- `zn3.o(wu1, java.lang.Long) -> y60` 是 transport-dispatch。
+- `jw3.g(wu1, java.lang.Long) -> y60` 是 transport-low-level。
+- `jw3.g` 的 parent 是 `zn3.o`。
+- 两层收到的是同一个请求对象（`sameRequestObjectAsRoot=true`）。
+- 两层都返回 `y60`。
+- `y60` 实现 `el4`，并暴露 `b(fl4, yb3) -> Object`。
 
-- [ ] 核对当前目录结构及 core / apps / agents / providers 的实际依赖方向。
-- [ ] 检查 core 是否反向导入具体 App 或领域 Provider。
-- [ ] 核对核心领域对象的 schema、版本策略和扩展边界。
-- [ ] 核对 Pipeline 的唯一写入者和职责边界。
-- [ ] 验证相同输入与相同规则版本能否得到相同的领域计算结果。
-- [ ] 验证 Calibration 的重复提交幂等性。
-- [ ] 验证 Replay 不会重复执行外部副作用。
-- [ ] 执行删除单个 App 的构建与测试。
-- [ ] 执行新增一个全新领域的扩展测试。
-- [ ] 验证 MacroState 不再强制所有领域使用金融语义。
-- [ ] 将每项结论关联到当前源码路径、测试名称和实际执行结果。
+本次日志共记录 4 次请求构造和 4 次传输 dispatch / low-level 进入，均返回 `y60`。
 
-## 7. 结论
+### 5.1 Hook 入口建议
 
-此前分析认为，该项目的核心方向是构建一个可承载多个领域应用的通用推理平台，而不是把基金分析业务直接扩展成平台本身。
+| 优先级 | 目标 | 用途 |
+|---|---|---|
+| P0 | `zn3.o(wu1, Long)` | 观察完整请求对象进入传输层；适合作为主请求入口 |
+| P0 | `jw3.g(wu1, Long)` | 观察低层传输分发；用于确认是否发生二次封装/重试 |
+| P0 | `y60.b(fl4, yb3)` | 观察响应/continuation 的异步回调入口 |
+| P1 | `ly1.<init>` | 请求构造字段和构造器重载验证 |
+| P1 | callback 实际类的目标方法 | 追踪 continuation 内部状态传递与终态 |
 
-当前最值得持续关注的两个架构问题是：
+应先在只读 observer 模式验证调用次数、线程、对象身份和返回类型，再决定功能 Hook。不要在请求构造器或传输入口修改参数。
 
-1. **领域中立性：** MacroState 等核心模型不能固化某个具体业务领域的语义。
-2. **可重放与幂等：** Calibration、事件追加和外部副作用必须具备一致、可测试的重放语义。
+## 6. Continuation 与 callback 调用链
 
-后续架构演进应优先保持核心稳定、领域能力可插拔、状态更新职责单一，并以源码证据和自动化测试验证每一项改进。
+`y60.b(fl4, yb3) -> Object` 是当前响应链最重要的入口。日志显示它在不同线程上运行，包含 `main` 和 `DefaultDispatcher-worker-8`，并在调用过程中进入成对的 callback 对象。
+
+观察到的典型结构：
+
+```text
+transport:
+  zn3.o(wu1, Long)
+    → jw3.g(wu1, Long)
+      → y60
+
+asynchronous continuation:
+  y60.b(fl4, yb3)
+    ├─ callback-0: concrete callback object
+    │    └─ callback-0 method, commonly a(Object, yb3)
+    └─ callback-1: concrete callback object
+         ├─ q(Object, Object)
+         ├─ w(yb3, Object)
+         └─ y(Object)
+```
+
+日志中 callback 对象的接口/字段形状存在重复模式，例如：
+
+- 一类对象实现 `vy4`，常见方法为 `q(Object,Object)`、`w(yb3,Object)`、`y(Object)`。
+- 另一类 callback 对象通常暴露 `a(Object,yb3)`。
+- `y60.b` 的参数对象形状随事件变化，不能把某一次的参数类当成固定响应 DTO。
+
+### 6.1 已观测 callback 类
+
+| Role | 类 |
+|---|---|
+| callback-0 | `cr9`, `ec0`, `r3`, `b5`, `qa`, `s5`, `kr1`, `k13`, `hm4` |
+| callback-1 | `k41`, `mm4`, `il5`, `qj3`, `x0`, `f0`, `g0`, `je2`, `ir1`, `pg1`, `d0`, `jm4` |
+
+以上分类来自 observer 的角色标记，不代表已确认每个类的业务语义。共观察到 21 个具体 callback 类；每个类只 Hook 其声明的方法，日志中的策略为 `concrete-class-declared-only`，单类扫描上限 `maxMethods=12`。
+
+### 6.2 高频 callback 方法
+
+| 方法 | 日志出现次数（enter/exit/throw 合计） |
+|---|---:|
+| `qj3.y(Object)` | 5,692 |
+| `qa.a(Object, yb3)` | 2,136 |
+| `qj3.w(yb3, Object)` | 1,858 |
+| `qj3.q(Object, Object)` | 1,836 |
+| `k13.a(Object, yb3)` | 1,150 |
+| `cr9.a(Object, yb3)` | 1,132 |
+| `qa.d(n88, yb3)` | 660 |
+| `s5.a(Object, yb3)` | 556 |
+| `hm4.a(Object, yb3)` | 458 |
+| `b5.a(Object, yb3)` | 450 |
+| `ir1.y(Object)` | 428 |
+| `kr1.a(Object, yb3)` | 418 |
+| `ir1.q(Object, Object)` | 412 |
+| `ir1.w(yb3, Object)` | 412 |
+| `pg1.y(Object)` | 332 |
+
+这里的“出现次数”是 enter、exit、throw 三类事件总和，不等同于独立请求数或独立对象数。
+
+## 7. Observer 运行统计与异常
+
+`deekseep_vision.log` 覆盖时间：`02:37:11.549–02:38:55.863`，共 19,747 行。
+
+| 事件 | 次数 |
+|---|---:|
+| 请求构造器进入 | 4 |
+| transport-dispatch 进入 | 4 |
+| transport-low-level 进入 | 4 |
+| continuation 进入 | 129 |
+| continuation 抛异常 | 42 |
+| callback 类观察记录 | 21 |
+| callback-enter | 9,578 |
+| callback-exit | 8,634 |
+| callback-throw | 944 |
+
+callback-enter 与 callback-exit + callback-throw 数量相等，说明本次日志记录到的 9,578 个 callback 调用均有结束事件。
+
+### 7.1 异常集中点
+
+callback-throw 共 944 次，其中：
+
+| 方法 | throw 次数 |
+|---|---:|
+| `qj3.y(Object)` | 771 |
+| `pg1.y(Object)` | 72 |
+| `x0.y(Object)` | 39 |
+| `f0.y(Object)` | 35 |
+| `il5.y(Object)` | 15 |
+| 其他方法合计 | 12 |
+
+另有 continuation-throw 42 次。日志里可见异常缩写如 `e06`、`ck7`、`us4`，但没有足够信息将这些混淆异常类型映射为业务错误。
+
+**判断：** `qj3.y(Object)` 是异常最集中的 callback 方法，值得作为第一优先级分析对象。但不能仅凭异常次数断言它是错误根因：日志显示 callback 仍持续运行，必须进一步还原其调用条件、返回值语义和异常处理方。
+
+### 7.2 DEX / 反射扫描异常
+
+日志还记录：
+
+- `dex.methodInventoryError.6649=java.lang.NoClassDefFoundError`
+- `dex.methodInventoryError.7154=java.lang.NoClassDefFoundError`
+- `manager.fieldInventoryError.8=java.lang.NoClassDefFoundError`
+
+这些错误在日志中重复出现。它们说明探针的类/方法/字段清点并非全覆盖；不能把“未观察到”解释为“宿主不存在”。
+
+## 8. 当前可以画出的调用链与不能画出的调用链
+
+### 8.1 已有日志证据支持
+
+```text
+mr2.h
+  → jr2.m
+    → jr2.y
+      → mw1.e
+        → mw1.y
+          → ly1.<init>          [request object]
+            → zn3.o(wu1, Long)  [transport-dispatch]
+              → jw3.g(wu1, Long) [transport-low-level]
+                → y60             [response/continuation holder]
+                  → y60.b(fl4, yb3)
+                    → callback-0 / callback-1
+                      → concrete callback methods
+```
+
+### 8.2 尚未被当前日志证实
+
+- HTTP endpoint / path、请求方法、headers、认证字段。
+- 实际网络库及其内部 Call / Request / Response 类型。
+- 请求体序列化器、JSON adapter 或 protobuf 等协议。
+- SSE / WebSocket / chunked response 的具体解析实现。
+- `y60.b` 的 `fl4`、`yb3` 参数的正式语义。
+- 哪个 callback 对应文本增量、工具调用、Agent 状态、完成/失败终态。
+- Agent tool call 的完整执行链、工具结果如何回注模型。
+- 2.7.5 与 2.7.3 的类名映射差异。
+
+这些内容需要对 APK 做静态反编译，并与动态日志交叉验证。不能用 callback 类名或对象字段形状直接推测协议语义。
+
+## 9. 下一轮逆向与 Hook 验证顺序
+
+### P0：先修正版本识别与映射边界
+
+1. 核对宿主 package、versionName、versionCode、build/code 标识。
+2. 追踪识别结果如何进入 Host Profile。
+3. 检查为何 code289 被路由到 2.7.1 full mode。
+4. 检查 code257 的 `mf6` 映射为何进入 code289 的安装流程。
+5. 安装失败必须按单 Hook 隔离；不能导致其他已匹配 Hook 被整体中止。
+6. 未知版本禁止静默套用最近版本的完整映射。
+
+### P1：请求与传输
+
+1. 对 `ly1` 两个构造器做字段写入点追踪，建立字段表。
+2. 逐层反编译 `mr2.h / jr2.m / jr2.y / mw1.e / mw1.y`，确定工厂职责。
+3. 以 `zn3.o` 为请求入口、`jw3.g` 为低层入口做只读 Hook。
+4. 比较四次请求的对象字段变化，确认请求类别/重试/会话差异。
+5. 追踪 `y60` 的创建位置及 `a/b` 字段赋值。
+
+### P2：响应与 Agent
+
+1. 反编译 `y60.b(fl4, yb3)` 的调用者、参数构造点和返回路径。
+2. 从 continuation 中 callback-0 / callback-1 的实例创建位置回溯。
+3. 优先分析 `qj3.y` 的 771 次异常和 `qj3.q/w` 的高频调用。
+4. 结合 UI 状态变化识别文本增量、工具调用、Agent 中间状态和终态。
+5. 找到工具调用从模型响应到本地执行，再到结果回注请求的闭环。
+
+### P3：序列化与流协议
+
+1. 从 `ly1` 字段消费点追踪到最终编码器。
+2. 从 `y60` / continuation 的数据源追踪到解码器和事件分发器。
+3. 确认协议后再建立 serializer / stream parser Hook，不提前认定 JSON 或 SSE。
+4. 对照 2.7.3、2.7.5 APK，建立版本差异表和映射回归测试。
+
+## 10. 安全与日志采集约束
+
+- 默认不记录用户消息正文、访问令牌、Cookie、Authorization header 或完整请求体。
+- 优先记录类名、方法签名、参数类型、对象身份、线程、调用深度、耗时、返回类型和异常类型。
+- 如需字段级分析，使用字段名、类型和长度等元信息；敏感字段值必须脱敏。
+- 任何功能 Hook 先经过只读观察和版本匹配验证，不允许通过未知映射强行执行。
+- 日志中的类名均为混淆符号；未经静态反编译确认，不得赋予业务名称。
+
+## 11. 交付状态
+
+| 分析项 | 状态 |
+|---|---|
+| 仓库文件盘点 | 已完成 |
+| dsprobe 启动 / 版本路由日志分析 | 已完成 |
+| 请求类 `ly1` 与构造器候选 | 日志已定位，字段语义待反编译 |
+| 请求工厂调用栈 | 日志已定位 |
+| 传输层 `zn3.o → jw3.g` | 日志已定位 |
+| 返回对象 `y60` 与 continuation | 日志已定位 |
+| callback 类和频次统计 | 已完成日志统计 |
+| 高频 callback 异常统计 | 已完成日志统计，根因待分析 |
+| HTTP / 序列化 / SSE / Agent 工具闭环 | 未确认 |
+| 2.7.3 / 2.7.5 APK 静态反编译 | 未完成 |
+| 2.7.2 同版本 APK 交叉验证 | 仓库缺少 2.7.2 APK |
 
 ---
 
 ## 分析记录元信息
 
 - 仓库：[`qingjian0/apps`](https://github.com/qingjian0/apps)
-- 文档位置：`README.md`
-- 内容来源：此前对仓库的架构与可演化性分析记录。
-- 状态：历史结论归档；当前 HEAD 的重新审计状态未确认。
-- 原则：不把历史分析结论冒充为当前源码事实；修复项必须由代码、测试和提交记录共同证明。
+- 分支：`main`
+- 分析对象：DeepSeek Android APK 与运行日志
+- 目标宿主包：`com.deepseek.chat`
+- 已观测宿主版本：`2.7.2/code289-cn`
+- 当前核心动态入口候选：`ly1`、`zn3.o`、`jw3.g`、`y60.b`
+- 当前最高优先级问题：code289 宿主被路由到 2.7.1 full mode，并触发 code257 的 `mf6` 类映射失败
+- 证据来源：仓库中的 `dsprobe.log`、`deekseep_vision.log` 及文件树元数据
+- 状态：日志调用链已归档；APK 静态反编译与完整 Agent / 序列化链仍待完成
