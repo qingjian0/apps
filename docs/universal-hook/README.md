@@ -20,7 +20,7 @@
 | `deepseek-sse-hook-evidence.zip` | 已有 SSE/Hook 证据包 | 生成条目、大小、哈希清单并与新扫描结果核对 |
 | 先前分析归档 | 2.7.1、2.7.3/2.7.5、Nexus/Deekseep 模块分析 | 只作为历史证据和参考实现；不将模块 APK 当作 DeepSeek 宿主 APK |
 
-2.7.2 当前只有运行日志证据，未在本仓库根目录发现对应宿主 APK。不能把 2.7.1 的 code288 或 2.7.5 的静态映射冒充 2.7.2/code289-cn。
+2.7.2 APK 已上传到仓库根目录（`deepseek-2-7-2.apk`，22,205,160 bytes）。本轮扫描会提取每个 APK/APKM 组件的 Manifest 包名、versionCode、versionName、split 标记及 SHA-256；只有这些身份字段与 `dsprobe.log` 的 `2.7.2/code289-cn` 一致，才可认定为同一构建。不得仅凭文件名或 versionName 认定。
 
 ## 核心设计：语义定位而非混淆名映射
 
@@ -153,4 +153,4 @@ JADX 反编译失败必须保留退出码和错误日志；Smali 是控制流复
 
 ## 当前状态
 
-本方案与自动审计流水线已扩展为五版本矩阵（2.7.1–2.7.5，含 2.7.4 APKM）。完成 Actions 全量扫描并核对输出后，才更新各版本的具体 Profile 和可安装 Hook 代码。静态候选报告不会被标记为真机 Hook 成功。
+本方案与自动审计流水线已扩展为五版本矩阵（2.7.1–2.7.5，含 2.7.4 APKM）。完成 Actions 全量扫描并核对每个组件的 Manifest/DEX 身份、Smali 解析完整性和语义候选后，才更新各版本的具体 Profile 和可安装 Hook 代码。静态候选报告不会被标记为真机 Hook 成功。
