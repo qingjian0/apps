@@ -178,3 +178,79 @@ MacroState 的固定金融因子说明：即使领域对象和 Pipeline 看起�
 - 内容来源：此前对仓库的架构与可演化性分析记录。
 - 状态：历史结论归档；当前 HEAD 的重新审计状态未确认。
 - 原则：不把历史分析结论冒充为当前源码事实；修复项必须由代码、测试和提交记录共同证明。
+
+
+---
+
+## 8. DeepSeek 2.7.5 APK 静态分析记录（2026-11-07）
+
+本节记录 DeepSeek_2.7.5.apk 的 DEX 静态分析结果，为 Deekseep-Custom 的 Native Adapter 与 ROI Hook 研究提供可追溯候选线索。它不是运行时调用链证明，也不代表 Native Adapter 已经接通。
+
+### 8.1 输入与覆盖范围
+
+| 项目 | 结果 |
+|---|---|
+| 输入文件 | DeepSeek_2.7.5.apk |
+| 文件大小 | 22,210,268 bytes |
+| SHA-256 | ddc52ef868b991fd33e634de834a3e2c022b0cd7ff9e854f4f141996aaeadb70 |
+| DEX 文件 | 3 个：classes.dex、classes2.dex、classes3.dex |
+| JADX 输出 | 13,940 个 Java 源文件 |
+| JADX 状态 | exit code 3；报告 344 个反编译错误 |
+| 分析范围 | 网络、API 路由、PoW/Challenge、异步/流式、Agent/Tools |
+| 结论级别 | 静态候选与符号交叉引用；尚无 2.7.5 真机运行时调用证据 |
+
+**完整性限制：** JADX 生成了大部分源文件，但存在 344 个反编译错误。类名、字段和方法签名可作为导航线索；反编译方法体需要逐项核验，不能把失败或缺失的代码当作不存在。
+
+### 8.2 高价值候选符号
+
+| 类 / 符号 | 静态证据 | 当前判断 |
+|---|---|---|
+| **defpackage.nw3** | 出现 /api/v0/chat/completion、/regenerate、/resume_stream、/edit_message、/continue；方法候选 e(yu1, Long):b70；包含 X-DS-PoW-Response | **高优先级**：聊天请求/续接 API 路由候选，实际方法语义待运行时确认 |
+| **defpackage.tz0** | 出现 /api/v0/chat/create_pow_challenge、/history_messages、/stop_stream；使用 Ktor 相关类型 | **高优先级**：Challenge、历史消息及停止流式请求的路由候选 |
+| **defpackage.oq1** | 字符串 ChallengePlugin、ChallengeAttempt、challenge_id、X-DS-Challenge-Response、X-DS-PoW-Response | **高优先级**：Challenge/PoW 请求头或验证流程候选 |
+| **com.deepseek.crypto.PowCalculator** | nativeCalculateDeepSeekHashV1Pow(String, String, long): long；Java 包装方法候选 a(long, String, String): long | **高置信度**：DeepSeekHashV1 PoW 原生计算入口 |
+| **defpackage.of2** | 引用 PowCalculator、DeepSeekHashV1、calculateDeepSeekHashV1Pow；包含 pow_prefetch 与聊天 completion 路径 | **高优先级**：PoW 预取/计算调用链候选 |
+| **defpackage.ef0、df0、vgb** | 静态交叉引用显示其方法引用 PowCalculator | **中高优先级**：PoW 包装、调度或调用者候选，需核对方法体 |
+| **defpackage.hx2、nx2** | 配置项 authed_pow_functions、pow_prefetch、pow_prefetch_count、hcaptcha_enabled、allow_parallel_streams | **高优先级**：远端配置与 PoW/Challenge 行为开关 |
+| **defpackage.rs9、sq1、ff0** | Kotlin 序列化 descriptor 分别指向 ServerChatChallenge、ChallengeResponse、AuthedPowSolution | **中高优先级**：Challenge/PoW 数据模型序列化器候选 |
+| **defpackage.m08** | Ktor 与 OkHttp 类型 | **中优先级**：HTTP 客户端/引擎候选 |
+| **defpackage.adc** | OkHttp RequestBody、ResponseBody 及 EventListener 风格方法 | **中优先级**：网络事件监听候选，不是请求构造器证据 |
+| **defpackage.fs3、qxb、gs3、ez8** | WebSocket、Ktor、Interceptor 等符号 | **中优先级**：异步传输/连接候选，尚未确认与聊天主请求的关系 |
+
+### 8.3 初步调用链假设（待运行时验证）
+
+基于静态路由和符号交叉引用，目前可形成以下待验证路径：
+
+    /api/v0/chat/create_pow_challenge
+            ↓
+    ServerChatChallenge / ChallengeResponse
+            ↓
+    PoW / Challenge 调度
+            ↓
+    PowCalculator.nativeCalculateDeepSeekHashV1Pow
+            ↓
+    ChallengeAttempt / X-DS-Challenge-Response
+            ↓
+    /api/v0/chat/completion
+            ↓
+    resume_stream / continue / stop_stream
+
+其中，nw3、tz0、oq1、of2 与 PowCalculator 是下一阶段优先核验的候选。上图是静态证据驱动的研究假设，不是已确认的真实运行顺序。
+
+### 8.4 对 Native Adapter 的工程影响
+
+1. **不得复用 2.7.2/code289 的混淆类名。** 2.7.5 必须独立建立版本识别和符号契约。
+2. **不得绕过官方 PoW/Challenge。** 应观察并复用官方客户端正常执行的请求路径；不伪造 AuthedPowSolution，不自行生成挑战结果。
+3. **先确认请求 DTO。** nw3.e(yu1, Long):b70 中的 yu1、b70 及其序列化关系仍需核验。
+4. **确认流式语义。** 当前静态索引未发现 text/event-stream 字面量，不能直接假设为 SSE；需要确认 Ktor 响应、Channel/Flow、回调及取消/续接语义。
+5. **运行时探针必须默认关闭。** 只记录类/方法签名、参数类型、返回类型、调用栈和耗时；不得记录 Prompt、响应正文、Authorization、Cookie 或 PoW 原始值。
+6. **证据不足时继续 fail-closed。** 在确认请求构造、Challenge、Transport 和异步回调之前，不实现会返回伪成功结果的 Native Adapter。
+
+### 8.5 可复现分析产物
+
+- APK 静态分析任务：<https://github.com/qingjian0/apps/actions/runs/42335116242>
+- 最新分析与索引任务：<https://github.com/qingjian0/apps/actions/runs/42335418821>
+- 工作分支：<https://github.com/qingjian0/apps/tree/work/deepseek-275-apk-audit>
+- 分析脚本：.github/workflows/deepseek-275-apk-audit.yml
+
+**下一阶段验收条件：** 通过 2.7.5 的显式诊断开关采集真实设备日志，确认 yu1 构造入口、nw3 请求调用、PoW 计算调用者、Challenge 请求头生成位置、Transport 返回类型及异步回调关系。只有这些证据闭环后，才开始实现 2.7.5 Native Adapter。
