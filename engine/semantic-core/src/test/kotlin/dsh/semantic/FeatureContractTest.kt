@@ -15,6 +15,11 @@ class FeatureContractTest {
         assertEquals(setOf(SafeEventField.SOURCE_LABEL, SafeEventField.ENABLED, SafeEventField.TEMPLATE_ID), event?.fields?.keys)
     }
 
+    @Test fun freeFormPromptTextCannotMasqueradeAsSourceLabel() {
+        val contract = DeepSeekFeatureContracts.all.single { it.role.value == "prompt.compose" }
+        assertNull(FeatureEventSanitizer().sanitize(contract, mapOf(SafeEventField.SOURCE_LABEL to "You are a helpful assistant")))
+    }
+
     @Test fun missingRequiredMetadataRejectsEvent() {
         val contract = DeepSeekFeatureContracts.all.single { it.role.value == "agent.tool.dispatch" }
         assertNull(FeatureEventSanitizer().sanitize(contract, mapOf(SafeEventField.TOOL_KIND to "search")))
