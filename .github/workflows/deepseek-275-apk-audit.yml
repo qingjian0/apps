@@ -6,6 +6,7 @@ on:
       - work/deepseek-275-apk-audit
     paths:
       - .github/workflows/deepseek-275-apk-audit.yml
+      - DeepSeek_2.7.5.apk
   workflow_dispatch:
 
 permissions:
@@ -21,11 +22,11 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-      - name: Download APK and JADX
+      - name: Verify checked-out APK and download JADX
         shell: bash
         run: |
           set -euo pipefail
-          curl -fL --retry 3 --retry-delay 2 https://raw.githubusercontent.com/qingjian0/apps/main/DeepSeek_2.7.5.apk -o DeepSeek_2.7.5.apk
+          test -s DeepSeek_2.7.5.apk
           curl -fL --retry 3 --retry-delay 2 https://github.com/skylot/jadx/releases/download/v1.5.6/jadx-1.5.6.zip -o jadx.zip
           unzip -q jadx.zip -d jadx-dist
           chmod +x jadx-dist/bin/jadx
