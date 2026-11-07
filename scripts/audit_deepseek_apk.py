@@ -30,7 +30,8 @@ ANCHORS = {
     "account_capability": ("subscription", "quota", "model_capability", "feature_flag", "remote_config"),
     "ui_settings": ("Settings", "Preference", "ViewModel", "NavController", "Compose"),
 }
-SENSITIVE = re.compile(r"(?i)(authorization|bearer\s+|cookie|api[_-]?key|access[_-]?token|refresh[_-]?token|password|prompt|message[_-]?content)")
+SENSITIVE = re.compile(r"(?i)(authorization|bearer\\s+|cookie|api[_-]?key|access[_-]?token|refresh[_-]?token|password|message[_-]?content)")
+SAFE_PROMPT_MARKER = re.compile(r"(?i)^(system_?prompt|custom_?instructions?|prompt_?(template|id|type|source)|instruction_?(enabled|source|type)|context_window)$")
 METHOD_RE = re.compile(r"^\.method\s+(.+?)\s+([^\s(]+)(\([^)]*\).+)$")
 CLASS_RE = re.compile(r"^\.class\s+.*?\s+(L[^;]+;)")
 SUPER_RE = re.compile(r"^\.super\s+(L[^;]+;)")
@@ -63,7 +64,9 @@ def safe_strings(line):
     if not m: return []
     value=m.group(1)
     # Preserve Smali-escaped text verbatim; unicode_escape corrupts non-ASCII and can create surrogates.
-    if SENSITIVE.search(value): return ["<redacted-sensitive-marker>"]
+    # Preserve schema identifiers for prompt discovery, but never index prompt bodies.
+    if SENSITIVE.search(value) and not SAFE_PROMPT_MARKER.fullmatch(value): return ["<redacted-sensitive-marker>"]
+    if re.search(r"(?i)prompt|instruction", value) and not SAFE_PROMPT_MARKER.fullmatch(value): return ["<redacted-prompt-content>"]
     return [value[:240]]
 
 def analyze_smali(root):
