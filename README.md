@@ -1240,3 +1240,9 @@ nativeCalculateDeepSeekHashV1Pow(String base, String challenge, long difficulty)
 - `dsprobe.log` 证实 2.7.2/code289-cn 宿主误选 2.7.1 full mapping，随后 unmapped 类名触发 ClassNotFoundException；探针源码修复和真机回归仍未交付。
 - 最新 PR HEAD 的两个 CI workflow 为 `action_required`，不可写成通过；详见最终交接报告。
 
+
+
+### 主技术文档：完整调用链与逐版本映射
+
+[DeepSeek 通用 Hook 主文档](docs/universal-hook/README.md) 已集中收录完整业务链、2.7.2/code289-cn 的 request/transport/response 候选、2.7.1–2.7.5 逐版本方法映射、SSE parse/dispatch 歧义、跨方法值流限制、设备日志根因链和下一轮验证顺序。详细方法签名与证据等级以主文档第“调用链与逐版本方法证据总表”章为准。
+
