@@ -1335,6 +1335,49 @@ class CallerControlFlowReturnBoundaryTest(unittest.TestCase):
         self.assertEqual(4, summary["queue_states_processed"])
         self.assertFalse(summary["context_expansion_complete"])
 
+
+    def test_interprocedural_points_to_candidate_scope_is_explicit_and_keeps_callees(self):
+        def method(owner, name, invokes=None, roles=None):
+            return {
+                "class": owner, "name": name, "descriptor": "()V",
+                "component": "base", "roles": roles or [],
+                "invoke_sites": invokes or [],
+                "invoke_sites_truncated": False, "invoke_sites_incomplete": False,
+                "object_points_to": {
+                    "complete": True, "invoke_arguments": [],
+                    "field_receivers": [], "return_values": [],
+                    "instruction_writes": [],
+                },
+            }
+
+        caller = method(
+            "Lx/Caller;", "entry",
+            [{
+                "instruction": 0, "line": 1, "owner": "Lx/Worker;",
+                "name": "run", "descriptor": "()V", "opcode": "invoke-static",
+                "registers": [], "result_instruction": None, "result_register": None,
+            }],
+            roles=[{"role": "request", "anchors": ["chat_completion"]}],
+        )
+        worker = method("Lx/Worker;", "run")
+        unrelated = method("Lx/Unrelated;", "run")
+        graph = AUDIT.build_interprocedural_points_to_graph(
+            [caller, worker, unrelated], root_scope="semantic-candidates"
+        )
+        summary = graph["summary"]
+        self.assertEqual("semantic-role-roots-only", summary["analysis_scope"])
+        self.assertFalse(summary["scope_is_whole_program"])
+        self.assertEqual(3, summary["eligible_root_method_count"])
+        self.assertEqual(1, summary["root_method_count"])
+        self.assertEqual(1, summary["semantic_candidate_root_count"])
+        self.assertEqual(1, len(graph["call_contexts"]))
+        self.assertEqual("Lx/Worker;->run()V", graph["call_contexts"][0]["callee"])
+        self.assertTrue(summary["context_expansion_complete"])
+
+    def test_interprocedural_points_to_rejects_unknown_root_scope(self):
+        with self.assertRaises(ValueError):
+            AUDIT.build_interprocedural_points_to_graph([], root_scope="guessed")
+
     def test_interprocedural_points_to_rejects_non_positive_record_budget(self):
         with self.assertRaises(ValueError):
             AUDIT.build_interprocedural_points_to_graph([], max_records=0)
