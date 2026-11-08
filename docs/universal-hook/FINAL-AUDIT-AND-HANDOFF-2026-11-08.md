@@ -8,7 +8,7 @@
 |---|---|
 | 五版本 APK/APKM 静态扫描 | 完成；2.7.1、2.7.2、2.7.4、2.7.5 身份可信；标签为 2.7.3 的输入身份不匹配，隔离 |
 | 五版本 aggregate | 成功；Matrix Run [#203](https://github.com/qingjian0/apps/actions/runs/42448208970) |
-| Python / Kotlin 静态语义代码 | 已实现多轮硬化；此前有成功 CI，但最新 HEAD 的两个 PR workflow 处于 `action_required`，不得宣称最新 HEAD CI 通过 |
+| Python / Kotlin 静态语义代码 | 已实现多轮硬化；PR #2 合并前最新 HEAD `7cbc2b96a26f1d699c85e026e08a06c91e4686a0` 的 Python Static Analysis 与 Semantic Core CI 均成功 |
 | Points-to 存储预算 | 全局硬上限、按 root 公平分配、跨 APKM split root 去重已实现；完整性门禁保留 |
 | 静态候选等级 | E0–E3 已输出；静态等级不授权 Hook |
 | 设备运行时 Hook | 未完成；静态产物中的 `runtime_confirmed_count=0`、`hook_authorized_count=0` |
@@ -167,17 +167,16 @@ Manifest 身份来自 `audit/universal-hook/version-identity.json`：
 
 以上类名只对日志对应构建有效，不能直接映射到 2.7.5 或其他版本。SSE 分派目前仍有歧义，不能宣称已完成跨版本唯一映射。
 
-## 9. 当前 CI 状态与合并约束
+## 9. CI 状态与合并记录
 
-最新 HEAD：`3769fb3b99047bb41ceb52c322c04c93aeda710b`。
+最终合并前 PR HEAD：`7cbc2b96a26f1d699c85e026e08a06c91e4686a0`。
 
-最新 PR 工作流：
-- [Universal Hook Static Analysis #260](https://github.com/qingjian0/apps/actions/runs/42450409844)：`action_required`。
-- [DeepSeek semantic core CI #256](https://github.com/qingjian0/apps/actions/runs/42450409825)：`action_required`。
+此前两个 workflow run `42450409844` / `42450409825` 曾处于 `action_required`，当时没有 jobs 执行；之后重新触发的最终检查均已成功：
+- [Universal Hook Static Analysis](https://github.com/qingjian0/apps/actions/runs/42451324101)：`success`。
+- [DeepSeek Semantic Core CI](https://github.com/qingjian0/apps/actions/runs/42451324083)：`success`。
+- [五版本 Matrix #203](https://github.com/qingjian0/apps/actions/runs/42448208970)：五版本任务与 aggregate 均成功。
 
-这两个 run 均已结束，但结论是 `action_required`，没有实际 jobs 执行结果。它们既不是测试失败，也不是成功。历史上其他提交的 Python/Kotlin CI 成功不能替代对最新 HEAD 的验证。五版本 Matrix #203 成功是本轮独立的 APK 静态审计证据，不等同于 PR required checks 全部通过。
-
-如 GitHub 要求人工批准 workflow，应在 Actions 页面完成审批后重新检查 run 和最新 commit checks。不得通过伪造状态、删除 required checks 或绕过保护规则来制造“全绿”。
+PR #2 已 squash merge 至 `main`，合并提交：`6e019d07e9b2f9ef3843d9da10096d9e9d99dab6`。其后主文档的调用链补充和交接链接作为文档提交继续进入 main。上述两个 CI 成功结果对应合并前 PR HEAD，不应误写为对后续纯文档提交重新运行的检查。
 
 ## 10. 最终状态与剩余工作
 
@@ -192,7 +191,7 @@ Manifest 身份来自 `audit/universal-hook/version-identity.json`：
 - 旧设备日志的版本路由错配根因分析。
 
 ### 仍未交付
-- 最新 HEAD 上两个 PR workflow 的实际 CI 成功结果（当前 `action_required`）。
+- 目标设备上的 runtime-confirmed Hook、SSE 分派唯一性、请求/响应完整桥接及业务闭环。
 - 2.7.3 可信 APK 输入替换或身份确认。
 - Android 探针仓库中的版本路由、unmapped 拦截、feature 隔离和幂等安装修复。
 - 目标设备上的 runtime-confirmed Hook、SSE 分派唯一性、请求/响应完整桥接及业务闭环。
@@ -203,7 +202,7 @@ Manifest 身份来自 `audit/universal-hook/version-identity.json`：
 本次可以交付的是**静态审计引擎与证据归档**，不是可直接宣称生产可用的跨版本 Hook 产品。所有未完成项必须保留为显式 blocker。任何后续版本只有在对应 APK 身份、静态证据、设备运行日志、安装结果和功能回归均可追溯时，才能升级状态。
 
 ---
-Generated from repository evidence at HEAD `3769fb3b99047bb41ceb52c322c04c93aeda710b`.
+Static audit evidence baseline: `3769fb3b99047bb41ceb52c322c04c93aeda710b`. PR #2 merge: `6e019d07e9b2f9ef3843d9da10096d9e9d99dab6`. Main call-chain documentation was subsequently expanded on `main`.
 
 
 ## 调用链文档入口
