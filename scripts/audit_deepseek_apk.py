@@ -959,6 +959,7 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
     for root in roots:
         queue.append({
             "method":root,"context_id":"root:"+root["_points_to_key"],
+            "root_method_key":root["_points_to_key"],
             "bindings":{},"register_overrides":{},
             "path":(root["_points_to_key"],),"depth":0
         })
@@ -979,6 +980,14 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
     call_context_records_dropped=0
     receiver_records_dropped=0
     seen_contexts=set()
+    root_diagnostics={
+        root["_points_to_key"]:{
+            "call_contexts_seen":0,"call_contexts_stored":0,
+            "call_contexts_dropped":0,"receiver_records_seen":0,
+            "receiver_records_stored":0,"receiver_records_dropped":0,
+            "queue_states_processed":0,"recursive_cuts":0,"depth_cuts":0
+        } for root in roots
+    }
 
     def substitute(identity,method_key,bindings,context_id,contextualize_allocations=True):
         formal_prefix="param:{}:".format(method_key)
@@ -1122,6 +1131,9 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
         queue_states_processed+=1
         caller=state["method"]
         caller_key=caller["_points_to_key"]
+        root_method_key=state["root_method_key"]
+        root_stats=root_diagnostics[root_method_key]
+        root_stats["queue_states_processed"]+=1
         caller_pts=caller.get("object_points_to",{})
         if (not caller_pts.get("complete") or caller.get("invoke_sites_truncated")
                 or caller.get("invoke_sites_incomplete")):
@@ -1209,8 +1221,11 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
                 else:
                     return_unresolved+=1
 
+            root_stats["call_contexts_seen"]+=1
             if len(call_contexts)<record_limit:
+                root_stats["call_contexts_stored"]+=1
                 call_contexts.append({
+                    "root_method_key":root_method_key,
                     "context_id":context_id,"caller":caller_key,"callee":callee_key,
                     "call_instruction":site["instruction"],"call_line":site["line"],
                     "call_depth":state["depth"]+1,
@@ -1235,6 +1250,7 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
             else:
                 records_truncated=True
                 call_context_records_dropped+=1
+                root_stats["call_contexts_dropped"]+=1
                 continue
             resolved+=1
             for fact in callee_pts.get("field_receivers",[]):
@@ -1249,8 +1265,11 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
                 status=("unknown" if has_unknown else
                         "singleton" if len(identities)==1 else
                         "multiple" if len(identities)>1 else "unresolved")
+                root_stats["receiver_records_seen"]+=1
                 if len(contextual_receivers)<record_limit:
+                    root_stats["receiver_records_stored"]+=1
                     contextual_receivers.append({
+                        "root_method_key":root_method_key,
                         "context_id":context_id,"caller":caller_key,"callee":callee_key,
                         "call_instruction":site["instruction"],
                         "call_depth":state["depth"]+1,
@@ -1265,14 +1284,17 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
                 else:
                     records_truncated=True
                     receiver_records_dropped+=1
+                    root_stats["receiver_records_dropped"]+=1
                 if status=="singleton":
                     singleton_context_receivers+=1
             if callee_key in state["path"]:
                 recursive_contexts_cut+=1
+                root_stats["recursive_cuts"]+=1
                 continue
             if state["depth"]+1>=max_call_depth:
                 if callee.get("invoke_sites"):
                     depth_contexts_cut+=1
+                    root_stats["depth_cuts"]+=1
                 continue
             next_state_id=(callee_key,context_id)
             if next_state_id in seen_contexts:
@@ -1282,6 +1304,7 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
             queue_states_enqueued+=1
             queue.append({
                 "method":callee,"context_id":context_id,
+                "root_method_key":root_method_key,
                 "bindings":resolved_bindings,"register_overrides":{},
                 "path":state["path"]+(callee_key,),
                 "depth":state["depth"]+1
@@ -1304,8 +1327,11 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
             status=("unknown" if unknown else
                     "singleton" if len(identities)==1 else
                     "multiple" if len(identities)>1 else "unresolved")
+            root_stats["receiver_records_seen"]+=1
             if len(contextual_receivers)<record_limit:
+                root_stats["receiver_records_stored"]+=1
                 contextual_receivers.append({
+                    "root_method_key":root_method_key,
                     "context_id":state["context_id"],"caller":caller_key,"callee":caller_key,
                     "call_instruction":None,"receiver_instruction":instruction,
                     "receiver_register":register,"field":fact.get("field"),
@@ -1318,8 +1344,36 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
             else:
                 records_truncated=True
                 receiver_records_dropped+=1
+                root_stats["receiver_records_dropped"]+=1
             if status=="singleton":
                 singleton_context_receivers+=1
+    root_rows=[]
+    for root_key,stats in root_diagnostics.items():
+        root_incomplete=(
+            stats["call_contexts_dropped"]>0
+            or stats["receiver_records_dropped"]>0
+            or stats["recursive_cuts"]>0
+            or stats["depth_cuts"]>0
+        )
+        root_rows.append({
+            "root_method_key":root_key,**stats,
+            "context_expansion_complete":not root_incomplete
+        })
+    root_rows.sort(
+        key=lambda row:(
+            row["call_contexts_seen"]+row["receiver_records_seen"],
+            row["queue_states_processed"],row["root_method_key"]
+        ),reverse=True)
+    root_summary={
+        "root_count":len(root_rows),
+        "roots_with_truncation":sum(
+            row["call_contexts_dropped"]>0 or row["receiver_records_dropped"]>0
+            for row in root_rows),
+        "roots_with_recursive_cuts":sum(row["recursive_cuts"]>0 for row in root_rows),
+        "roots_with_depth_cuts":sum(row["depth_cuts"]>0 for row in root_rows),
+        "roots_marked_incomplete":sum(not row["context_expansion_complete"] for row in root_rows),
+        "top_hot_roots":root_rows[:20]
+    }
     for method in methods:
         method.pop("_points_to_key",None)
     return {
@@ -1356,6 +1410,7 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
             "context_expansion_complete":(not records_truncated and recursive_contexts_cut==0
                 and depth_contexts_cut==0 and return_summary_recursive_cuts==0
                 and return_summary_depth_cuts==0),
+            "root_diagnostics":root_summary,
             "recursive_fixed_point":False,"runtime_identity_proven":False
         }
     }
