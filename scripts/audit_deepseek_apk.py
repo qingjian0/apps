@@ -985,7 +985,11 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
             "call_contexts_seen":0,"call_contexts_stored":0,
             "call_contexts_dropped":0,"receiver_records_seen":0,
             "receiver_records_stored":0,"receiver_records_dropped":0,
-            "queue_states_processed":0,"recursive_cuts":0,"depth_cuts":0
+            "queue_states_processed":0,"recursive_cuts":0,"depth_cuts":0,
+            "unresolved_call_sites":0,"ambiguous_call_sites":0,
+            "incomplete_call_sites":0,"return_summary_recursive_cuts":0,
+            "return_summary_depth_cuts":0,"return_identity_unknown_count":0,
+            "return_identity_unresolved_count":0
         } for root in roots
     }
 
@@ -1138,6 +1142,7 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
         if (not caller_pts.get("complete") or caller.get("invoke_sites_truncated")
                 or caller.get("invoke_sites_incomplete")):
             incomplete+=len(caller.get("invoke_sites",[])) or 1
+            root_stats["incomplete_call_sites"]+=len(caller.get("invoke_sites",[])) or 1
             continue
         args_by_instruction=collections.defaultdict(list)
         for item in caller_pts.get("invoke_arguments",[]):
@@ -1161,18 +1166,22 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
                 callee=choices[0]
             elif len(choices)>1:
                 ambiguous+=1
+                root_stats["ambiguous_call_sites"]+=1
                 continue
             else:
                 unresolved+=1
+                root_stats["unresolved_call_sites"]+=1
                 continue
             callee_key=callee["_points_to_key"]
             callee_pts=callee.get("object_points_to",{})
             if not callee_pts.get("complete"):
                 incomplete+=1
+                root_stats["incomplete_call_sites"]+=1
                 continue
             actuals=args_by_instruction.get(site["instruction"],[])
             if any(not x.get("mapping_complete") for x in actuals):
                 incomplete+=1
+                root_stats["incomplete_call_sites"]+=1
                 continue
             context_id="{}=>{}@{}".format(
                 state["context_id"],caller_key,site["instruction"])
@@ -1207,9 +1216,15 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
                 parsed_target["return_type"].startswith(("L","[")))
             if (is_object_return and site.get("result_register")
                     and site.get("result_instruction") is not None):
+                recursive_cuts_before=return_summary_recursive_cuts
+                depth_cuts_before=return_summary_depth_cuts
                 return_summary=resolve_contextual_return(
                     callee,context_id,resolved_bindings,
                     state["path"]+(caller_key,callee_key),state["depth"]+1,expand=True)
+                root_stats["return_summary_recursive_cuts"]+=(
+                    return_summary_recursive_cuts-recursive_cuts_before)
+                root_stats["return_summary_depth_cuts"]+=(
+                    return_summary_depth_cuts-depth_cuts_before)
                 if return_summary["identity_status"]=="singleton" and linear_return_safe:
                     register_overrides[site["result_register"]]={
                         "definition_instruction":site["result_instruction"],
@@ -1218,8 +1233,10 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
                     return_propagations+=1
                 elif return_summary["identity_status"]=="unknown":
                     return_unknowns+=1
+                    root_stats["return_identity_unknown_count"]+=1
                 else:
                     return_unresolved+=1
+                    root_stats["return_identity_unresolved_count"]+=1
 
             root_stats["call_contexts_seen"]+=1
             if len(call_contexts)<record_limit:
@@ -1354,6 +1371,11 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
             or stats["receiver_records_dropped"]>0
             or stats["recursive_cuts"]>0
             or stats["depth_cuts"]>0
+            or stats["return_summary_recursive_cuts"]>0
+            or stats["return_summary_depth_cuts"]>0
+            or stats["unresolved_call_sites"]>0
+            or stats["ambiguous_call_sites"]>0
+            or stats["incomplete_call_sites"]>0
         )
         root_rows.append({
             "root_method_key":root_key,**stats,
@@ -1371,6 +1393,15 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
             for row in root_rows),
         "roots_with_recursive_cuts":sum(row["recursive_cuts"]>0 for row in root_rows),
         "roots_with_depth_cuts":sum(row["depth_cuts"]>0 for row in root_rows),
+        "roots_with_return_summary_cuts":sum(
+            row["return_summary_recursive_cuts"]>0 or row["return_summary_depth_cuts"]>0
+            for row in root_rows),
+        "roots_with_unresolved_calls":sum(
+            row["unresolved_call_sites"]>0 for row in root_rows),
+        "roots_with_ambiguous_calls":sum(
+            row["ambiguous_call_sites"]>0 for row in root_rows),
+        "roots_with_incomplete_calls":sum(
+            row["incomplete_call_sites"]>0 for row in root_rows),
         "roots_marked_incomplete":sum(not row["context_expansion_complete"] for row in root_rows),
         "top_hot_roots":root_rows[:20]
     }
@@ -1409,7 +1440,8 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
             "depth_contexts_cut":depth_contexts_cut,
             "context_expansion_complete":(not records_truncated and recursive_contexts_cut==0
                 and depth_contexts_cut==0 and return_summary_recursive_cuts==0
-                and return_summary_depth_cuts==0),
+                and return_summary_depth_cuts==0 and unresolved==0
+                and ambiguous==0 and incomplete==0),
             "root_diagnostics":root_summary,
             "recursive_fixed_point":False,"runtime_identity_proven":False
         }
