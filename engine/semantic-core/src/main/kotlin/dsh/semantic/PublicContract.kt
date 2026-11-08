@@ -242,7 +242,7 @@ enum class AuthorizationRejection {
     INCOMPLETE_HOST_IDENTITY, PROFILE_NOT_RUNTIME_VERIFIED, PROFILE_IDENTITY_REJECTED,
     ROLE_NOT_IN_PROFILE, RESOLUTION_NOT_ACCEPTED, METHOD_NOT_IN_PROFILE,
     EVIDENCE_INCOMPLETE, EVIDENCE_NEGATIVE, HOST_IDENTITY_EVIDENCE_MISSING,
-    RUNTIME_EVIDENCE_MISSING, RUNTIME_EVIDENCE_NOT_BOUND_TO_METHOD
+    RUNTIME_EVIDENCE_MISSING, RUNTIME_EVIDENCE_NOT_BOUND_TO_METHOD, PROFILE_EVIDENCE_REQUIREMENTS_MISSING
 }
 
 /** Constructor is module-internal: consumers must obtain a plan from HookAuthorizationPolicy. */
@@ -302,7 +302,11 @@ class HookAuthorizationPolicy(private val profileValidator: HookProfileValidator
         val roleEvidence = evidence.filter { it.role == roleId }
         if (roleEvidence.any { !it.complete }) errors += AuthorizationRejection.EVIDENCE_INCOMPLETE
         if (roleEvidence.any { it.polarity == EvidencePolarity.NEGATIVE }) errors += AuthorizationRejection.EVIDENCE_NEGATIVE
-        val positiveComplete = roleEvidence.filter { it.complete && it.polarity == EvidencePolarity.POSITIVE }\n        val availableFamilies = positiveComplete.map { it.family }.toSet()\n        val requiredFamilies = roleProfile?.requiredEvidenceFamilies.orEmpty() +\n            roleProfile?.candidates?.firstOrNull { it.method == method }?.requiredEvidenceFamilies.orEmpty()\n        if (!availableFamilies.containsAll(requiredFamilies)) errors += AuthorizationRejection.PROFILE_EVIDENCE_REQUIREMENTS_MISSING
+        val positiveComplete = roleEvidence.filter { it.complete && it.polarity == EvidencePolarity.POSITIVE }
+        val availableFamilies = positiveComplete.map { it.family }.toSet()
+        val requiredFamilies = roleProfile?.requiredEvidenceFamilies.orEmpty() +
+            roleProfile?.candidates?.firstOrNull { it.method == method }?.requiredEvidenceFamilies.orEmpty()
+        if (!availableFamilies.containsAll(requiredFamilies)) errors += AuthorizationRejection.PROFILE_EVIDENCE_REQUIREMENTS_MISSING
         if (positiveComplete.none { it.family == EvidenceFamily.HOST_IDENTITY && it.source.artifactSha256.equals(host.baseApkSha256, true) }) {
             errors += AuthorizationRejection.HOST_IDENTITY_EVIDENCE_MISSING
         }
