@@ -24,6 +24,8 @@
 - 首轮 Resolver 的静态候选存在误判：2.7.3 把第三方验证 SDK 误认为宿主 Local API，2.7.5 的会话候选胜出分差仅约 0.355。已移除宿主 APK 的 Local API 映射、将默认胜出分差提高至 0.5，并要求 HookCoordinator 同时具备完整运行时宿主身份和运行行为证据。
 - 以上是静态审计与语义核心进展，不代表已完成 LSPosed Hook；最新安装门槛和回归测试以本轮 Semantic Core CI 为准。
 - Resolver 已进一步增加四证据族门槛、框架/第三方 SDK 负面证据、稀有锚点沿调用图/字段流传播，以及按功能域定义的必需证据族；语义引擎改动会自动触发五版本重新接入。
+- 2026-11-08 修复 Points-to 全局存储预算竞争：调用上下文和接收者记录按 root 平分预算；单个 root 超额只标记该 root 不完整，不再因记录存储上限提前停止后续图遍历。新增 Python 回归覆盖热点 root 与独立 root 的隔离；以最新 CI 结果为准。
+- 旧五版本产物均触及 200,000 条记录上限，不能作为完整 Points-to 结果。旧产物另显示 `deepseek 273.apk` 的 Manifest 为 versionName `2.5.2` / versionCode `273`，与矩阵标签 2.7.3 不一致；在替换或确认 APK 身份前，不把它计为已验证的 2.7.3 版本证据。
 
 **当前限制：** 这是引擎核心原型，不是已完成的 DEX 自动语义发现器，也没有接入 LSPosed Android Backend。Agent、提示词、本地 API 等全功能域已列入覆盖目标，但必须逐域完成静态证据、运行时验证、桥接和回归测试后才能标记完成。详情：[全功能覆盖矩阵](docs/universal-hook/README.md) · [Kotlin Semantic Core](engine/semantic-core/)。
 
