@@ -804,6 +804,10 @@ class SmaliGraphExtractionTest(unittest.TestCase):
         graph = AUDIT.build_interprocedural_points_to_graph([method])
         self.assertGreaterEqual(graph["summary"]["return_summary_recursive_cuts"], 1)
         self.assertFalse(graph["summary"]["context_expansion_complete"])
+        self.assertFalse(graph["summary"]["root_diagnostics"]["top_hot_roots"][0]["context_expansion_complete"])
+        self.assertGreaterEqual(
+            graph["summary"]["root_diagnostics"]["top_hot_roots"][0]["return_summary_recursive_cuts"], 1
+        )
         self.assertFalse(graph["summary"]["recursive_fixed_point"])
 
     def test_interprocedural_points_to_cuts_recursive_contexts_fail_closed(self):
@@ -1335,6 +1339,31 @@ class CallerControlFlowReturnBoundaryTest(unittest.TestCase):
         self.assertEqual(4, summary["queue_states_processed"])
         self.assertFalse(summary["context_expansion_complete"])
 
+
+    def test_interprocedural_points_to_marks_unresolved_calls_incomplete_per_root(self):
+        root = {
+            "class": "Lx/Root;", "name": "entry", "descriptor": "()V",
+            "component": "base", "roles": [{"role": "request", "anchors": ["entry"]}],
+            "invoke_sites": [{
+                "instruction": 0, "line": 1, "owner": "Lexternal/Library;",
+                "name": "run", "descriptor": "()V", "opcode": "invoke-static",
+                "registers": [], "result_instruction": None, "result_register": None,
+            }],
+            "invoke_sites_truncated": False, "invoke_sites_incomplete": False,
+            "object_points_to": {
+                "complete": True, "invoke_arguments": [], "field_receivers": [],
+                "return_values": [], "instruction_writes": [],
+            },
+        }
+        graph = AUDIT.build_interprocedural_points_to_graph(
+            [root], root_scope="semantic-candidates"
+        )
+        summary = graph["summary"]
+        self.assertEqual(1, summary["unresolved_call_sites"])
+        self.assertFalse(summary["context_expansion_complete"])
+        root_row = summary["root_diagnostics"]["top_hot_roots"][0]
+        self.assertEqual(1, root_row["unresolved_call_sites"])
+        self.assertFalse(root_row["context_expansion_complete"])
 
     def test_interprocedural_points_to_candidate_scope_is_explicit_and_keeps_callees(self):
         def method(owner, name, invokes=None, roles=None):
