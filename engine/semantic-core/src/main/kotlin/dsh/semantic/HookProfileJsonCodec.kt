@@ -106,9 +106,12 @@ private fun JsonObject.requiredObject(key: String): JsonObject =
 private fun JsonObject.requiredArray(key: String): JsonArray =
     requiredElement(key) as? JsonArray ?: throw IllegalArgumentException("expected-array-$key")
 
-private fun JsonObject.requiredString(key: String): String =
-    requiredElement(key).jsonPrimitive.let { primitive ->\n        if (!primitive.isString) throw IllegalArgumentException("expected-string-$key")\n        primitive.contentOrNull?.takeIf { it.isNotBlank() }\n    }
+private fun JsonObject.requiredString(key: String): String {
+    val primitive = requiredElement(key).jsonPrimitive
+    if (!primitive.isString) throw IllegalArgumentException("expected-string-$key")
+    return primitive.contentOrNull?.takeIf { it.isNotBlank() }
         ?: throw IllegalArgumentException("missing-or-empty-$key")
+}
 
 private fun JsonObject.requiredInt(key: String): Int =
     requiredElement(key).jsonPrimitive.intOrNull ?: throw IllegalArgumentException("invalid-int-$key")
@@ -120,7 +123,18 @@ private inline fun <reified T : Enum<T>> JsonObject.requiredEnum(key: String): T
     enumValueOf(requiredString(key))
 
 private inline fun <reified T : Enum<T>> JsonObject.requiredEnumSet(key: String): Set<T> =
-    requiredArray(key).map { enumValueOf<T>(it.jsonPrimitive.content) }.toSet()
+    requiredArray(key).map {
+        val primitive = it.jsonPrimitive
+        if (!primitive.isString) throw IllegalArgumentException("invalid-enum-set-$key")
+        enumValueOf<T>(primitive.content)
+    }.toSet()
+
+private fun JsonObject.requiredStringSet(key: String): Set<String> =
+    requiredArray(key).map {
+        val primitive = it.jsonPrimitive
+        if (!primitive.isString || primitive.content.isBlank()) throw IllegalArgumentException("invalid-string-set-$key")
+        primitive.content
+    }.toSet()
 
 private fun JsonObject.optionalStringSet(key: String): Set<String> =
-    (this[key] as? JsonArray)?.map { it.jsonPrimitive.content }?.toSet().orEmpty()
+    if (this[key] == null) emptySet() else requiredStringSet(key)
