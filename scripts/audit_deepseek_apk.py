@@ -973,10 +973,17 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
     if max_records < 1:
         raise ValueError("max_records must be positive")
     record_limit=max_records
-    # Partition the aggregate storage budget across roots so one hot root cannot consume
-    # every other root's evidence allowance. Keep at least one slot per root when
-    # the requested budget is smaller than the root count.
-    per_root_record_limit=max(1,record_limit//max(1,len(roots)))
+    # Partition each record-family budget across roots. Quotas differ by at most
+    # one slot; when roots outnumber the budget, zero-slot roots are still traversed
+    # and diagnosed, but cannot exceed the configured global storage cap.
+    root_count=len(roots)
+    base_quota,remainder=divmod(record_limit,max(1,root_count))
+    root_record_limits={
+        root["_points_to_key"]:base_quota+(1 if index<remainder else 0)
+        for index,root in enumerate(roots)
+    }
+    per_root_record_limit=max(root_record_limits.values(),default=0)
+    per_root_record_limit_min=min(root_record_limits.values(),default=0)
     roots_with_roles=sum(bool(m.get("roles")) for m in roots)
     queue_states_enqueued=len(queue)
     queue_states_processed=0
@@ -986,6 +993,7 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
     seen_contexts=set()
     root_diagnostics={
         root["_points_to_key"]:{
+            "record_limit":root_record_limits[root["_points_to_key"]],
             "call_contexts_seen":0,"call_contexts_stored":0,
             "call_contexts_dropped":0,"receiver_records_seen":0,
             "receiver_records_stored":0,"receiver_records_dropped":0,
@@ -1243,7 +1251,7 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
                     root_stats["return_identity_unresolved_count"]+=1
 
             root_stats["call_contexts_seen"]+=1
-            if root_stats["call_contexts_stored"]<per_root_record_limit:
+            if root_stats["call_contexts_stored"]<root_stats["record_limit"]:
                 root_stats["call_contexts_stored"]+=1
                 call_contexts.append({
                     "root_method_key":root_method_key,
@@ -1288,7 +1296,7 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
                         "singleton" if len(identities)==1 else
                         "multiple" if len(identities)>1 else "unresolved")
                 root_stats["receiver_records_seen"]+=1
-                if root_stats["receiver_records_stored"]<per_root_record_limit:
+                if root_stats["receiver_records_stored"]<root_stats["record_limit"]:
                     root_stats["receiver_records_stored"]+=1
                     contextual_receivers.append({
                         "root_method_key":root_method_key,
@@ -1429,7 +1437,11 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
             "records_truncated":records_truncated,
             "record_limit":record_limit,
             "per_root_record_limit":per_root_record_limit,
-            "record_budget_policy":"fair-share-per-root; storage truncation never stops graph traversal",
+            "per_root_record_limit_min":per_root_record_limit_min,
+            "record_budget_scope":"independent global cap per record family (call contexts and contextual receivers)",
+            "record_budget_policy":"deterministic fair-share-per-root; per-root quotas differ by at most one; zero-slot roots are still traversed; storage truncation never stops graph traversal",
+            "call_context_records_stored":len(call_contexts),
+            "contextual_receiver_records_stored":len(contextual_receivers),
             "analysis_scope":("whole-program-eligible-method-roots" if root_scope=="all"
                 else "semantic-role-roots-only"),
             "scope_is_whole_program":root_scope=="all",
