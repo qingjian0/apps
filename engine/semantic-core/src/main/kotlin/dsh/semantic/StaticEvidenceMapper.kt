@@ -10,6 +10,7 @@ data class StaticMethodRecord(
     val invokes: List<String>,
     val opcodeCount: Int,
     val roles: List<StaticRoleEvidence>,
+    val literalStrings: Set<String> = emptySet(),
     val isStatic: Boolean? = null
 )
 
@@ -53,7 +54,9 @@ class StaticEvidenceMapper {
             record.parameterTypes, record.returnType, record.isStatic)
         return record.roles.mapNotNull { roleEvidence ->
             val roleName = roleAliases[roleEvidence.roleLabel] ?: return@mapNotNull null
-            val strongAnchors = roleEvidence.anchors.distinct().filterNot { it in weakOnlyAnchors[roleEvidence.roleLabel].orEmpty() }
+            val strongAnchors = roleEvidence.anchors.distinct()
+                .filterNot { it in weakOnlyAnchors[roleEvidence.roleLabel].orEmpty() }
+                .filter { it in record.literalStrings }
             // A generic token alone must not create a production semantic candidate.
             if (strongAnchors.isEmpty()) return@mapNotNull null
             val evidence = buildList {
