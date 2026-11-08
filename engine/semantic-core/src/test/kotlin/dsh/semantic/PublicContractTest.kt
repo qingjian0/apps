@@ -104,4 +104,134 @@ class PublicContractTest {
         val empty = profile.copy(roles = listOf(profile.roles.single().copy(candidates = emptyList())))
         assertTrue(ProfileRejection.EMPTY_ROLE_CANDIDATES in HookProfileValidator().validate(empty, host).rejections)
     }
+
+    private fun evidence(
+        id: String,
+        family: EvidenceFamily,
+        methodRef: MethodDescriptor? = method,
+        runId: String? = "audit-run-1"
+    ) = AuditableEvidence(
+        evidenceId = id,
+        family = family,
+        role = RoleId("network.route"),
+        source = EvidenceSource(host.baseApkSha256!!, "audit/base.apk", methodRef, runId, "test-fixture"),
+        polarity = EvidencePolarity.POSITIVE,
+        strength = EvidenceStrength.DIRECT,
+        complete = true,
+        detailCode = when (family) {
+            EvidenceFamily.HOST_IDENTITY -> "HOST_IDENTITY_MATCHED"
+            EvidenceFamily.RUNTIME_BEHAVIOR -> "RUNTIME_TRIGGER_MATCHED"
+            EvidenceFamily.CALL_GRAPH -> "CALL_EDGE_CONFIRMED"
+            else -> "TYPE_SHAPE_CONFIRMED"
+        }
+    )
+
+    private fun runtimeEvidence(methodRef: MethodDescriptor = method) = listOf(
+        evidence("call-graph-1", EvidenceFamily.CALL_GRAPH),
+        evidence("type-shape-1", EvidenceFamily.TYPE_SHAPE),
+        evidence("host-identity-1", EvidenceFamily.HOST_IDENTITY, null, null),
+        evidence("runtime-trigger-1", EvidenceFamily.RUNTIME_BEHAVIOR, methodRef, "device-run-1")
+    )
+
+    private fun acceptedResolution(): Resolution {
+        val role = RoleId("network.route")
+        val legacyHost = HostFingerprint(
+            host.packageName, host.versionCode, host.versionName,
+            host.signingCertSha256, host.dexFingerprint!!, host.classLoaderId
+        )
+        val candidate = SemanticCandidate(
+            role,
+            MethodShape(method.owner, method.name, method.descriptor, method.parameterDescriptors()!!, method.returnDescriptor()!!),
+            legacyHost,
+            listOf(
+                Evidence(EvidenceFamily.CALL_GRAPH, "request-to-transport", 0.9),
+                Evidence(EvidenceFamily.TYPE_SHAPE, "request-shape", 0.9)
+            )
+        )
+        return SemanticResolver().resolve(
+            legacyHost,
+            RolePolicy(role, minimumEvidenceFamilies = 2, minimumScore = 1.0, requiredFamilies = setOf(EvidenceFamily.CALL_GRAPH, EvidenceFamily.TYPE_SHAPE)),
+            listOf(candidate)
+        )
+    }
+
+    @Test fun malformedSplitApkDigestMakesIdentityIncomplete() {
+        val incomplete = host.copy(splitApkSha256 = setOf("not-a-sha256"))
+        assertFalse(incomplete.isComplete())
+        assertTrue(IdentityField.SPLIT_APK_SHA256 in incomplete.missingRequiredFields())
+    }
+
+    @Test fun methodShapeRejectsParameterOrReturnTypeDisagreement() {
+        val wrongParameters = MethodShape("Lx/y;", "submit", "(I)V", listOf("Ljava/lang/String;"), "V")
+        val wrongReturn = MethodShape("Lx/y;", "submit", "(I)V", listOf("I"), "Ljava/lang/Object;")
+        assertFalse(wrongParameters.isWellFormed())
+        assertFalse(wrongReturn.isWellFormed())
+    }
+
+    @Test fun staticResolutionCannotProduceAuthorizedPlan() {
+        val result = HookAuthorizationPolicy().authorize(
+            host, profile.copy(status = ProfileStatus.RUNTIME_VERIFIED),
+            RoleId("network.route"), acceptedResolution(),
+            runtimeEvidence().filterNot { it.family == EvidenceFamily.RUNTIME_BEHAVIOR }
+        )
+        assertFalse(result.authorized)
+        assertTrue(AuthorizationRejection.RUNTIME_EVIDENCE_MISSING in result.rejections)
+    }
+
+    @Test fun onlyRuntimeVerifiedExactProfileCanAuthorizeHook() {
+        val result = HookAuthorizationPolicy().authorize(
+            host, profile.copy(status = ProfileStatus.RUNTIME_VERIFIED),
+            RoleId("network.route"), acceptedResolution(), runtimeEvidence()
+        )
+        assertTrue(result.authorized, result.rejections.toString())
+        assertEquals(method, result.plan?.method)
+    }
+
+    @Test fun staticVerifiedProfileCannotAuthorizeEvenWithRuntimeEvidence() {
+        val result = HookAuthorizationPolicy().authorize(
+            host, profile, RoleId("network.route"), acceptedResolution(), runtimeEvidence()
+        )
+        assertFalse(result.authorized)
+        assertTrue(AuthorizationRejection.PROFILE_NOT_RUNTIME_VERIFIED in result.rejections)
+    }
+
+    @Test fun runtimeEvidenceMustBindToExactMethod() {
+        val otherMethod = MethodDescriptor("Lx/y/Request;", "other", "()V")
+        val result = HookAuthorizationPolicy().authorize(
+            host, profile.copy(status = ProfileStatus.RUNTIME_VERIFIED),
+            RoleId("network.route"), acceptedResolution(), runtimeEvidence(otherMethod)
+        )
+        assertFalse(result.authorized)
+        assertTrue(AuthorizationRejection.RUNTIME_EVIDENCE_MISSING in result.rejections)
+        assertTrue(AuthorizationRejection.RUNTIME_EVIDENCE_NOT_BOUND_TO_METHOD in result.rejections)
+    }
+
+    @Test fun profileEvidenceRequirementsAreEnforcedBeforeAuthorization() {
+        val incomplete = runtimeEvidence().filterNot { it.family == EvidenceFamily.TYPE_SHAPE }
+        val result = HookAuthorizationPolicy().authorize(
+            host, profile.copy(status = ProfileStatus.RUNTIME_VERIFIED),
+            RoleId("network.route"), acceptedResolution(), incomplete
+        )
+        assertFalse(result.authorized)
+        assertTrue(AuthorizationRejection.PROFILE_EVIDENCE_REQUIREMENTS_MISSING in result.rejections)
+    }
+
+    @Test fun authorizedPlanIsThePublicCoordinatorInstallInputAndIsIdempotent() {
+        var installs = 0
+        val authorization = HookAuthorizationPolicy().authorize(
+            host, profile.copy(status = ProfileStatus.RUNTIME_VERIFIED),
+            RoleId("network.route"), acceptedResolution(), runtimeEvidence()
+        )
+        val plan = assertNotNull(authorization.plan)
+        val coordinator = HookCoordinator(object : HookBackend {
+            override fun install(method: MethodShape, role: RoleId): HookHandle {
+                installs++
+                return object : HookHandle { override fun uninstall() {} }
+            }
+        })
+        assertEquals(InstallStatus.INSTALLED, coordinator.install(plan).status)
+        assertEquals(InstallStatus.ALREADY_INSTALLED, coordinator.install(plan).status)
+        assertEquals(1, installs)
+    }
+
 }
