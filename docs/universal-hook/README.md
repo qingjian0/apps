@@ -288,3 +288,11 @@ The per-root quota is now a deterministic quotient/remainder partition of the co
 ### Kotlin ingestion: protocol anchors must be literal (2026-11-08)
 
 Kotlin StaticAuditJsonReader now reads the method-level strings array and passes it to StaticEvidenceMapper. A role anchor is eligible for PROTOCOL_ANCHOR only when the exact anchor also occurs in that method's literal string constants, and generic weak-only anchors remain excluded. Anchor-frequency normalization counts only literal anchors. A role match inferred from an invoke/API token may remain a discovery hint, but it cannot be promoted into protocol evidence by itself. Resolver policy still requires independent evidence families and role-specific required families; this change prevents a static role label from satisfying the protocol-anchor requirement without a real literal.
+
+
+## 最终审计与交接（2026-11-08）
+
+本轮统一结论、五版本真实 Manifest 身份、扫描统计、Points-to 完整性边界、E0–E3 证据等级、旧探针版本路由异常、CI 状态和剩余 blocker，统一见 [最终审计与交接报告](FINAL-AUDIT-AND-HANDOFF-2026-11-08.md)。
+
+重要状态覆盖此前阶段性记录：Matrix #203 的五版本静态任务及 aggregate 成功；但最新 PR HEAD 的两个 PR workflow 是 `action_required`，不属于通过或失败。2.7.3 标签 APK 仍因 Manifest 2.5.2/code273 被隔离。静态候选不等于 runtime Hook；当前 runtime-confirmed / hook-authorized 计数均为 0。旧探针路由修复需要在探针源码仓库完成，不能由本静态审计仓库的文档替代。
+
