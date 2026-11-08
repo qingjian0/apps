@@ -212,10 +212,10 @@ JADX 反编译失败必须保留退出码和错误日志；Smali 是控制流复
 
 新增产物：interprocedural-value-edges.jsonl.gz、field-slot-index.jsonl.gz。字段槽分组不证明对象实例相同，不能作为强语义证据；现已增加方法激活内对象 Points-to 与有界 call-string 上下文投影，但仅作诊断，不生成 DATA_FLOW 证据或授权 Hook。
 
-专用 Python 静态分析验证工作流：.github/workflows/universal-hook-semantic-audit.yml。测试未通过 Actions 成功结果前，不将本轮标记为 CI 通过。当前工作保留在 Draft PR #2，不合并 main。
+专用 Python 静态分析验证工作流：.github/workflows/universal-hook-semantic-audit.yml。历史阶段记录曾处于等待验证状态；最终 PR #2 已于 2026-11-08 合并到 main。合并前最新 HEAD `7cbc2b96a26f1d699c85e026e08a06c91e4686a0` 的 Universal Hook Static Analysis run `42451324101` 与 DeepSeek Semantic Core CI run `42451324083` 均成功。
 
 
-Kotlin StaticProgramGraph / StaticAuditCli 已读取参数/返回值边索引；只有 summary 明确确认边文件未截断时才导入。跨方法 DATA_FLOW 证据仅由参数/返回值边产生；相同字段槽的读写共现只作诊断，不再满足 DATA_FLOW 证据合同。对应 Python 与 Kotlin Actions 正在验证。
+Kotlin StaticProgramGraph / StaticAuditCli 已读取参数/返回值边索引；只有 summary 明确确认边文件未截断时才导入。跨方法 DATA_FLOW 证据仅由参数/返回值边产生；相同字段槽的读写共现只作诊断，不再满足 DATA_FLOW 证据合同。Python 与 Kotlin 对应检查已在 PR #2 合并前最新 HEAD 上通过；设备端运行时 Hook 与业务闭环仍未完成。
 
 ## Points-to root 预算隔离（2026-11-08）
 
