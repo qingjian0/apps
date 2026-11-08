@@ -22,6 +22,7 @@ data class MethodShape(val ownerDescriptor: String, val name: String, val descri
         val parsed = MethodDescriptor.parse(ownerDescriptor, name, descriptor) ?: return false
         return parsed.parameterDescriptors() == parameterTypes && parsed.returnDescriptor() == returnType
     }
+}
 
 data class SemanticCandidate(val role: RoleId, val method: MethodShape, val host: HostFingerprint, val evidence: List<Evidence>, val negativeEvidence: Set<String> = emptySet(), val sourceVersion: String? = host.versionName)
 
