@@ -973,6 +973,10 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
     if max_records < 1:
         raise ValueError("max_records must be positive")
     record_limit=max_records
+    # Partition the aggregate storage budget across roots so one hot root cannot consume
+    # every other root's evidence allowance. Keep at least one slot per root when
+    # the requested budget is smaller than the root count.
+    per_root_record_limit=max(1,record_limit//max(1,len(roots)))
     roots_with_roles=sum(bool(m.get("roles")) for m in roots)
     queue_states_enqueued=len(queue)
     queue_states_processed=0
@@ -1239,7 +1243,7 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
                     root_stats["return_identity_unresolved_count"]+=1
 
             root_stats["call_contexts_seen"]+=1
-            if len(call_contexts)<record_limit:
+            if root_stats["call_contexts_stored"]<per_root_record_limit:
                 root_stats["call_contexts_stored"]+=1
                 call_contexts.append({
                     "root_method_key":root_method_key,
@@ -1268,7 +1272,8 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
                 records_truncated=True
                 call_context_records_dropped+=1
                 root_stats["call_contexts_dropped"]+=1
-                continue
+            # Storage truncation is diagnostic only: continue traversing this call so
+            # descendants and independent roots are still analyzed.
             resolved+=1
             for fact in callee_pts.get("field_receivers",[]):
                 identities=[]
@@ -1283,7 +1288,7 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
                         "singleton" if len(identities)==1 else
                         "multiple" if len(identities)>1 else "unresolved")
                 root_stats["receiver_records_seen"]+=1
-                if len(contextual_receivers)<record_limit:
+                if root_stats["receiver_records_stored"]<per_root_record_limit:
                     root_stats["receiver_records_stored"]+=1
                     contextual_receivers.append({
                         "root_method_key":root_method_key,
@@ -1345,7 +1350,7 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
                     "singleton" if len(identities)==1 else
                     "multiple" if len(identities)>1 else "unresolved")
             root_stats["receiver_records_seen"]+=1
-            if len(contextual_receivers)<record_limit:
+            if root_stats["receiver_records_stored"]<per_root_record_limit:
                 root_stats["receiver_records_stored"]+=1
                 contextual_receivers.append({
                     "root_method_key":root_method_key,
@@ -1423,6 +1428,8 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
             "return_summary_depth_cuts":return_summary_depth_cuts,
             "records_truncated":records_truncated,
             "record_limit":record_limit,
+            "per_root_record_limit":per_root_record_limit,
+            "record_budget_policy":"fair-share-per-root; storage truncation never stops graph traversal",
             "analysis_scope":("whole-program-eligible-method-roots" if root_scope=="all"
                 else "semantic-role-roots-only"),
             "scope_is_whole_program":root_scope=="all",
