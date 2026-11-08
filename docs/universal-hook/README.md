@@ -210,7 +210,7 @@ JADX 反编译失败必须保留退出码和错误日志；Smali 是控制流复
 - 字段访问点与精确 field descriptor 分组，保留 value/receiver 寄存器；
 - 未解析/多重目标、数据流不完整、证据截断和 wide-register 指令保持 fail-closed。
 
-新增产物：interprocedural-value-edges.jsonl.gz、field-slot-index.jsonl.gz。字段槽分组不证明对象实例相同，不能作为强语义证据；对象 points-to/alias 传播仍待实现。
+新增产物：interprocedural-value-edges.jsonl.gz、field-slot-index.jsonl.gz。字段槽分组不证明对象实例相同，不能作为强语义证据；现已增加方法激活内对象 Points-to 与有界 call-string 上下文投影，但仅作诊断，不生成 DATA_FLOW 证据或授权 Hook。
 
 专用 Python 静态分析验证工作流：.github/workflows/universal-hook-semantic-audit.yml。测试未通过 Actions 成功结果前，不将本轮标记为 CI 通过。当前工作保留在 Draft PR #2，不合并 main。
 
@@ -255,3 +255,26 @@ Kotlin StaticProgramGraph / StaticAuditCli 已读取参数/返回值边索引；
 ### APK 身份阻断项
 
 旧审计产物中的 `deepseek 273.apk` 虽被标为 2.7.3，但 Manifest 实际为 `versionName=2.5.2`、`versionCode=273`。扫描结果可以保留为该 APK 的静态证据，但不能作为已确认的 DeepSeek 2.7.3 版本审计。重新审计时必须继续将其隔离在可信跨版本匹配之外，直到替换 APK 或取得可核对的构建身份依据。
+
+## Hook 候选静态证据等级（2026-11-08）
+
+扫描器现在为每个角色候选输出 `static_evidence_level`、`evidence_family_count`、`evidence_families`、`runtime_confirmed` 和 `hook_authorized`。证据族仅统计可区分的静态来源：
+
+- `protocol_anchor`：角色锚点同时存在于 Smali 字符串常量中；仅由 invoke 目标触发的角色命中不重复算作协议字符串证据。
+- `call_graph`：候选方法存在入边或出边。
+- `stable_api_calls`：候选方法调用 Kotlin/Java/Android/Ktor/OkHttp/Retrofit 等稳定 API。
+- `type_shape`：候选类具有接口实现或非 Object 直接父类。
+- `control_flow`：CFG 完整且存在可解析控制流边。
+- `intraprocedural_points_to`：方法内 Points-to 完整且至少存在一个 singleton field receiver。
+
+| 等级 | 判据 | 含义 |
+|---|---|---|
+| `E0_ROLE_MATCH_ONLY` | 0 个独立证据族 | 仅有语义角色命中，不足以支持 Hook 候选结论 |
+| `E0_ONE_STATIC_FAMILY` | 1 个静态证据族 | 单一静态来源 |
+| `E1_TWO_STATIC_FAMILIES` | 2 个静态证据族 | 初步交叉佐证 |
+| `E2_THREE_STATIC_FAMILIES` | 3 个静态证据族 | 多源静态佐证 |
+| `E3_FOUR_OR_MORE_STATIC_FAMILIES` | 至少 4 个静态证据族 | 较高静态证据多样性，仍不是运行时确认 |
+
+等级按证据族数量生成，不把重复字符串、混淆名或单一 invoke 的多次出现累计成独立证据。所有静态候选均固定输出 `runtime_confirmed=false`、`hook_authorized=false`；只有独立设备证据和运行时宿主身份校验才能推进到运行时确认，静态等级不能绕过 Kotlin Resolver、负面证据、完整描述符和 fail-closed 门槛。
+
+回归测试覆盖角色命中但无独立证据、真实字符串锚点、多个独立静态证据族，以及任何等级都不授权 Hook。候选 CSV 同步输出证据等级与证据族，summary 输出各等级数量。
