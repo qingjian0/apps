@@ -955,11 +955,23 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
         raise ValueError("root_scope must be 'all' or 'semantic-candidates'")
     roots=(eligible_roots if root_scope=="all"
            else [m for m in eligible_roots if m.get("roles")])
+    # A method signature is not a root identity: APKM splits can contain the
+    # same descriptor in multiple components. Preserve legacy keys for unique
+    # signatures, but qualify duplicates by component and stable root ordinal.
+    root_signature_counts=collections.Counter(root["_points_to_key"] for root in roots)
+    for root_index,root in enumerate(roots):
+        signature=root["_points_to_key"]
+        if root_signature_counts[signature] == 1:
+            root["_points_to_root_key"]=signature
+        else:
+            component=root.get("component") or "<unknown-component>"
+            root["_points_to_root_key"]="{}::{}::root-index:{}".format(
+                component,signature,root_index)
     queue=collections.deque()
     for root in roots:
         queue.append({
-            "method":root,"context_id":"root:"+root["_points_to_key"],
-            "root_method_key":root["_points_to_key"],
+            "method":root,"context_id":"root:"+root["_points_to_root_key"],
+            "root_method_key":root["_points_to_root_key"],
             "bindings":{},"register_overrides":{},
             "path":(root["_points_to_key"],),"depth":0
         })
@@ -979,7 +991,7 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
     root_count=len(roots)
     base_quota,remainder=divmod(record_limit,max(1,root_count))
     root_record_limits={
-        root["_points_to_key"]:base_quota+(1 if index<remainder else 0)
+        root["_points_to_root_key"]:base_quota+(1 if index<remainder else 0)
         for index,root in enumerate(roots)
     }
     per_root_record_limit=max(root_record_limits.values(),default=0)
@@ -992,8 +1004,8 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
     receiver_records_dropped=0
     seen_contexts=set()
     root_diagnostics={
-        root["_points_to_key"]:{
-            "record_limit":root_record_limits[root["_points_to_key"]],
+        root["_points_to_root_key"]:{
+            "record_limit":root_record_limits[root["_points_to_root_key"]],
             "call_contexts_seen":0,"call_contexts_stored":0,
             "call_contexts_dropped":0,"receiver_records_seen":0,
             "receiver_records_stored":0,"receiver_records_dropped":0,
@@ -1420,6 +1432,7 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
     }
     for method in methods:
         method.pop("_points_to_key",None)
+        method.pop("_points_to_root_key",None)
     return {
         "call_contexts":call_contexts,
         "contextual_receivers":contextual_receivers,
