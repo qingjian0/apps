@@ -23,6 +23,7 @@ data class HostIdentity(
         if (!signingCertSha256.isSha256()) add(IdentityField.SIGNING_CERT_SHA256)
         if (!baseApkSha256.isSha256()) add(IdentityField.BASE_APK_SHA256)
         if (!dexFingerprint.isSha256()) add(IdentityField.DEX_FINGERPRINT)
+        if (splitApkSha256.any { !it.matches(Regex("[a-fA-F0-9]{64}")) }) add(IdentityField.SPLIT_APK_SHA256)
         if (processName.isBlank()) add(IdentityField.PROCESS_NAME)
         if (classLoaderId.isBlank()) add(IdentityField.CLASS_LOADER_ID)
     }
@@ -52,7 +53,7 @@ data class HostIdentity(
 
 enum class IdentityField {
     PACKAGE_NAME, VERSION_NAME, VERSION_CODE, SIGNING_CERT_SHA256,
-    BASE_APK_SHA256, DEX_FINGERPRINT, PROCESS_NAME, CLASS_LOADER_ID
+    BASE_APK_SHA256, SPLIT_APK_SHA256, DEX_FINGERPRINT, PROCESS_NAME, CLASS_LOADER_ID
 }
 
 private fun String?.isSha256(): Boolean = this != null && matches(Regex("[a-fA-F0-9]{64}"))
@@ -226,10 +227,11 @@ class HookProfileValidator(private val supportedSchemaMajor: Int = 1) {
         if (roleIds.size != roleIds.toSet().size) errors += ProfileRejection.DUPLICATE_ROLE
         profile.roles.forEach { role ->
             if (role.candidates.isEmpty()) errors += ProfileRejection.EMPTY_ROLE_CANDIDATES
-            if (role.minimumEvidenceFamilies < 1 || !role.requiredEvidenceFamilies.containsAll(role.candidates.flatMap { it.requiredEvidenceFamilies }.toSet())) {
+            if (role.minimumEvidenceFamilies < 1 || role.minimumEvidenceFamilies < role.requiredEvidenceFamilies.size || !role.requiredEvidenceFamilies.containsAll(role.candidates.flatMap { it.requiredEvidenceFamilies }.toSet())) {
                 errors += ProfileRejection.INVALID_EVIDENCE_POLICY
             }
             if (role.candidates.any { !it.method.isValid }) errors += ProfileRejection.INVALID_METHOD_DESCRIPTOR
+            if (role.candidates.map { it.method.stableIdentity }.size != role.candidates.map { it.method.stableIdentity }.toSet().size) errors += ProfileRejection.INVALID_EVIDENCE_POLICY
         }
         return ProfileValidationResult(errors.isEmpty(), errors)
     }
