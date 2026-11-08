@@ -1374,6 +1374,61 @@ class CallerControlFlowReturnBoundaryTest(unittest.TestCase):
         self.assertEqual("Lx/Worker;->run()V", graph["call_contexts"][0]["callee"])
         self.assertTrue(summary["context_expansion_complete"])
 
+    def test_interprocedural_points_to_preserves_root_provenance_for_shared_callee(self):
+        def method(owner, name, invokes=None, roles=None):
+            return {
+                "class": owner, "name": name, "descriptor": "()V",
+                "component": "base", "roles": roles or [],
+                "invoke_sites": invokes or [],
+                "invoke_sites_truncated": False, "invoke_sites_incomplete": False,
+                "object_points_to": {
+                    "complete": True, "invoke_arguments": [],
+                    "field_receivers": [], "return_values": [],
+                    "instruction_writes": [],
+                },
+            }
+
+        def call(target, instruction):
+            return {
+                "instruction": instruction, "line": instruction + 1,
+                "owner": target, "name": "run", "descriptor": "()V",
+                "opcode": "invoke-static", "registers": [],
+                "result_instruction": None, "result_register": None,
+            }
+
+        first = method(
+            "Lx/FirstRoot;", "entry", [call("Lx/Shared;", 0)],
+            roles=[{"role": "request", "anchors": ["first"]}],
+        )
+        second = method(
+            "Lx/SecondRoot;", "entry", [call("Lx/Shared;", 0)],
+            roles=[{"role": "agent", "anchors": ["second"]}],
+        )
+        shared = method("Lx/Shared;", "run")
+        graph = AUDIT.build_interprocedural_points_to_graph(
+            [first, second, shared], root_scope="semantic-candidates"
+        )
+
+        expected_roots = {
+            "Lx/FirstRoot;->entry()V",
+            "Lx/SecondRoot;->entry()V",
+        }
+        self.assertEqual(
+            expected_roots,
+            {row["root_method_key"] for row in graph["call_contexts"]},
+        )
+        self.assertEqual(
+            2, len({row["context_id"] for row in graph["call_contexts"]})
+        )
+        self.assertEqual(2, graph["summary"]["root_diagnostics"]["root_count"])
+        self.assertEqual(
+            0, graph["summary"]["root_diagnostics"]["roots_marked_incomplete"]
+        )
+        self.assertTrue(all(
+            row["context_expansion_complete"]
+            for row in graph["summary"]["root_diagnostics"]["top_hot_roots"]
+        ))
+
     def test_interprocedural_points_to_rejects_unknown_root_scope(self):
         with self.assertRaises(ValueError):
             AUDIT.build_interprocedural_points_to_graph([], root_scope="guessed")
