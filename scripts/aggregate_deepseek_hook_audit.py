@@ -261,11 +261,11 @@ def main():
                      "E2_THREE_STATIC_FAMILIES","E3_FOUR_OR_MORE_STATIC_FAMILIES")
     for v,s in summaries.items():
         counts=s.get("candidate_static_evidence_level_counts",{})
-        report.append("| {} | {} | {} | {} | {} | {} | {} | {} | {} |".format(
-            v,s.get("candidate_method_count",0),
-            *(counts.get(level,0) for level in evidence_levels),
-            s.get("candidate_runtime_confirmed_count",0),
-            s.get("candidate_hook_authorized_count",0)))
+        values=[v,s.get("candidate_method_count",0)]
+        values.extend(counts.get(level,0) for level in evidence_levels)
+        values.extend((s.get("candidate_runtime_confirmed_count",0),
+                       s.get("candidate_hook_authorized_count",0)))
+        report.append("| " + " | ".join(str(value) for value in values) + " |")
     report += ["","所有静态候选均应保持 runtime_confirmed=false、hook_authorized=false；设备证据和 Resolver 门槛单独验证。",""]
     report += ["","## 语义候选匹配","","匹配分数由语义锚点、稳定框架/API 调用族和规范化 opcode 分布组成；候选截取前先按锚点数量、稳定 API 调用量和方法体规模排序。仅保留至少共享一个协议锚点、稳定 API 调用或协议字符串，且双向最佳并领先第二名至少 0.06 的匹配；仅角色相同、并列或非互选候选均被拒绝。分数仅用于排序，必须回看源码/Smali 和调用者/被调用者证据。","",
       "| 角色 | 来源版本 | 来源方法 | 目标版本 | 候选方法 | 相似度 |","|---|---|---|---|---|---:|"]
