@@ -278,3 +278,8 @@ Kotlin StaticProgramGraph / StaticAuditCli 已读取参数/返回值边索引；
 等级按证据族数量生成，不把重复字符串、混淆名或单一 invoke 的多次出现累计成独立证据。所有静态候选均固定输出 `runtime_confirmed=false`、`hook_authorized=false`；只有独立设备证据和运行时宿主身份校验才能推进到运行时确认，静态等级不能绕过 Kotlin Resolver、负面证据、完整描述符和 fail-closed 门槛。
 
 回归测试覆盖角色命中但无独立证据、真实字符串锚点、多个独立静态证据族，以及任何等级都不授权 Hook。候选 CSV 同步输出证据等级与证据族，summary 输出各等级数量。
+
+
+### Points-to storage cap edge case (2026-11-08)
+
+The per-root quota is now a deterministic quotient/remainder partition of the configured record-family budget. Per-root quotas differ by at most one. If there are more roots than slots, some roots receive a zero storage quota; those roots are still fully traversed and their dropped-record/incomplete diagnostics are retained. This preserves the hard global cap instead of silently exceeding it with a minimum-one-slot rule. Call-context and contextual-receiver record families each have their own global cap and independent per-root counters. The summary reports both stored counts, the maximum/minimum per-root quota, and each root's actual quota. Regression coverage includes three roots competing for two slots.
