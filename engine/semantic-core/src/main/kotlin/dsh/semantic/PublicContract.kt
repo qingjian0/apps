@@ -302,7 +302,7 @@ class HookAuthorizationPolicy(private val profileValidator: HookProfileValidator
         val roleEvidence = evidence.filter { it.role == roleId }
         if (roleEvidence.any { !it.complete }) errors += AuthorizationRejection.EVIDENCE_INCOMPLETE
         if (roleEvidence.any { it.polarity == EvidencePolarity.NEGATIVE }) errors += AuthorizationRejection.EVIDENCE_NEGATIVE
-        val positiveComplete = roleEvidence.filter { it.complete && it.polarity == EvidencePolarity.POSITIVE }
+        val positiveComplete = roleEvidence.filter { it.complete && it.polarity == EvidencePolarity.POSITIVE }\n        val availableFamilies = positiveComplete.map { it.family }.toSet()\n        val requiredFamilies = roleProfile?.requiredEvidenceFamilies.orEmpty() +\n            roleProfile?.candidates?.firstOrNull { it.method == method }?.requiredEvidenceFamilies.orEmpty()\n        if (!availableFamilies.containsAll(requiredFamilies)) errors += AuthorizationRejection.PROFILE_EVIDENCE_REQUIREMENTS_MISSING
         if (positiveComplete.none { it.family == EvidenceFamily.HOST_IDENTITY && it.source.artifactSha256.equals(host.baseApkSha256, true) }) {
             errors += AuthorizationRejection.HOST_IDENTITY_EVIDENCE_MISSING
         }
