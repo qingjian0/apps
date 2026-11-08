@@ -9,6 +9,20 @@
 >
 > 本文是基于当前仓库文件与日志的分析归档，不把混淆类名臆测成业务语义，也不把未检查的 APK 二进制说成已完成反编译。
 
+## 跨项目实施与 AI 交接入口
+
+如需把通用 Hook 核心交给其他 AI 或其他仓库实施，先阅读：
+
+1. [跨项目实施手册](docs/universal-hook/IMPLEMENTATION-HANDBOOK.md)：模块边界、依赖方向、Resolver、Profile、Hook 生命周期、事件桥接、接入顺序和验收标准。
+2. [SDK 接口合同](docs/universal-hook/SDK-CONTRACT.md)：跨仓库 API、Adapter、错误模型、线程/生命周期和兼容性约束。
+3. [AI 工程执行任务书](docs/universal-hook/AI-IMPLEMENTATION-PROMPT.md)：可直接复制给其他 AI 的 P0–P6 实施任务。
+4. [引擎架构文档](docs/universal-hook/ENGINE-ARCHITECTURE.md) 与 [最终审计报告](docs/universal-hook/FINAL-AUDIT-AND-HANDOFF-2026-11-08.md)。
+
+**注意：** 新增文档定义目标合同，不代表 SDK、LSPosed Backend、真机 Hook 或跨项目接入已经实现。静态候选不能被描述为 Hook 已授权或设备验证成功。
+
+---
+
+
 ## 新一代 Runtime Semantic Hook Engine
 
 本项目的最终方向升级为跨版本运行时语义 Hook 引擎，不再以固定混淆类名/方法名映射作为通用性基础。工程设计和验收要求见 [引擎架构文档](docs/universal-hook/ENGINE-ARCHITECTURE.md)。
