@@ -937,7 +937,7 @@ def build_interprocedural_value_graph(methods):
             "edges_truncated":total_edge_count>MAX_INTERPROCEDURAL_VALUE_EDGES}}
 
 
-def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records=200000):
+def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records=200000, root_scope="all"):
     """Build bounded call-string contexts for receiver and direct return identity projection.
 
     Return values are propagated only across straight-line caller methods, and only
@@ -949,8 +949,12 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
         key=method["class"]+"->"+method["name"]+method["descriptor"]
         method["_points_to_key"]=key
         by_signature[key].append(method)
-    roots=[m for m in methods if m.get("object_points_to",{}).get("complete")
-           and not m.get("invoke_sites_truncated") and not m.get("invoke_sites_incomplete")]
+    eligible_roots=[m for m in methods if m.get("object_points_to",{}).get("complete")
+                    and not m.get("invoke_sites_truncated") and not m.get("invoke_sites_incomplete")]
+    if root_scope not in ("all","semantic-candidates"):
+        raise ValueError("root_scope must be 'all' or 'semantic-candidates'")
+    roots=(eligible_roots if root_scope=="all"
+           else [m for m in eligible_roots if m.get("roles")])
     queue=collections.deque()
     for root in roots:
         queue.append({
@@ -1334,6 +1338,10 @@ def build_interprocedural_points_to_graph(methods, max_call_depth=4, max_records
             "return_summary_depth_cuts":return_summary_depth_cuts,
             "records_truncated":records_truncated,
             "record_limit":record_limit,
+            "analysis_scope":("whole-program-eligible-method-roots" if root_scope=="all"
+                else "semantic-role-roots-only"),
+            "scope_is_whole_program":root_scope=="all",
+            "eligible_root_method_count":len(eligible_roots),
             "root_method_count":len(roots),
             "semantic_candidate_root_count":roots_with_roles,
             "queue_states_enqueued":queue_states_enqueued,
@@ -1561,6 +1569,10 @@ def main():
         raise SystemExit(f"No DEX methods recovered from {src.name}; apktool exit status and input package layout require investigation")
     interprocedural=build_interprocedural_value_graph(all_methods)
     interprocedural_points_to=build_interprocedural_points_to_graph(all_methods)
+    # A separate candidate-root slice is additive evidence. It must never replace
+    # or be merged into the whole-program bounded analysis above.
+    interprocedural_points_to_candidates=build_interprocedural_points_to_graph(
+        all_methods, root_scope="semantic-candidates")
     field_slot_index=build_field_slot_index(all_methods)
     # Keep the complete method inventory compressed in the repository; no source dump or raw logs are copied.
     write_jsonl_gzip(out/"methods.jsonl.gz", all_methods)
@@ -1569,6 +1581,8 @@ def main():
     write_jsonl_gzip(out/"interprocedural-value-edges.jsonl.gz", interprocedural["edges"])
     write_jsonl_gzip(out/"field-slot-index.jsonl.gz", field_slot_index)
     write_jsonl_gzip(out/"interprocedural-points-to.jsonl.gz", interprocedural_points_to["contextual_receivers"])
+    write_jsonl_gzip(out/"interprocedural-points-to-candidates.jsonl.gz",
+                     interprocedural_points_to_candidates["contextual_receivers"])
     candidates=[]
     for m in all_methods:
         roles=m.get("roles",[])
@@ -1611,6 +1625,7 @@ def main():
       "field_instance_identity_scope":"intraprocedural-singleton-points-to-per-method-activation",
       "interprocedural_value_flow":interprocedural["summary"],
       "interprocedural_points_to":interprocedural_points_to["summary"],
+      "interprocedural_points_to_candidate_scope":interprocedural_points_to_candidates["summary"],
       "candidate_method_count":len(candidates),
       "native_libraries":native,"tool_limits":{"JADX":"best-effort; inspect exit status and APKTool smali evidence",
       "Hook":"static candidate discovery only; no device Hook is claimed"}}
