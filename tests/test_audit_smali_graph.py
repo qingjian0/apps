@@ -1297,7 +1297,7 @@ class CallerControlFlowReturnBoundaryTest(unittest.TestCase):
 
 
     def test_interprocedural_points_to_reports_root_and_record_budget_diagnostics(self):
-        def method(owner, name, invokes=None, roles=None, receivers=None):
+        def method(owner, name, invokes=None, roles=None):
             return {
                 "class": owner, "name": name, "descriptor": "()V",
                 "component": "base", "roles": roles or [],
@@ -1305,7 +1305,7 @@ class CallerControlFlowReturnBoundaryTest(unittest.TestCase):
                 "invoke_sites_truncated": False, "invoke_sites_incomplete": False,
                 "object_points_to": {
                     "complete": True, "invoke_arguments": [],
-                    "field_receivers": receivers or [], "return_values": [],
+                    "field_receivers": [], "return_values": [],
                     "instruction_writes": [],
                 },
             }
