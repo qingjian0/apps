@@ -296,3 +296,278 @@ Kotlin StaticAuditJsonReader now reads the method-level strings array and passes
 
 重要状态覆盖此前阶段性记录：Matrix #203 的五版本静态任务及 aggregate 成功；但最新 PR HEAD 的两个 PR workflow 是 `action_required`，不属于通过或失败。2.7.3 标签 APK 仍因 Manifest 2.5.2/code273 被隔离。静态候选不等于 runtime Hook；当前 runtime-confirmed / hook-authorized 计数均为 0。旧探针路由修复需要在探针源码仓库完成，不能由本静态审计仓库的文档替代。
 
+
+
+---
+
+# 调用链与逐版本方法证据总表（主文档）
+
+> 本章把静态审计、Kotlin Semantic Core ingestion 和 2.7.2/code289-cn 设备 observer 线索放在同一条证据链中。混淆类名仅在对应 APK 身份内有效。标记为“候选”的方法不等于已安装 Hook；语义角色的跨版本匹配也不自动证明每一条边都存在直接 invoke。
+
+## 1. 先看完整业务链：从提交到流式响应
+
+目标是恢复 DeepSeek 原生对话链，而不是把任意网络库方法当作 Hook 点。按业务语义，链路分为以下阶段：
+
+| 顺序 | 语义层 | 需要捕获的对象/事件 | 当前证据与状态 |
+|---:|---|---|---|
+| 1 | UI / Compose 入口 | 输入提交、页面/会话状态、Compose root | 设备日志确认 ComposeView.setContent native dual-root capture 安装 1 次；捕获 native root content=zy1 |
+| 2 | Message Submit / Agent 编排 | 用户提交命令、会话 ID、模型/模式、附件和提示词组装 | 尚未获得唯一且完整的跨版本提交方法；不能用 UI 点击代替 |
+| 3 | Request DTO 构造 | 请求对象、字段赋值、会话上下文、附件引用 | 2.7.2 observer 请求对象候选 ly1 implements wu1；构造器/字段来源仍需逐字段核验 |
+| 4 | Request Route / Transport Dispatch | 请求 DTO 进入传输层，选择 endpoint/请求配置 | Kotlin resolver 在可信版本中唯一解析 network.route；2.7.2 为 jw3.g(wu1, Long)->y60 |
+| 5 | Low-level Transport | HTTP 请求实际发送、header/plugin、body、响应对象 | 2.7.2 observer 同时标记 zn3.o(wu1, Long)->y60 与 jw3.g(wu1, Long)->y60；两者的直接调用先后关系需以目标 APK invoke edge/设备事件序列确认 |
+| 6 | Response / Continuation | 响应体、挂起恢复、错误/完成/取消 | y60 implements el4；另有 y60.b(fl4, yb3)->Object 响应回调候选，需核验完整声明与实际触发 |
+| 7 | SSE Byte / Line Parse | 字节流、行读取、event/data/id/retry、空行分帧 | 当前 sse.parse 在五份 ingestion 中均有两个竞争候选，resolver 拒绝唯一解析 |
+| 8 | SSE Event Dispatch | 已解析事件到 Delta/事件模型、工具事件和完成事件 | 2.7.1/2.7.2/2.7.4/2.7.5 存在候选歧义；code273 样本虽静态解析出一个候选，但该样本身份不可信，不能作 2.7.3 通用结论 |
+| 9 | Flow / Coroutine | emit、collect、Continuation resume、cancel、异常传播 | 跨版本图匹配数量较多，但候选存在歧义和截断；不得据此指定唯一 Hook |
+| 10 | UI State / Render | 消息增量、工具卡片、引用、完成态、错误态 | 设备日志只确认 native root/navigation 捕获；尚无完整响应 Delta 到 UI 状态的闭环证据 |
+
+**重要：** 上表是“业务链阶段图”，不是宣称所有相邻阶段已由单条静态 invoke 链贯通。当前最强的 2.7.2 证据集中在 request DTO / transport 入口；SSE parser、event dispatcher、Flow 与最终 UI 状态仍需要逐边补证。
+
+## 2. 2.7.2 / code289-cn：设备观察与方法候选
+
+这是目前唯一有明确设备 observer 标记的版本。日志文件为仓库根目录 deekseep_vision.log（约 6.44 MB、19,746 行）和 dsprobe.log（12,320 bytes、49 行）。probe-log-summary 记录 deekseep_vision.log 中：
+- observer_session_start：1
+- observer_role:transport-low-level：1
+- observer_role:transport-dispatch：1
+- request_class_marker：1
+- request_constructor_candidate：2
+- request_factory_candidate：5
+- observer_installed_event：4
+- top method markers：jw3.g、zn3.o 各 1 次
+
+### 2.1 请求对象与传输入口
+
+| 节点 | 记录 | 语义判断 | 证据状态 |
+|---|---|---|---|
+| Request model | ly1 implements wu1 | ly1 是实现 wu1 的请求对象候选；wu1 是 transport 接口/请求抽象候选 | observer class marker；必须回到 code289 DEX 核验字段和构造来源 |
+| Transport dispatch | zn3.o(wu1, Long)->y60 | 上层 transport dispatch 候选 | observer method marker；单次标记，不代表全调用路径已复原 |
+| Low-level transport | jw3.g(wu1, Long)->y60 | Kotlin resolver 的 network.route 唯一候选；返回 y60 | 静态 resolver + observer method marker |
+| Response carrier | y60 implements el4 | y60 具有 el4 接口关系，可能承载响应/continuation 协议 | 类型结构证据；不单独证明 SSE 语义 |
+| Response callback | y60.b(fl4, yb3)->Object | 响应/continuation 回调候选 | 既有方法审阅线索；需要用 code289 完整 descriptor、调用者和设备触发日志复核 |
+
+当前可写出的最小证据链为：
+
+    ly1 (implements wu1)
+       ├─ request object / request factory evidence
+       ▼
+    wu1 request abstraction
+       ▼
+    zn3.o(wu1, Long) -> y60       [transport-dispatch observer marker]
+       ▼
+    jw3.g(wu1, Long) -> y60       [network.route resolver + low-level observer marker]
+       ▼
+    y60 implements el4
+       ▼
+    y60.b(fl4, yb3) -> Object     [response callback candidate]
+       ▼
+    SSE parser / event dispatch  [not uniquely resolved]
+       ▼
+    Flow / UI state              [not yet end-to-end proven]
+
+图中 zn3.o 与 jw3.g 的上下层次是角色层面的候选顺序；在补齐 code289 的精确 invoke edge 和 observer event correlation 前，不应把箭头解释为已证明的直接调用关系。
+
+### 2.2 2.7.2 静态 Resolver 结果
+
+来自 audit/universal-hook/semantic-ingest-summary.txt：
+
+| 角色 | 唯一解析结果 | 分数 / runner-up | 决策 |
+|---|---|---:|---|
+| network.route | Ljw3;->g(Lwu1;Ljava/lang/Long;)Ly60; | 4.85 / 4.1657 | resolved |
+| search.query | Lyv9;->j(Ljqa;Lpq7;Lfy4;Lr15;I)V | 5.0996 / 0 | resolved |
+| multimodal.image | Leu0;->t(Context, Bitmap, String)->Uri | 5.2853 / 3.5678 | resolved |
+| network.pow | 7 个候选 | — | rejected: ambiguous |
+| sse.dispatch | Lnv1;->a(...)Object 与 Lr3;->c(...)Object | — | rejected: ambiguous |
+| sse.parse | Lfk0;->y(Object)Object 与 Lg0;->y(Object)Object | — | rejected: ambiguous |
+| conversation.session | 30 个候选 | — | rejected: ambiguous |
+| attachment.file | 5 个候选 | — | rejected: ambiguous |
+| account.capability | 2 个候选，缺少必需证据族 | — | rejected |
+
+这意味着当前 code289 可把 network.route、search.query、multimodal.image 作为只读观察候选；不能把 SSE parser/dispatcher、会话存储、PoW 或附件链升级成唯一 Hook。
+
+## 3. 五个输入版本的逐版本候选映射
+
+以下方法来自静态 semantic ingestion。签名采用 DEX owner/name/descriptor 形式；每个混淆名称只在对应 APK 构建中有效。
+
+### 3.1 Request Route
+
+| 输入标签 | Manifest 身份 | network.route 候选 | Resolver 状态 |
+|---|---|---|---|
+| 2.7.1 | 2.7.1 / code287 | Lrv3;->g(Ldu1;Ljava/lang/Long;)Lb60; | resolved |
+| 2.7.2 | 2.7.2 / code289 | Ljw3;->g(Lwu1;Ljava/lang/Long;)Ly60; | resolved；有 observer marker |
+| 2.7.3 标签样本 | **2.5.2 / code273** | Lhx2;->g(Lu01;Ljava/lang/Long;)Lz40; 等 5 个候选 | **rejected: ambiguous；样本隔离** |
+| 2.7.4 | 2.7.4 / code294 | Ljy3;->g(Lnw1;Ljava/lang/Long;)Ld70; | resolved |
+| 2.7.5 | 2.7.5 / code295 | Lnw3;->e(Lyu1;Ljava/lang/Long;)Lb70; | resolved |
+
+四个可信版本的 request_route 两两语义匹配均报告 7 个 accepted matches，且诊断中的 ambiguous/non-mutual/below-threshold/no-shared-evidence 均为 0。这个结果说明语义特征可跨版本对应，不表示四个版本共享同一混淆类名，也不表示已在四个版本设备上安装 Hook。
+
+### 3.2 Search Query
+
+| 输入标签 | search.query 候选 | Resolver 状态 |
+|---|---|---|
+| 2.7.1 | Lwh7;->h(Lgla;Ldn7;Lbx4;Ln05;I)V | resolved |
+| 2.7.2 | Lyv9;->j(Ljqa;Lpq7;Lfy4;Lr15;I)V | resolved |
+| 2.7.3 标签样本 | Llu3;->i(Lo39;Lld6;Lhv3;Ley3;I)V | resolved；仅 code273 隔离样本 |
+| 2.7.4 | Ly98;->c(Loua;Lgs7;Ln05;La45;I)V | resolved |
+| 2.7.5 | Lm07;->h(Ltqa;Lxq7;Ljy4;Lv15;I)V | resolved |
+
+四个可信版本的 search.query 两两语义匹配各有 1 个 accepted match。该角色更接近查询/搜索请求构造入口，不应直接等同于完整 Agent 工具执行器或网页内容解析器。
+
+### 3.3 Multimodal Image
+
+| 输入标签 | multimodal.image 候选 | Resolver 状态 |
+|---|---|---|
+| 2.7.1 | Ltjc;->w(Context, Bitmap, String)->Uri | resolved |
+| 2.7.2 | Leu0;->t(Context, Bitmap, String)->Uri | resolved |
+| 2.7.3 标签样本 | Lqga;->l(Context, Bitmap, String)->Uri | resolved；仅 code273 隔离样本 |
+| 2.7.4 | Ltv0;->u(Context, Bitmap, String)->Uri | resolved |
+| 2.7.5 | Lfu0;->t(Context, Bitmap, String)->Uri | resolved |
+
+五个样本的候选结构均为 Context + Bitmap + String -> Uri，resolver 分数约 5.2853、runner-up 约 3.5678。它是图片预处理/URI 生成候选，不等于图片上传完成、请求包含图片成功或服务端视觉响应已验证。
+
+### 3.4 SSE Parse 与 Dispatch
+
+SSE 必须拆成两个独立角色：
+
+- sse.parse：把响应字节/行流解析为 event、data、id、retry 等帧字段。
+- sse.dispatch：把解析后的事件映射为 delta、tool、search、引用、完成/错误等业务事件。
+
+不能把两者合并成一个“收包方法”。
+
+| 输入标签 | sse.parse 候选 | sse.dispatch 候选 | 最终状态 |
+|---|---|---|---|
+| 2.7.1 | Lg0;->z(Object)Object / Lmj0;->z(Object)Object | Lvu1;->a(...)Object / Ln3;->c(...)Object | 两角色均歧义 |
+| 2.7.2 | Lfk0;->y(Object)Object / Lg0;->y(Object)Object | Lnv1;->a(...)Object / Lr3;->c(...)Object | 两角色均歧义 |
+| 2.7.3 标签样本 | Le0;->A(Object)Object / Lyf0;->A(Object)Object | Lk11;->a(Lk11;Lgw8;Lif2;)Object | parse 歧义；dispatch 静态唯一但样本身份隔离 |
+| 2.7.4 | Lg0;->y(Object)Object / Lpl0;->y(Object)Object | Lex1;->a(...)Object / Lq3;->c(...)Object | 两角色均歧义 |
+| 2.7.5 | Lg0;->z(Object)Object / Lgk0;->z(Object)Object | Lpv1;->a(...)Object / Lr3;->c(...)Object | 两角色均歧义 |
+
+跨版本 semantic-match-diagnostics 对 sse_transport 与 sse_dispatch 的部分 pair 记录了 4 个 accepted matches；这属于图匹配统计。Kotlin resolver 对具体版本仍报告 sse.parse / sse.dispatch 候选歧义。**匹配数量不覆盖唯一性门禁**，不能因为 pairwise match accepted 就选择 top candidate 强行安装。
+
+### 3.5 其他语义角色的跨版本图匹配统计
+
+以下数字是 semantic-match-diagnostics 中可信版本 pairwise 对照的 accepted match 数量范围，不是唯一 Hook 数，也不是功能覆盖率：
+
+| 角色 | 每个版本对 accepted matches（大致范围） | 当前解释 |
+|---|---:|---|
+| request_route | 7 | 角色结构稳定；可信版本 Resolver 唯一 |
+| sse_transport | 4 | transport 相关结构可匹配；不能替代 parser/dispatcher 唯一性 |
+| sse_dispatch | 4 | 图级匹配可成立；resolver 仍可能歧义 |
+| flow_coroutine | 114–117 | 数量多但同类协程方法大量重复，存在 41–44 个左右的双侧歧义 |
+| serialization | 93–98 | 序列化方法族庞大，存在双侧歧义和低分候选 |
+| agent_tool | 11–13 | 工具相关结构候选；不等于本地工具执行链 |
+| session | 107–117 | 会话方法族数量大，不能据此认定唯一 Session Repository |
+| agent_planning | 48–49 | 规划/状态机结构候选，仍需参数/状态语义复核 |
+| tool_registry_execution | 11–13 | 工具注册/执行相关候选；必须分离服务端工具事件与本地执行器 |
+| local_api_gateway | 3 | 曾出现第三方验证 SDK 误判；宿主 APK 不应据此声明内置 Local API Gateway，角色已从宿主 Hook 解析路径移除 |
+
+## 4. 跨方法参数、返回值与字段流：当前能证明什么
+
+审计器已生成跨方法值流：
+- invoke 参数寄存器与目标方法 entry:pN 参数定义建立 argument edges；
+- move-result 与目标方法返回值建立 return edges；
+- 静态/实例调用使用完整 owner + method + descriptor 匹配；
+- unresolved、ambiguous、incomplete、truncated 的映射保留诊断，不生成强边；
+- field-slot 读写分组只描述字段槽，不证明两个调用点操作同一个运行时对象；
+- Points-to 仅在方法激活内 singleton receiver 等受限范围内提供对象身份线索；跨方法上下文仍受递归、深度和记录预算约束。
+
+五版本的 interprocedural value-flow edge 均未被存储截断，但存在大量 unresolved/incomplete call sites。Points-to whole-program summary 则有 records_truncated=true、context_expansion_complete=false。故当前可以说“存在参数/返回值映射证据”，不能说“已经还原完整请求对象从构造器一路流到 parser 的对象身份链”。
+
+Kotlin ingestion 当前显示 interprocedural Points-to 记录未加载（loaded records=0），虽然能读取 expected counts；不得把 expected count 当成实际载入的上下文记录。值流边文件完整不代表 Points-to 完整。
+
+## 5. UI / Navigation / Native Root 设备证据
+
+dsprobe.log 的 code289-cn 设备会话还记录了三项独立成功：
+- ComposeView.setContent native dual-root capture installed x1；
+- navigation controller capture installed，class=p16；
+- captured DeepSeek native root，content=zy1；
+- font scale Hook installed on android.app.Activity。
+
+这些是该设备会话的实际安装/捕获日志，强于单纯静态候选，但它们只覆盖 UI root/navigation/字体缩放观察，不证明 message submit、Agent、请求、SSE、工具结果和 Local API 全链路可用。
+
+## 6. 设备安装失败：原始事件与根因链
+
+dsprobe.log 原始顺序显示：
+
+1. module loaded，hostGeneration=2.7.2/code289-cn；
+2. installAllFeatureHooks 开始；
+3. installer 选择 “2.7.1 full mode via HostRemap classes=7636”；
+4. 同一轮又调用 code257 agent tool-log Canvas renderer；
+5. ClassLoader 查找 “deekseep unmapped mf6” 失败，抛 ClassNotFoundException；
+6. installAllFeatureHooks 整组失败；
+7. lifecycle bootstrap 再次进入安装，重复选择 2.7.1 full mode 并重复失败；
+8. 日志统计约 10 次 hook_install_attempt、10 次 wrong_full_mode_selection、10 次 hook_install_failure、20 次 class_not_found。
+
+根因链：
+
+    host fingerprint = 2.7.2 / code289-cn
+                  |
+                  v
+    wrong profile selection = 2.7.1 full mode / code287 map
+                  |
+                  v
+    legacy code257 feature mapping leaks into code289 process
+                  |
+                  v
+    unresolved placeholder "deekseep unmapped mf6"
+                  |
+                  v
+    ClassLoader ClassNotFoundException
+                  |
+                  v
+    whole installAllFeatureHooks group fails
+                  |
+                  v
+    lifecycle re-entry repeats same failed installation
+
+### 必须在探针源码仓库修复
+
+- Profile 选择以 package + Manifest/versionCode + 签名 + DEX fingerprint 联合判断；code289 不得回退 code287。
+- 所有类名/描述符必须先经过 resolved-state、格式和目标 DEX 存在性校验；unmapped/placeholder 禁止进入 ClassLoader。
+- HookCoordinator 按 feature/role 隔离，optional Hook 失败只禁用本角色，不使其他已安装功能回滚。
+- 幂等键至少包括 process + host fingerprint + role ID + resolved full descriptor。
+- lifecycle 重入复用安装结果，不重复安装同一 Hook。
+- 修复后逐一回归 navigation、native root、request route、SSE parse、SSE dispatch；保留失败日志和真实设备版本指纹。
+
+本轮在 apps 仓库完成的是日志根因定位和审计记录，不是 Android 探针源码修复。
+
+## 7. 以调用链为中心的下一轮验证顺序
+
+| 优先级 | 验证点 | 必须取得的证据 | 通过标准 |
+|---:|---|---|---|
+| P0 | Host Profile / ClassLoader | code289 设备指纹、所选 profile、每个类名解析结果 | 只选 code289；无 placeholder lookup；无 fallback |
+| P1 | Request DTO | ly1 构造器、wu1 字段/接口、字段写入来源 | 构造对象、字段值来源、实际请求实例可关联 |
+| P1 | Transport dispatch | zn3.o 与 jw3.g 的完整 descriptor、调用者/被调用者、事件顺序 | 证明直接/间接调用关系；区分 dispatch 与 low-level |
+| P1 | Response callback | y60 的接口/字段、b(fl4,yb3) 声明、调用时机 | 与同一 request/response session 关联 |
+| P2 | SSE parse | 行读取/帧解析入口、event/data 产物 | 候选唯一，至少覆盖多帧、空行、结束帧、异常帧 |
+| P2 | SSE dispatch | 解析事件到 delta/tool/search/error/done 的分派 | 唯一 dispatcher；每种事件有可追溯映射 |
+| P2 | Flow / cancel | emit/collect/resume/cancel 的同一 session 关联 | 正常结束、异常、用户取消、断线恢复均可追踪 |
+| P3 | UI state | response delta 到 Compose state/message item | 同一会话内内容、工具卡片、完成态正确更新 |
+| P3 | Local API bridge | Gateway 入站请求到宿主原生请求，再回传 OpenAI chunk | 非流式/流式/工具/取消/错误均闭环；Gateway 与宿主 Hook 独立验收 |
+
+**每个验证点必须记录：** host fingerprint、split/component、完整 method descriptor、调用线程、对象 identity token（仅随机化诊断 ID）、调用顺序、返回/异常、触发场景和脱敏后的事件类型。不得记录 prompt、消息正文、Authorization、Cookie、API Key 或原始媒体数据。
+
+## 8. 证据等级与当前结论
+
+| 结论 | 当前等级 | 允许的工程动作 |
+|---|---|---|
+| 2.7.2 request route 的 jw3.g 候选 | 静态唯一 + observer method marker | 可做只读观察验证；尚不可宣称完整业务 Hook |
+| 2.7.2 zn3.o transport dispatch | observer method marker / 角色候选 | 先补完整 descriptor 和直接调用边 |
+| ly1 implements wu1 | observer request class marker | 只读检查字段/构造来源 |
+| y60 implements el4 | 类型结构证据 | 检查 response/continuation 语义 |
+| y60.b(fl4,yb3) | 待复核回调候选 | 不作为已确认 Hook |
+| search.query / multimodal.image | 五版本静态 Resolver resolved（2.7.3 样本隔离） | 逐版本只读观察 |
+| sse.parse | 五版本均有歧义 | 禁止唯一 Hook 安装 |
+| sse.dispatch | 可信版本有歧义；code273 样本单候选但隔离 | 禁止把 code273 结果推广到 2.7.3 |
+| navigation p16 / native root zy1 | 2.7.2 设备日志确认安装/捕获 | 可保留已观察功能；仍需回归幂等与版本路由 |
+| 完整 Agent / Local API / SSE 闭环 | 未证明 | 不得宣称完成 |
+
+## 9. 本章对应的机器证据
+
+- [semantic-ingest-summary.txt](../../audit/universal-hook/semantic-ingest-summary.txt)：五版本 Kotlin ingestion、每个角色 resolved/rejected 原因和方法描述符。
+- [semantic-match-diagnostics.json](../../audit/universal-hook/semantic-match-diagnostics.json)：跨版本 pairwise 匹配、歧义、非互选和阈值统计。
+- [probe-log-summary.json](../../audit/universal-hook/probe-log-summary.json)：设备日志哈希、事件计数和 observer method markers。
+- [version-identity.json](../../audit/universal-hook/version-identity.json)：Manifest 身份和可信状态。
+- [version-summary.json](../../audit/universal-hook/version-summary.json)：调用图、参数/返回值边、Points-to、CFG 和完整性统计。
+- [dsprobe.log](../../dsprobe.log)：2.7.2/code289-cn Profile 错配与 ClassNotFoundException 原始日志。
+- [deekseep_vision.log](../../deekseep_vision.log)：observer 会话、transport marker、request class/factory/constructor 事件原始日志。
+
