@@ -233,14 +233,14 @@ Kotlin StaticProgramGraph / StaticAuditCli 已读取参数/返回值边索引；
 
 ### 修复策略
 
-- `max_records` 作为该版本 Points-to 记录的总预算基数。
-- 计算 `per_root_record_limit = max(1, max_records // root_count)`，调用上下文和接收者记录分别按 root 计数、分别应用配额。
-- 一个热点 root 达到自身存储配额后，只增加该 root 的 dropped 计数并标记分析不完整；不得占用其他 root 的配额。
+- `max_records` 是每一种记录族（调用上下文、上下文接收者）各自的全局硬上限；两种记录族分别维护独立的存储计数。
+- 使用确定性的 quotient/remainder 分配：`base, remainder = divmod(max_records, root_count)`，各 root 配额相差不超过 1。root 数量超过预算槽位时，部分 root 配额为 0；仍遍历这些 root，并记录 dropped/incomplete 诊断。
+- root 身份不能只用方法签名：APK split/component 可能包含相同 owner + name + descriptor。唯一签名继续使用原签名作为稳定键；重复签名使用 component + 方法签名 + 稳定 root ordinal 生成独立 root ID，供配额、队列上下文和诊断使用。方法解析本身仍严格使用完整方法签名。
 - **存储截断不再中断分析遍历**：即使某条调用上下文记录未存储，也继续处理其 callee、递归/深度诊断和后续独立调用点。
 - `root_diagnostics` 保留每个 root 的 seen/stored/dropped 计数；整体 `records_truncated` 和 `context_expansion_complete` 仍严格反映不完整情况。
 - Kotlin Semantic Core 只在整体摘要和 JSONL 记录数一致且完整时加载 Points-to；该数据仍是诊断信息，不得生成 `DATA_FLOW` 证据或授权 Hook。
 
-当 root 数量大于请求的总预算时，为保证每个 root 至少有一个独立记录槽，实际总存储数可能略高于 `max_records`；这是一项有意的最小配额策略，摘要会同时给出总预算与每 root 配额，不能把它误读成严格全局硬上限。
+当 root 数量大于预算槽位时，部分 root 的配额为 0；不得通过给每个 root 强制分配至少一个槽位而突破全局硬上限。root diagnostics 的 `root_count` 必须与 `root_method_count` 一致；相同方法签名跨 component 出现时也必须保留为不同 root。
 
 ### 回归覆盖
 
