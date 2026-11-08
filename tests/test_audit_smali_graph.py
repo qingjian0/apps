@@ -1584,6 +1584,53 @@ class CallerControlFlowReturnBoundaryTest(unittest.TestCase):
             AUDIT.build_interprocedural_points_to_graph([], max_records=0)
 
 
+    def test_interprocedural_points_to_keeps_same_signature_roots_separate_across_apk_components(self):
+        def method(owner, name, component, invokes=None, roles=None):
+            return {
+                "class": owner, "name": name, "descriptor": "()V",
+                "component": component, "roles": roles or [],
+                "invoke_sites": invokes or [],
+                "invoke_sites_truncated": False, "invoke_sites_incomplete": False,
+                "object_points_to": {
+                    "complete": True, "invoke_arguments": [],
+                    "field_receivers": [], "return_values": [],
+                    "instruction_writes": [],
+                },
+            }
+
+        def call():
+            return {
+                "instruction": 0, "line": 1, "owner": "Lx/Worker;",
+                "name": "run", "descriptor": "()V", "opcode": "invoke-static",
+                "registers": [], "result_instruction": None, "result_register": None,
+            }
+
+        roles = [{"role": "request", "anchors": ["request"]}]
+        base_root = method("Lx/Entry;", "start", "base", [call()], roles)
+        split_root = method(
+            "Lx/Entry;", "start", "split_config.arm64_v8a", [call()], roles)
+        base_worker = method("Lx/Worker;", "run", "base")
+        split_worker = method("Lx/Worker;", "run", "split_config.arm64_v8a")
+
+        graph = AUDIT.build_interprocedural_points_to_graph(
+            [base_root, split_root, base_worker, split_worker],
+            max_records=2, root_scope="semantic-candidates",
+        )
+        summary = graph["summary"]
+        rows = summary["root_diagnostics"]["top_hot_roots"]
+        root_ids = {row["root_method_key"] for row in rows}
+
+        self.assertEqual(2, summary["root_method_count"])
+        self.assertEqual(2, summary["root_diagnostics"]["root_count"])
+        self.assertEqual(2, len(root_ids))
+        self.assertTrue(any(root_id.startswith("base::") for root_id in root_ids))
+        self.assertTrue(any(root_id.startswith("split_config.arm64_v8a::") for root_id in root_ids))
+        self.assertEqual(2, summary["call_context_records_stored"])
+        self.assertEqual(2, summary["resolved_call_contexts"])
+        self.assertEqual(2, summary["queue_states_processed"])
+        self.assertEqual(root_ids, {row["root_method_key"] for row in graph["call_contexts"]})
+
+
     def test_static_candidate_evidence_grade_requires_independent_families_and_never_authorizes_hook(self):
         anchor_only = AUDIT.static_candidate_evidence(
             {"roles": [{"role": "request"}], "invokes": []},
