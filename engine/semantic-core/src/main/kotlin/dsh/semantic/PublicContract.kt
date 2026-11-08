@@ -236,3 +236,95 @@ class HookProfileValidator(private val supportedSchemaMajor: Int = 1) {
         return ProfileValidationResult(errors.isEmpty(), errors)
     }
 }
+
+
+enum class AuthorizationRejection {
+    INCOMPLETE_HOST_IDENTITY, PROFILE_NOT_RUNTIME_VERIFIED, PROFILE_IDENTITY_REJECTED,
+    ROLE_NOT_IN_PROFILE, RESOLUTION_NOT_ACCEPTED, METHOD_NOT_IN_PROFILE,
+    EVIDENCE_INCOMPLETE, EVIDENCE_NEGATIVE, HOST_IDENTITY_EVIDENCE_MISSING,
+    RUNTIME_EVIDENCE_MISSING, RUNTIME_EVIDENCE_NOT_BOUND_TO_METHOD
+}
+
+/** Constructor is module-internal: consumers must obtain a plan from HookAuthorizationPolicy. */
+data class AuthorizedHookPlan internal constructor(
+    val host: HostIdentity,
+    val profileId: String,
+    val profileRevision: Int,
+    val role: RoleId,
+    val method: MethodDescriptor,
+    val evidenceIds: Set<String>
+)
+
+data class HookAuthorizationResult(
+    val plan: AuthorizedHookPlan?,
+    val rejections: Set<AuthorizationRejection>
+) {
+    val authorized: Boolean get() = plan != null && rejections.isEmpty()
+}
+
+/**
+ * Separates static resolution from installation authorization. A static candidate can never
+ * create an AuthorizedHookPlan; the profile and complete, positive runtime evidence are required.
+ */
+class HookAuthorizationPolicy(private val profileValidator: HookProfileValidator = HookProfileValidator()) {
+    fun authorize(
+        host: HostIdentity,
+        profile: HookProfile,
+        roleId: RoleId,
+        resolution: Resolution,
+        evidence: List<AuditableEvidence>
+    ): HookAuthorizationResult {
+        val errors = linkedSetOf<AuthorizationRejection>()
+        if (!host.isComplete()) errors += AuthorizationRejection.INCOMPLETE_HOST_IDENTITY
+        if (profile.status != ProfileStatus.RUNTIME_VERIFIED) errors += AuthorizationRejection.PROFILE_NOT_RUNTIME_VERIFIED
+        if (!profileValidator.validate(profile, host).accepted) errors += AuthorizationRejection.PROFILE_IDENTITY_REJECTED
+
+        val roleProfile = profile.roles.singleOrNull { it.role == roleId }
+        if (roleProfile == null) errors += AuthorizationRejection.ROLE_NOT_IN_PROFILE
+        if (!resolution.accepted || resolution.selected == null || resolution.role != roleId) {
+            errors += AuthorizationRejection.RESOLUTION_NOT_ACCEPTED
+        }
+
+        val selected = resolution.selected
+        val method = selected?.let {
+            MethodDescriptor.parse(it.method.ownerDescriptor, it.method.name, it.method.descriptor)
+        }
+        if (selected != null && (selected.role != roleId || selected.host.packageName != host.packageName ||
+                selected.host.versionCode != host.versionCode || selected.host.versionName != host.versionName ||
+                selected.host.signingDigest != host.signingCertSha256 || selected.host.dexDigest != host.dexFingerprint ||
+                selected.host.classLoaderId != host.classLoaderId)) {
+            errors += AuthorizationRejection.PROFILE_IDENTITY_REJECTED
+        }
+        if (method == null || roleProfile?.candidates?.none { it.method == method } != false) {
+            errors += AuthorizationRejection.METHOD_NOT_IN_PROFILE
+        }
+
+        val roleEvidence = evidence.filter { it.role == roleId }
+        if (roleEvidence.any { !it.complete }) errors += AuthorizationRejection.EVIDENCE_INCOMPLETE
+        if (roleEvidence.any { it.polarity == EvidencePolarity.NEGATIVE }) errors += AuthorizationRejection.EVIDENCE_NEGATIVE
+        val positiveComplete = roleEvidence.filter { it.complete && it.polarity == EvidencePolarity.POSITIVE }
+        if (positiveComplete.none { it.family == EvidenceFamily.HOST_IDENTITY && it.source.artifactSha256.equals(host.baseApkSha256, true) }) {
+            errors += AuthorizationRejection.HOST_IDENTITY_EVIDENCE_MISSING
+        }
+        val runtimeEvidence = positiveComplete.filter {
+            it.family == EvidenceFamily.RUNTIME_BEHAVIOR &&
+                it.source.artifactSha256.equals(host.baseApkSha256, true) &&
+                it.source.auditRunId?.isNotBlank() == true &&
+                it.source.method == method
+        }
+        if (runtimeEvidence.isEmpty()) errors += AuthorizationRejection.RUNTIME_EVIDENCE_MISSING
+        if (positiveComplete.any { it.family == EvidenceFamily.RUNTIME_BEHAVIOR && it.source.method != method }) {
+            errors += AuthorizationRejection.RUNTIME_EVIDENCE_NOT_BOUND_TO_METHOD
+        }
+
+        val plan = if (errors.isEmpty() && method != null) AuthorizedHookPlan(
+            host = host,
+            profileId = profile.profileId,
+            profileRevision = profile.revision,
+            role = roleId,
+            method = method,
+            evidenceIds = positiveComplete.map { it.evidenceId }.toSet()
+        ) else null
+        return HookAuthorizationResult(plan, errors)
+    }
+}
