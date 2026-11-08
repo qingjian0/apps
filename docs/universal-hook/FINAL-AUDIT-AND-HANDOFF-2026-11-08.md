@@ -172,7 +172,7 @@ Manifest 身份来自 `audit/universal-hook/version-identity.json`：
 最新 HEAD：`3769fb3b99047bb41ceb52c322c04c93aeda710b`。
 
 最新 PR 工作流：
-- [Universal Hook Static Analysis #260](https://github.com/github.com/qingjian0/apps/actions/runs/42450409844)：`action_required`。
+- [Universal Hook Static Analysis #260](https://github.com/qingjian0/apps/actions/runs/42450409844)：`action_required`。
 - [DeepSeek semantic core CI #256](https://github.com/qingjian0/apps/actions/runs/42450409825)：`action_required`。
 
 这两个 run 均已结束，但结论是 `action_required`，没有实际 jobs 执行结果。它们既不是测试失败，也不是成功。历史上其他提交的 Python/Kotlin CI 成功不能替代对最新 HEAD 的验证。五版本 Matrix #203 成功是本轮独立的 APK 静态审计证据，不等同于 PR required checks 全部通过。
