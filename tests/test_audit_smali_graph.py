@@ -1458,6 +1458,69 @@ class CallerControlFlowReturnBoundaryTest(unittest.TestCase):
             for row in graph["summary"]["root_diagnostics"]["top_hot_roots"]
         ))
 
+    def test_interprocedural_points_to_budget_isolated_per_root_and_keeps_traversing(self):
+        def method(owner, name, invokes=None, roles=None):
+            return {
+                "class": owner, "name": name, "descriptor": "()V",
+                "component": "base", "roles": roles or [],
+                "invoke_sites": invokes or [],
+                "invoke_sites_truncated": False, "invoke_sites_incomplete": False,
+                "object_points_to": {
+                    "complete": True, "invoke_arguments": [],
+                    "field_receivers": [], "return_values": [],
+                    "instruction_writes": [],
+                },
+            }
+
+        def call(target, instruction):
+            return {
+                "instruction": instruction, "line": instruction + 1,
+                "owner": target, "name": "run", "descriptor": "()V",
+                "opcode": "invoke-static", "registers": [],
+                "result_instruction": None, "result_register": None,
+            }
+
+        hot_root = method(
+            "Lx/HotRoot;", "entry",
+            [call("Lx/HotA;", 0), call("Lx/HotB;", 1)],
+            roles=[{"role": "request", "anchors": ["hot"]}],
+        )
+        independent_root = method(
+            "Lx/IndependentRoot;", "entry",
+            [call("Lx/Independent;", 0)],
+            roles=[{"role": "agent", "anchors": ["independent"]}],
+        )
+        hot_a = method("Lx/HotA;", "run")
+        hot_b = method("Lx/HotB;", "run")
+        independent = method("Lx/Independent;", "run")
+
+        graph = AUDIT.build_interprocedural_points_to_graph(
+            [hot_root, independent_root, hot_a, hot_b, independent],
+            max_records=2, root_scope="semantic-candidates",
+        )
+        summary = graph["summary"]
+        rows = {
+            row["root_method_key"]: row
+            for row in summary["root_diagnostics"]["top_hot_roots"]
+        }
+        hot_key = "Lx/HotRoot;->entry()V"
+        independent_key = "Lx/IndependentRoot;->entry()V"
+
+        self.assertEqual(2, summary["root_method_count"])
+        self.assertEqual(1, summary["per_root_record_limit"])
+        self.assertEqual(1, rows[hot_key]["call_contexts_stored"])
+        self.assertEqual(1, rows[hot_key]["call_contexts_dropped"])
+        self.assertEqual(1, rows[independent_key]["call_contexts_stored"])
+        self.assertEqual(0, rows[independent_key]["call_contexts_dropped"])
+        self.assertEqual(
+            {hot_key, independent_key},
+            {row["root_method_key"] for row in graph["call_contexts"]},
+        )
+        # The over-budget call is still traversed; storage truncation is not a work cutoff.
+        self.assertEqual(3, summary["resolved_call_contexts"])
+        self.assertEqual(5, summary["queue_states_processed"])
+        self.assertFalse(summary["context_expansion_complete"])
+
     def test_interprocedural_points_to_rejects_unknown_root_scope(self):
         with self.assertRaises(ValueError):
             AUDIT.build_interprocedural_points_to_graph([], root_scope="guessed")
