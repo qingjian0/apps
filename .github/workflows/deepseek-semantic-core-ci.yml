@@ -17,7 +17,7 @@ permissions:
 
 concurrency:
   group: deepseek-semantic-core-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   test:
