@@ -1587,6 +1587,41 @@ def analyze_smali(root):
                             "file":str(file.relative_to(root))})
     return classes,methods,call_edges
 
+def static_candidate_evidence(method, incoming_count, outgoing_count, class_fact):
+    """Describe static evidence diversity without implying runtime validation or Hook authorization."""
+    families=[]
+    if method.get("roles"):
+        families.append("protocol_anchor")
+    if incoming_count or outgoing_count:
+        families.append("call_graph")
+    stable_prefixes=("Lkotlin/","Lkotlinx/","Ljava/","Landroid/","Lio/ktor/","Lokhttp3/","Lretrofit2/","Landroidx/")
+    if any(target.startswith(stable_prefixes) for target in method.get("invokes",[])):
+        families.append("stable_api_calls")
+    if class_fact and (
+        class_fact.get("interfaces")
+        or class_fact.get("super") not in (None,"Ljava/lang/Object;")
+    ):
+        families.append("type_shape")
+    cfg=method.get("control_flow",{}).get("cfg",{})
+    if cfg.get("complete") is True and cfg.get("edge_count",0)>0:
+        families.append("control_flow")
+    points_to=method.get("object_points_to",{})
+    if points_to.get("complete") is True and points_to.get("singleton_receiver_count",0)>0:
+        families.append("intraprocedural_points_to")
+    count=len(families)
+    level=("E3_FOUR_OR_MORE_STATIC_FAMILIES" if count>=4 else
+           "E2_THREE_STATIC_FAMILIES" if count==3 else
+           "E1_TWO_STATIC_FAMILIES" if count==2 else
+           "E0_ANCHOR_ONLY")
+    return {
+        "static_evidence_level":level,
+        "evidence_family_count":count,
+        "evidence_families":families,
+        "runtime_confirmed":False,
+        "hook_authorized":False
+    }
+
+
 def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("--input",required=True); ap.add_argument("--version",required=True)
@@ -1677,15 +1712,25 @@ def main():
     write_jsonl_gzip(out/"interprocedural-points-to.jsonl.gz", interprocedural_points_to["contextual_receivers"])
     write_jsonl_gzip(out/"interprocedural-points-to-candidates.jsonl.gz",
                      interprocedural_points_to_candidates["contextual_receivers"])
+    incoming_counts=collections.Counter(edge["to"] for edge in all_edges)
+    outgoing_counts=collections.Counter(edge["from"] for edge in all_edges)
+    classes_by_component={(item.get("component"),item.get("descriptor")):item for item in all_classes}
     candidates=[]
     for m in all_methods:
         roles=m.get("roles",[])
         if roles:
             score=sum(len(x["anchors"]) for x in roles)
+            method_key=m["class"]+"->"+m["name"]+m["descriptor"]
+            class_fact=classes_by_component.get((m.get("component"),m["class"]))
+            evidence=static_candidate_evidence(
+                m,incoming_counts.get(method_key,0),outgoing_counts.get(method_key,0),class_fact)
             candidates.append({"class":m["class"],"name":m["name"],"descriptor":m["descriptor"],
                 "component":m["component"],"file":m["file"],"line":m["line"],"score":score,"roles":roles,
-                "invokes":m["invokes"][:40],"opcode_count":m["opcode_count"]})
-    candidates.sort(key=lambda x:(-x["score"],x["class"],x["name"]))
+                "invokes":m["invokes"][:40],"opcode_count":m["opcode_count"],
+                **evidence})
+    candidates.sort(key=lambda x:(-x["evidence_family_count"],-x["score"],x["class"],x["name"]))
+    candidate_evidence_level_counts=dict(collections.Counter(
+        item["static_evidence_level"] for item in candidates))
     summary={"version_label":a.version,"source_file":src.name,"source_bytes":src.stat().st_size,
       "source_sha256":sha256(src),"components":[x.name for x in components],"component_metadata":[json.loads((out/x.stem/"component.json").read_text()) for x in components],"dex":inventory,
       "dex_count":len(inventory),"class_count":len(all_classes),"method_count":len(all_methods),
@@ -1721,11 +1766,14 @@ def main():
       "interprocedural_points_to":interprocedural_points_to["summary"],
       "interprocedural_points_to_candidate_scope":interprocedural_points_to_candidates["summary"],
       "candidate_method_count":len(candidates),
+      "candidate_static_evidence_level_counts":candidate_evidence_level_counts,
+      "candidate_runtime_confirmed_count":sum(1 for item in candidates if item["runtime_confirmed"]),
+      "candidate_hook_authorized_count":sum(1 for item in candidates if item["hook_authorized"]),
       "native_libraries":native,"tool_limits":{"JADX":"best-effort; inspect exit status and APKTool smali evidence",
       "Hook":"static candidate discovery only; no device Hook is claimed"}}
     (out/"summary.json").write_text(json.dumps(summary,indent=2,ensure_ascii=True))
     (out/"hook-candidates.json").write_text(json.dumps(candidates,indent=2,ensure_ascii=True))
-    (out/"candidate-methods.csv").write_text("version,component,class,method,descriptor,score,roles,file,line\n"+"".join(
-      ",".join(json.dumps(v,ensure_ascii=True) for v in [a.version,c["component"],c["class"],c["name"],c["descriptor"],c["score"],"|".join(x["role"] for x in c["roles"]),c["file"],c["line"]])+"\n" for c in candidates))
+    (out/"candidate-methods.csv").write_text("version,component,class,method,descriptor,score,static_evidence_level,evidence_family_count,evidence_families,runtime_confirmed,hook_authorized,roles,file,line\n"+"".join(
+      ",".join(json.dumps(v,ensure_ascii=True) for v in [a.version,c["component"],c["class"],c["name"],c["descriptor"],c["score"],c["static_evidence_level"],c["evidence_family_count"],"|".join(c["evidence_families"]),c["runtime_confirmed"],c["hook_authorized"],"|".join(x["role"] for x in c["roles"]),c["file"],c["line"]])+"\n" for c in candidates))
     print(json.dumps({k:summary[k] for k in ("version_label","source_sha256","dex_count","class_count","method_count","call_edge_count","candidate_method_count","component_metadata")},ensure_ascii=True))
 if __name__=="__main__": main()
