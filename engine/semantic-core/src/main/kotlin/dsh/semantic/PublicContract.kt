@@ -38,7 +38,7 @@ data class HostIdentity(
         ).joinToString("|")
         return MessageDigest.getInstance("SHA-256")
             .digest(canonical.toByteArray(Charsets.UTF_8))
-            .joinToString("") { "%02x".format(it) }
+            .joinToString("") { "%02x".format(it.toInt() and 0xff) }
     }
 
     fun matches(binding: HostProfileBinding): Boolean =
