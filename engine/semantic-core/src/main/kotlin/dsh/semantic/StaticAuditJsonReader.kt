@@ -27,17 +27,21 @@ class StaticAuditJsonReader(private val mapper: StaticEvidenceMapper = StaticEvi
             val anchors = value["anchors"]?.jsonArray?.mapNotNull { it.jsonPrimitive.contentOrNull }.orEmpty()
             StaticRoleEvidence(label, anchors)
         }.orEmpty()
+        val literalStrings = obj["strings"]?.jsonArray?.mapNotNull { it.jsonPrimitive.contentOrNull }?.toSet().orEmpty()
         val access = obj.string("access").orEmpty()
         val record = StaticMethodRecord(owner, name, descriptor, parsed.first, parsed.second,
             invokes, obj["opcode_count"]?.jsonPrimitive?.intOrNull ?: 0, roles,
+            literalStrings = literalStrings,
             isStatic = access.split(' ').contains("static"))
         return mapper.map(host, record, anchorFrequency)
     }
 
     fun anchorKeys(line: String): List<String> {
         val obj = json.parseToJsonElement(line).jsonObject
+        val literalStrings = obj["strings"]?.jsonArray?.mapNotNull { it.jsonPrimitive.contentOrNull }?.toSet().orEmpty()
         return obj["roles"]?.jsonArray?.flatMap { role ->
-            role.jsonObject["anchors"]?.jsonArray?.mapNotNull { it.jsonPrimitive.contentOrNull }.orEmpty()
+            role.jsonObject["anchors"]?.jsonArray?.mapNotNull { it.jsonPrimitive.contentOrNull }
+                ?.filter { it in literalStrings }.orEmpty()
         }?.distinct().orEmpty()
     }
 
