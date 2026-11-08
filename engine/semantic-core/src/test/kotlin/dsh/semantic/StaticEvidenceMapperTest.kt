@@ -13,7 +13,8 @@ class StaticEvidenceMapperTest {
             parameterTypes = listOf("Ljava/lang/String;"), returnType = "V",
             invokes = listOf("Lkotlinx/coroutines/flow/Flow;->emit(Ljava/lang/Object;)V", "Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;"),
             opcodeCount = 42,
-            roles = listOf(StaticRoleEvidence("prompt_pipeline", listOf("custom_instructions", "prompt_template")))
+            roles = listOf(StaticRoleEvidence("prompt_pipeline", listOf("custom_instructions", "prompt_template"))),
+            literalStrings = setOf("custom_instructions", "prompt_template")
         )
         val candidate = StaticEvidenceMapper().map(host, record).single()
         assertEquals("prompt.compose", candidate.role.value)
@@ -26,7 +27,8 @@ class StaticEvidenceMapperTest {
         val host = HostFingerprint("com.deepseek.chat", 301, "future", "cert", "dex-new", "loader-new")
         val record = StaticMethodRecord(
             "Lq/a;", "m", "()V", emptyList(), "V", emptyList(), 8,
-            listOf(StaticRoleEvidence("prompt_pipeline", listOf("custom_instructions", "system_prompt")))
+            listOf(StaticRoleEvidence("prompt_pipeline", listOf("custom_instructions", "system_prompt"))),
+            literalStrings = setOf("custom_instructions", "system_prompt")
         )
         val candidate = StaticEvidenceMapper().map(host, record, mapOf("custom_instructions" to 1, "system_prompt" to 400)).single()
         val weights = candidate.evidence.filter { it.family == EvidenceFamily.PROTOCOL_ANCHOR }.associate { it.key to it.weight }
@@ -47,7 +49,8 @@ class StaticEvidenceMapperTest {
         val record = StaticMethodRecord(
             "Lcn/fly/verify/bq;", "o", "(Z)Ljava/lang/String;", listOf("Z"), "Ljava/lang/String;",
             listOf("Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;"), 18,
-            listOf(StaticRoleEvidence("request_route", listOf("/api/v0/chat/completion")))
+            listOf(StaticRoleEvidence("request_route", listOf("/api/v0/chat/completion"))),
+            literalStrings = setOf("/api/v0/chat/completion")
         )
         val candidate = StaticEvidenceMapper().map(host, record).single()
         assertTrue("third-party-sdk-owner" in candidate.negativeEvidence)
@@ -76,7 +79,8 @@ class StaticEvidenceMapperTest {
         val host = HostFingerprint("com.deepseek.chat", 289, "2.7.2", "cert", "dex", "loader")
         val record = StaticMethodRecord(
             "Lx/y;", "a", "()V", emptyList(), "V", emptyList(), 12,
-            listOf(StaticRoleEvidence("prompt_pipeline", listOf("prompt", "custom_instructions")))
+            listOf(StaticRoleEvidence("prompt_pipeline", listOf("prompt", "custom_instructions"))),
+            literalStrings = setOf("custom_instructions")
         )
         val candidate = StaticEvidenceMapper().map(host, record).single()
         assertTrue(candidate.evidence.any { it.family == EvidenceFamily.PROTOCOL_ANCHOR && it.key == "custom_instructions" })
