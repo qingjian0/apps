@@ -69,7 +69,7 @@ class HookProfileJsonCodec(
                 versionCode = host.requiredLong("versionCode"),
                 signingCertSha256 = host.requiredString("signingCertSha256"),
                 baseApkSha256 = host.requiredString("baseApkSha256"),
-                splitApkSha256 = host.optionalStringSet("splitApkSha256"),
+                splitApkSha256 = host.requiredStringSet("splitApkSha256"),
                 dexFingerprint = host.requiredString("dexFingerprint")
             ),
             roles = roles
@@ -107,7 +107,7 @@ private fun JsonObject.requiredArray(key: String): JsonArray =
     requiredElement(key) as? JsonArray ?: throw IllegalArgumentException("expected-array-$key")
 
 private fun JsonObject.requiredString(key: String): String =
-    requiredElement(key).jsonPrimitive.contentOrNull?.takeIf { it.isNotBlank() }
+    requiredElement(key).jsonPrimitive.let { primitive ->\n        if (!primitive.isString) throw IllegalArgumentException("expected-string-$key")\n        primitive.contentOrNull?.takeIf { it.isNotBlank() }\n    }
         ?: throw IllegalArgumentException("missing-or-empty-$key")
 
 private fun JsonObject.requiredInt(key: String): Int =
