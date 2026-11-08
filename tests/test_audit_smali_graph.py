@@ -1520,6 +1520,7 @@ class CallerControlFlowReturnBoundaryTest(unittest.TestCase):
 
         self.assertEqual(2, summary["root_method_count"])
         self.assertEqual(1, summary["per_root_record_limit"])
+        self.assertEqual("fair-share-per-root; storage truncation never stops graph traversal", summary["record_budget_policy"])
         self.assertEqual(1, rows[hot_key]["call_contexts_stored"])
         self.assertEqual(1, rows[hot_key]["call_contexts_dropped"])
         self.assertEqual(1, rows[independent_key]["call_contexts_stored"])
