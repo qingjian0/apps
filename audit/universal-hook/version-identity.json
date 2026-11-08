@@ -1,0 +1,52 @@
+{
+  "2.7.1": {
+    "label": "2.7.1",
+    "status": "verified",
+    "trusted_for_cross_version": true,
+    "base_component": "deepseek271.apk",
+    "package": "com.deepseek.chat",
+    "manifest_version_name": "2.7.1",
+    "version_code": "287",
+    "apk_sha256": "86e77d419fed957dde8857a14d2f5340499ea40549f10cc3180c596e3f77efc8"
+  },
+  "2.7.2": {
+    "label": "2.7.2",
+    "status": "verified",
+    "trusted_for_cross_version": true,
+    "base_component": "deepseek-2-7-2.apk",
+    "package": "com.deepseek.chat",
+    "manifest_version_name": "2.7.2",
+    "version_code": "289",
+    "apk_sha256": "3c2fe31c73575400b9d59e46dde05daa2ef06491498ebfef658801e99eca1aff"
+  },
+  "2.7.3": {
+    "label": "2.7.3",
+    "status": "label-mismatch",
+    "trusted_for_cross_version": false,
+    "base_component": "deepseek 273.apk",
+    "package": "com.deepseek.chat",
+    "manifest_version_name": "2.5.2",
+    "version_code": "273",
+    "apk_sha256": "a6d025c14c98118a5a67849e04aaef6f3c9c13aaf0fa62caaee0e47091374ea3"
+  },
+  "2.7.4": {
+    "label": "2.7.4",
+    "status": "verified",
+    "trusted_for_cross_version": true,
+    "base_component": "component-0-base.apk",
+    "package": "com.deepseek.chat",
+    "manifest_version_name": "2.7.4",
+    "version_code": "294",
+    "apk_sha256": "2e898602374ed75f53d8e4c162fa625f5f4e1793b16fbd567f6dd02f6277a709"
+  },
+  "2.7.5": {
+    "label": "2.7.5",
+    "status": "verified",
+    "trusted_for_cross_version": true,
+    "base_component": "DeepSeek_2.7.5.apk",
+    "package": "com.deepseek.chat",
+    "manifest_version_name": "2.7.5",
+    "version_code": "295",
+    "apk_sha256": "ddc52ef868b991fd33e634de834a3e2c022b0cd7ff9e854f4f141996aaeadb70"
+  }
+}

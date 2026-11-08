@@ -1,0 +1,12 @@
+Signer (minSdkVersion=33, maxSdkVersion=2147483647) certificate DN: CN=DeepSeek, OU=DeepSeek, O=DeepSeek, L=hangzhou, ST=zhejiang, C=cn
+Signer (minSdkVersion=33, maxSdkVersion=2147483647) certificate SHA-256 digest: c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa
+Signer (minSdkVersion=33, maxSdkVersion=2147483647) certificate SHA-1 digest: ca2378d73740d0010d2c4bce7eef948b32fef14b
+Signer (minSdkVersion=33, maxSdkVersion=2147483647) certificate MD5 digest: 1e1d1800a35927e71b85f5dbd35536e7
+Signer (minSdkVersion=24, maxSdkVersion=32) certificate DN: CN=Android, OU=Android, O=Google Inc., L=Mountain View, ST=California, C=US
+Signer (minSdkVersion=24, maxSdkVersion=32) certificate SHA-256 digest: 1eecc46fdc2173437d70140f163aaa97941d41b04d91da3eb689aec4f339abeb
+Signer (minSdkVersion=24, maxSdkVersion=32) certificate SHA-1 digest: c28e0433b4dcba4a7ba33ad03f9a1798042f6a5e
+Signer (minSdkVersion=24, maxSdkVersion=32) certificate MD5 digest: 7109b6e1c0ccc598d51125a70ac0dfac
+Source Stamp Signer certificate DN: CN=Android, OU=Android, O=Google Inc., L=Mountain View, ST=California, C=US
+Source Stamp Signer certificate SHA-256 digest: 3257d599a49d2c961a471ca9843f59d341a405884583fc087df4237b733bbd6d
+Source Stamp Signer certificate SHA-1 digest: b1af3a0bf998aeede1a8716a539e5a59da1d86d6
+Source Stamp Signer certificate MD5 digest: 577b8a9fbc7e308321aec6411169d2fb

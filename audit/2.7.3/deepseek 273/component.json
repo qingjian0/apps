@@ -1,0 +1,31 @@
+{
+  "apk": "deepseek 273.apk",
+  "bytes": 14211169,
+  "sha256": "a6d025c14c98118a5a67849e04aaef6f3c9c13aaf0fa62caaee0e47091374ea3",
+  "manifest": {
+    "package": "com.deepseek.chat",
+    "split": null,
+    "version_code": "273",
+    "version_code_major": null,
+    "version_name": "2.5.2",
+    "root_attributes": {
+      "{http://schemas.android.com/apk/res/android}compileSdkVersion": "36",
+      "{http://schemas.android.com/apk/res/android}compileSdkVersionCodename": "16",
+      "package": "com.deepseek.chat",
+      "platformBuildVersionCode": "36",
+      "platformBuildVersionName": "16"
+    },
+    "binary_manifest": {
+      "aapt_exit": 0,
+      "package": "com.deepseek.chat",
+      "version_code": "273",
+      "version_name": "2.5.2"
+    },
+    "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
+    "apksigner_exit": 0
+  },
+  "apktool_exit": 0,
+  "jadx_exit": 3,
+  "java_files": 12319,
+  "dex_count": 3
+}

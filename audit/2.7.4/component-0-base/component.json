@@ -1,0 +1,33 @@
+{
+  "apk": "component-0-base.apk",
+  "bytes": 17785152,
+  "sha256": "2e898602374ed75f53d8e4c162fa625f5f4e1793b16fbd567f6dd02f6277a709",
+  "manifest": {
+    "package": "com.deepseek.chat",
+    "split": null,
+    "version_code": "294",
+    "version_code_major": null,
+    "version_name": "2.7.4",
+    "root_attributes": {
+      "{http://schemas.android.com/apk/res/android}compileSdkVersion": "37",
+      "{http://schemas.android.com/apk/res/android}compileSdkVersionCodename": "17",
+      "{http://schemas.android.com/apk/res/android}requiredSplitTypes": "base__abi,base__density",
+      "{http://schemas.android.com/apk/res/android}splitTypes": "",
+      "package": "com.deepseek.chat",
+      "platformBuildVersionCode": "37",
+      "platformBuildVersionName": "17"
+    },
+    "binary_manifest": {
+      "aapt_exit": 0,
+      "package": "com.deepseek.chat",
+      "version_code": "294",
+      "version_name": "2.7.4"
+    },
+    "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
+    "apksigner_exit": 0
+  },
+  "apktool_exit": 0,
+  "jadx_exit": 3,
+  "java_files": 14224,
+  "dex_count": 4
+}

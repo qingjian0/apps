@@ -9,16 +9,41 @@
 >
 > 本文是基于当前仓库文件与日志的分析归档，不把混淆类名臆测成业务语义，也不把未检查的 APK 二进制说成已完成反编译。
 
+## 新一代 Runtime Semantic Hook Engine
+
+本项目的最终方向升级为跨版本运行时语义 Hook 引擎，不再以固定混淆类名/方法名映射作为通用性基础。工程设计和验收要求见 [引擎架构文档](docs/universal-hook/ENGINE-ARCHITECTURE.md)。
+
+当前已在本分支新增独立 Kotlin/JVM Semantic Core 原型（GitHub Actions 编译与单元测试已通过）：
+- 宿主指纹约束（仅允许目标包名进入 Hook 解析）；
+- 多证据族聚合，重复字符串不能虚增置信度；
+- 候选歧义、证据不足、负面证据时 fail-closed；
+- 角色级幂等 HookCoordinator 和可注入 HookBackend；
+- 独立 GitHub Actions 单元测试工作流。
+- 新增 StaticProgramGraph：接入真实调用边、跨方法字段读写关联、控制流结构摘要、父类继承与接口实现关系；候选锚点按全宿主索引稀有度加权。
+- 五版本静态审计已全部通过（Run `42345954380`，五个版本任务与 aggregate 成功）；生成完整 DEX/类/方法/调用边/字段/控制流索引及跨版本报告，见 [五版本详细审计记录](docs/universal-hook/五版本静态审计与语义解析记录-2026-11-07.md) 和 `audit/universal-hook/`。
+- 首轮 Resolver 的静态候选存在误判：2.7.3 把第三方验证 SDK 误认为宿主 Local API，2.7.5 的会话候选胜出分差仅约 0.355。已移除宿主 APK 的 Local API 映射、将默认胜出分差提高至 0.5，并要求 HookCoordinator 同时具备完整运行时宿主身份和运行行为证据。
+- 以上是静态审计与语义核心进展，不代表已完成 LSPosed Hook；最新安装门槛和回归测试以本轮 Semantic Core CI 为准。
+- Resolver 已进一步增加四证据族门槛、框架/第三方 SDK 负面证据、稀有锚点沿调用图/字段流传播，以及按功能域定义的必需证据族；语义引擎改动会自动触发五版本重新接入。
+- 2026-11-08 修复 Points-to 全局存储预算竞争：调用上下文和接收者记录按 root 平分预算；单个 root 超额只标记该 root 不完整，不再因记录存储上限提前停止后续图遍历。新增 Python 回归覆盖热点 root 与独立 root 的隔离；以最新 CI 结果为准。
+- 旧五版本产物均触及 200,000 条记录上限，不能作为完整 Points-to 结果。旧产物另显示 `deepseek 273.apk` 的 Manifest 为 versionName `2.5.2` / versionCode `273`，与矩阵标签 2.7.3 不一致；在替换或确认 APK 身份前，不把它计为已验证的 2.7.3 版本证据。
+- Hook 候选现输出 E0–E3 静态证据等级与证据族；等级不代表设备运行时确认，也不授权 Hook。运行时确认与 Hook 授权字段在静态审计产物中始终为 false，避免将字符串命中或静态候选误报为已验证 Hook。
+
+**当前限制：** 这是引擎核心原型，不是已完成的 DEX 自动语义发现器，也没有接入 LSPosed Android Backend。Agent、提示词、本地 API 等全功能域已列入覆盖目标，但必须逐域完成静态证据、运行时验证、桥接和回归测试后才能标记完成。详情：[全功能覆盖矩阵](docs/universal-hook/README.md) · [Kotlin Semantic Core](engine/semantic-core/)。
+
 ## 1. 仓库材料盘点
 
-本仓库当前保留两份 APK 和两份运行日志。2.7.3 与 2.7.5 两份 APK 均已完成静态证据采集，并完成网络 / SSE / PoW 跨版本语义映射。
+本仓库当前保留五个宿主版本输入（2.7.1 APK、2.7.2 APK、2.7.3 APK、2.7.4 APKM、2.7.5 APK）、两份运行日志和一份 SSE/Hook 证据包。2.7.3 / 2.7.5 已有静态证据；2.7.1 / 2.7.4 纳入本轮统一重审。2.7.2 APK `deepseek-2-7-2.apk` 已上传，需与 code289-cn 动态日志核对构建身份。
 
 | 文件 | 大小 | 本轮处理状态 |
 |---|---:|---|
-| DeepSeek_2.7.5.apk | 22,210,268 bytes | 已提取 3 个 DEX；JADX 1.5.6 输出 13,940 个 Java 源文件；第一方索引覆盖 12,596 个类 |
-| deepseek 273.apk | 14,211,169 bytes | 已提取 3 个 DEX；JADX 12,319 个 Java 源文件；APKTool 13,311 个 smali 文件；304 项 JADX 错误 |
-| deekseep_vision.log | 6,440,972 bytes / 19,747 行 | 已完成动态事件、线程、异常、Continuation 与 Callback 统计 |
-| dsprobe.log | 12,320 bytes / 50 行 | 已完成 Hook 安装失败和版本映射分析 |
+| deepseek271.apk | 22,006,745 bytes | 2.7.1 输入；本轮重新核对实际包身份和 DEX |
+| deepseek-2-7-2.apk | 22,205,160 bytes | 2.7.2 新上传输入；与 code289-cn 动态日志交叉验证 |
+| deepseek 273.apk | 14,211,169 bytes | 2.7.3；既有 JADX/Smali 结果，本轮重新统一扫描 |
+| com.deepseek.chat_2.7.4-294_...apkm | 19,476,565 bytes | 2.7.4 / code294 分包容器；按内嵌 APK 组件逐个扫描 |
+| DeepSeek_2.7.5.apk | 22,210,268 bytes | 2.7.5；既有 JADX/Smali 结果，本轮重新统一扫描 |
+| deekseep_vision.log | 6,440,972 bytes / 19,747 行 | 动态 observer 大日志；统一汇总调用角色和方法标记 |
+| dsprobe.log | 12,320 bytes / 50 行 | 2.7.2/code289-cn 版本误选 2.7.1/code257 映射及重复安装失败 |
+| deepseek-sse-hook-evidence.zip | 329,086 bytes | 已有 SSE/Hook 证据包；本轮重新盘点条目和哈希 |
 
 2.7.3 APK SHA-256：a6d025c14c98118a5a67849e04aaef6f3c9c13aaf0fa62caaee0e47091374ea3
 
@@ -1185,3 +1210,33 @@ nativeCalculateDeepSeekHashV1Pow(String base, String challenge, long difficulty)
 - 请求、SSE 事件、完成、取消和 auto-resume 的状态链闭合。
 - 无敏感数据进入日志。
 - 未完成设备测试前，不将任何候选标记为“生产可用”。
+
+
+## 29. 跨版本通用 Hook 重新审计
+
+本轮将分析范围扩展到仓库内全部 DeepSeek 宿主 APK/APKM：2.7.1、2.7.2/code289-cn、2.7.3、2.7.4/code294、2.7.5；2.7.2 APK 与设备日志作为关联证据集。2.7.4 是 APKM，必须按内嵌 APK 组件拆分分析；2.7.2 已有 APK 输入，需先核对签名、versionCode 与日志设备构建身份，再生成静态 Profile。
+
+- 通用 Hook 设计文档：[docs/universal-hook/README.md](docs/universal-hook/README.md)
+- 审计脚本：[scripts/audit_deepseek_apk.py](scripts/audit_deepseek_apk.py)
+- 跨版本聚合脚本：[scripts/aggregate_deepseek_hook_audit.py](scripts/aggregate_deepseek_hook_audit.py)
+- 独立工作流：[.github/workflows/deepseek-universal-hook-audit.yml](.github/workflows/deepseek-universal-hook-audit.yml)
+- 工作分支：`work/deepseek-universal-hook-audit`
+
+设计原则：以业务语义角色定位 Hook，通过调用图、完整方法描述符、类型结构、稳定框架调用、协议锚点和字节码形状交叉验证；未知版本、候选歧义和 ClassLoader 解析失败时 fail-closed。静态分析、动态观察和真机 Hook 验证分开标记。自动审计结果将直接写回本仓库 `audit/`，不以本地文件作为交付。
+
+
+- Points-to storage quotas use deterministic quotient/remainder allocation. When roots outnumber record slots, zero-quota roots are still traversed and diagnosed; the global cap is never exceeded. Call-context and contextual-receiver record families have independent caps.
+
+
+## 最终审计交付（2026-11-08）
+
+本轮五版本静态审计、版本身份隔离、Points-to root 预算修复、E0–E3 候选证据分级和旧探针日志根因分析已统一归档。最终交付入口：[Universal Hook 最终审计与交接报告](docs/universal-hook/FINAL-AUDIT-AND-HANDOFF-2026-11-08.md)。
+
+关键结论：
+- Matrix Run [#203](https://github.com/qingjian0/apps/actions/runs/42448208970) 五版本任务与 aggregate 均成功；产物对应提交 `3769fb3b99047bb41ceb52c322c04c93aeda710b`。
+- 输入标签 2.7.3 的 APK Manifest 实际为 2.5.2 / code273，已从可信跨版本匹配隔离。
+- E0–E3 是静态证据等级，不代表 runtime-confirmed 或 Hook authorized；当前静态产物两项计数均为 0。
+- Points-to 存储硬上限与 root 公平配额已验证，但上下文展开仍可能不完整，必须保持 diagnostic-only / fail-closed。
+- `dsprobe.log` 证实 2.7.2/code289-cn 宿主误选 2.7.1 full mapping，随后 unmapped 类名触发 ClassNotFoundException；探针源码修复和真机回归仍未交付。
+- 最新 PR HEAD 的两个 CI workflow 为 `action_required`，不可写成通过；详见最终交接报告。
+

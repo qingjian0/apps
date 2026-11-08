@@ -1,0 +1,153 @@
+{
+  "file": "deepseek-sse-hook-evidence.zip",
+  "bytes": 329086,
+  "sha256": "036b3d447b3110fff2177a37925d6455a231365a66dd889244c9fb98cfc8be2a",
+  "entry_count": 29,
+  "entries": [
+    {
+      "path": "deepseek-sse-hook-evidence/evidence-map.md",
+      "bytes": 3935,
+      "sha256": "d94ad99f3d9ae53d1a4ac0b8000d504d5fc2d04b71ea3ed65a8f53de065af841"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/comparison-report.md",
+      "bytes": 2098,
+      "sha256": "e36ffa887dd96b01d1c74a56e0e362b748c84e961c5f8bcf8203baaf6d5a10e8"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/native/librscrypto.so",
+      "bytes": 336568,
+      "sha256": "4571b9bcf08d5f070a47a495bdcd4c77f4a088feee560ed11701ca93c7b56053"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.5/summary.json",
+      "bytes": 4072,
+      "sha256": "d0cd624d1ca4121b8b8faa07a3b7d1d08f246633231881a9f00acacb070eb510"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.5/java/PowCalculator.java",
+      "bytes": 1280,
+      "sha256": "784d3b0cc1880c0ae9f2e485832766d80dbb27c37bd39a47fc616bb048eb0fc2"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.5/smali/fl0.smali",
+      "bytes": 2910,
+      "sha256": "bec6f2ea3a32a451888eea7097d8083cbf153a566ec5e4826fe50650dbfd0188"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.5/smali/ev1.smali",
+      "bytes": 488,
+      "sha256": "6ff1f7f3a17554cee6b4098cccd2fe99f0fa87d4a6175d260f83c82022a95267"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.5/smali/iv1.smali",
+      "bytes": 28116,
+      "sha256": "e0f1f08d653f518d712cde71120a9d37aff754481113aa38fdc35539ce1dff8d"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.5/smali/nw3.smali",
+      "bytes": 43189,
+      "sha256": "bedad99be7e00804ee8aa33afc0e07125d31f67baac1c6ca6f21a63782d72680"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.5/smali/t5.smali",
+      "bytes": 55561,
+      "sha256": "117c9a63ad08216caa565aae66aabd7fad031af5bae5705a1ae17508ef50945d"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.5/smali/rr2.smali",
+      "bytes": 56079,
+      "sha256": "45911ce7e4c51f43528f5070b1176d7cae01612962d5b21d097eed96a2bcd1b5"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.5/smali/g0.smali",
+      "bytes": 54702,
+      "sha256": "cfea08d208203cfa38ae66fd8195c4fe0a9a46812f4749b9effd1cbdc2d0e88a"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.5/smali/of2.smali",
+      "bytes": 20574,
+      "sha256": "1366bdc1f92e55cfb9081423db0c6772267c0dae2e2255089580b6999dfc5d99"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.5/smali/vs1.smali",
+      "bytes": 22965,
+      "sha256": "e614f04b248d5d115c4f5313f135f3ffa69c6ac114f3525d1b246b152dd04f32"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.5/smali/r3.smali",
+      "bytes": 100230,
+      "sha256": "0a15f3b93f6a7ee0214eb8f5597c36f62742dff6475e7930b192ad4c04c663cd"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.5/smali/oq1.smali",
+      "bytes": 40519,
+      "sha256": "e55506ba15872c948c8fca30a04c812be6c40bd1d96578e52ac59b1fb3b39052"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.3/summary.json",
+      "bytes": 3213,
+      "sha256": "5df28be56856f844fbd28d3aa4c6500e5ce95c8e15de28332c336194e5d7f315"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.3/java/PowCalculator.java",
+      "bytes": 1280,
+      "sha256": "9f7b502057e057c481d41b3d1c321282abd8545bf1ea6ff7911538679e1012da"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.3/smali/fl0.smali",
+      "bytes": 6958,
+      "sha256": "08bfa15c3dc047f15d43579da9db39fa135c012fa3e13c3ea60d99ab01cfea24"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.3/smali/e0.smali",
+      "bytes": 52674,
+      "sha256": "94f7dbb236bbc22938b4cb5bbbeac3ee8d05ac78c25ddb6c14d8b50bdb64d221"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.3/smali/ap9.smali",
+      "bytes": 12826,
+      "sha256": "faea51833ae71b09b70ad50ae9d951ce9142f48847c85f4f74a4d929551dae29"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.3/smali/qu1.smali",
+      "bytes": 55866,
+      "sha256": "7bd62d486f5e07187e1fcedd89019c5598b55b4f24d88d3c2dcece46397938ee"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.3/smali/k11.smali",
+      "bytes": 93352,
+      "sha256": "75e71308136967b21757d7827f3489f3511508aa5acdfc9316585ff27cac9e42"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.3/smali/g5.smali",
+      "bytes": 49254,
+      "sha256": "904711957b00d0ea5875f2d68a51c330e07b475eddabfd3a1e7c6f39f018542d"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.3/smali/e11.smali",
+      "bytes": 39165,
+      "sha256": "35e7e4db5d09792f55d7cf25ea6496ff4a62cfc7cb3a214585272f85f277aa32"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.3/smali/ix.smali",
+      "bytes": 27891,
+      "sha256": "7fcc5ae1cfe2782ee4418a0490d0cccb82f31dbee854dcee68ce544d51e7b556"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.3/smali/a11.smali",
+      "bytes": 488,
+      "sha256": "092e631738494efc28d992ec742c00d4549e726201d8865aa439444bf2131f40"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.3/smali/hx2.smali",
+      "bytes": 42102,
+      "sha256": "c4254058ed7728f5fa358e003ba387fb4b790982b195955d3fd869e34a0787a7"
+    },
+    {
+      "path": "deepseek-sse-hook-evidence/2.7.3/smali/jz0.smali",
+      "bytes": 22961,
+      "sha256": "222859d03d041c22b166239b113bfcd9241908eb5807e6ae00464bc26dd0d0e3"
+    }
+  ]
+}

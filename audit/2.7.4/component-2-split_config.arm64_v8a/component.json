@@ -1,0 +1,31 @@
+{
+  "apk": "component-2-split_config.arm64_v8a.apk",
+  "bytes": 9143648,
+  "sha256": "482af60defab32a280810bcbdb2a96d9505cb3214eab0d2c46b41d6a34bee03c",
+  "manifest": {
+    "package": "com.deepseek.chat",
+    "split": "config.arm64_v8a",
+    "version_code": "294",
+    "version_code_major": null,
+    "version_name": null,
+    "root_attributes": {
+      "{http://schemas.android.com/apk/res/android}versionCode": "294",
+      "{http://schemas.android.com/apk/res/android}splitTypes": "base__abi",
+      "package": "com.deepseek.chat",
+      "split": "config.arm64_v8a"
+    },
+    "binary_manifest": {
+      "aapt_exit": 0,
+      "package": "com.deepseek.chat",
+      "version_code": "294",
+      "version_name": null,
+      "split": "config.arm64_v8a"
+    },
+    "signing_sha256": "c6893c5368f7b5122fecdafc6c4ecf49e0b3dc4e42bd166cdb646907788c7ffa",
+    "apksigner_exit": 0
+  },
+  "apktool_exit": 0,
+  "jadx_exit": 2,
+  "java_files": 0,
+  "dex_count": 0
+}
