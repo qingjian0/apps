@@ -1590,7 +1590,13 @@ def analyze_smali(root):
 def static_candidate_evidence(method, incoming_count, outgoing_count, class_fact):
     """Describe static evidence diversity without implying runtime validation or Hook authorization."""
     families=[]
-    if method.get("roles"):
+    roles=method.get("roles",[])
+    literal_strings=set(method.get("strings",[]))
+    literal_anchors={
+        anchor for role in roles for anchor in role.get("anchors",[])
+        if anchor in literal_strings
+    }
+    if literal_anchors:
         families.append("protocol_anchor")
     if incoming_count or outgoing_count:
         families.append("call_graph")
@@ -1612,7 +1618,8 @@ def static_candidate_evidence(method, incoming_count, outgoing_count, class_fact
     level=("E3_FOUR_OR_MORE_STATIC_FAMILIES" if count>=4 else
            "E2_THREE_STATIC_FAMILIES" if count==3 else
            "E1_TWO_STATIC_FAMILIES" if count==2 else
-           "E0_ANCHOR_ONLY")
+           "E0_ONE_STATIC_FAMILY" if count==1 else
+           "E0_ROLE_MATCH_ONLY")
     return {
         "static_evidence_level":level,
         "evidence_family_count":count,
