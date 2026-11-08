@@ -65,6 +65,8 @@ data class MethodDescriptor(
 ) {
     val stableIdentity: String get() = "$owner->$name$descriptor"
     val isValid: Boolean get() = isClassDescriptor(owner) && isValidMethodName(name) && isMethodDescriptor(descriptor)
+    fun parameterDescriptors(): List<String>? = parseMethodParts(descriptor)?.first
+    fun returnDescriptor(): String? = parseMethodParts(descriptor)?.second
 
     companion object {
         fun parse(owner: String, name: String, descriptor: String): MethodDescriptor? =
@@ -81,19 +83,24 @@ private fun isClassDescriptor(value: String): Boolean =
         value.substring(1, value.length - 1).isNotBlank() &&
         value.substring(1, value.length - 1).none { it in ".;[(" }
 
-private fun isMethodDescriptor(value: String): Boolean {
-    if (!value.startsWith("(")) return false
+private fun isMethodDescriptor(value: String): Boolean = parseMethodParts(value) != null
+
+private fun parseMethodParts(value: String): Pair<List<String>, String>? {
+    if (!value.startsWith("(")) return null
     val close = value.indexOf(')')
-    if (close < 0 || close == value.lastIndex) return false
+    if (close < 0 || close == value.lastIndex) return null
     var index = 1
+    val parameters = mutableListOf<String>()
     while (index < close) {
-        val next = parseFieldTypeEnd(value, index, allowVoid = false) ?: return false
-        if (next > close) return false
+        val next = parseFieldTypeEnd(value, index, allowVoid = false) ?: return null
+        if (next > close) return null
+        parameters += value.substring(index, next)
         index = next
     }
-    if (index != close) return false
-    val returnEnd = parseFieldTypeEnd(value, close + 1, allowVoid = true) ?: return false
-    return returnEnd == value.length
+    if (index != close) return null
+    val returnEnd = parseFieldTypeEnd(value, close + 1, allowVoid = true) ?: return null
+    if (returnEnd != value.length) return null
+    return parameters to value.substring(close + 1)
 }
 
 private fun parseFieldTypeEnd(value: String, start: Int, allowVoid: Boolean): Int? {
