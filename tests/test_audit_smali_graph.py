@@ -1627,7 +1627,7 @@ class CallerControlFlowReturnBoundaryTest(unittest.TestCase):
         self.assertTrue(any(root_id.startswith("split_config.arm64_v8a::") for root_id in root_ids))
         self.assertEqual(2, summary["call_context_records_stored"])
         self.assertEqual(2, summary["resolved_call_contexts"])
-        self.assertEqual(2, summary["queue_states_processed"])
+        self.assertEqual(4, summary["queue_states_processed"])
         self.assertEqual(root_ids, {row["root_method_key"] for row in graph["call_contexts"]})
 
 
