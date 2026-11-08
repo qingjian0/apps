@@ -1297,7 +1297,7 @@ class CallerControlFlowReturnBoundaryTest(unittest.TestCase):
 
 
     def test_interprocedural_points_to_reports_root_and_record_budget_diagnostics(self):
-        def method(owner, name, invokes=None, roles=None):
+        def method(owner, name, invokes=None, roles=None, receivers=None):
             return {
                 "class": owner, "name": name, "descriptor": "()V",
                 "component": "base", "roles": roles or [],
@@ -1305,7 +1305,7 @@ class CallerControlFlowReturnBoundaryTest(unittest.TestCase):
                 "invoke_sites_truncated": False, "invoke_sites_incomplete": False,
                 "object_points_to": {
                     "complete": True, "invoke_arguments": [],
-                    "field_receivers": [], "return_values": [],
+                    "field_receivers": receivers or [], "return_values": [],
                     "instruction_writes": [],
                 },
             }
@@ -1490,9 +1490,21 @@ class CallerControlFlowReturnBoundaryTest(unittest.TestCase):
             [call("Lx/Independent;", 0)],
             roles=[{"role": "agent", "anchors": ["independent"]}],
         )
-        hot_a = method("Lx/HotA;", "run")
-        hot_b = method("Lx/HotB;", "run")
-        independent = method("Lx/Independent;", "run")
+        def receiver(field):
+            return {
+                "instruction": 0, "field": field, "access": "read",
+                "receiver_register": "v0",
+                "points_to": ["alloc:" + field + "#0:Ljava/lang/Object;"],
+                "unknown": False, "identity_status": "singleton",
+                "identity": "alloc:" + field + "#0:Ljava/lang/Object;",
+            }
+
+        hot_a = method("Lx/HotA;", "run", receivers=[receiver("Lx/HotA;->value:Ljava/lang/Object;")])
+        hot_b = method("Lx/HotB;", "run", receivers=[receiver("Lx/HotB;->value:Ljava/lang/Object;")])
+        independent = method(
+            "Lx/Independent;", "run",
+            receivers=[receiver("Lx/Independent;->value:Ljava/lang/Object;")],
+        )
 
         graph = AUDIT.build_interprocedural_points_to_graph(
             [hot_root, independent_root, hot_a, hot_b, independent],
@@ -1512,6 +1524,10 @@ class CallerControlFlowReturnBoundaryTest(unittest.TestCase):
         self.assertEqual(1, rows[hot_key]["call_contexts_dropped"])
         self.assertEqual(1, rows[independent_key]["call_contexts_stored"])
         self.assertEqual(0, rows[independent_key]["call_contexts_dropped"])
+        self.assertEqual(1, rows[hot_key]["receiver_records_stored"])
+        self.assertEqual(1, rows[hot_key]["receiver_records_dropped"])
+        self.assertEqual(1, rows[independent_key]["receiver_records_stored"])
+        self.assertEqual(0, rows[independent_key]["receiver_records_dropped"])
         self.assertEqual(
             {hot_key, independent_key},
             {row["root_method_key"] for row in graph["call_contexts"]},
