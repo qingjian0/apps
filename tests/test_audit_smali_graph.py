@@ -1552,10 +1552,21 @@ class CallerControlFlowReturnBoundaryTest(unittest.TestCase):
             incoming_count=0, outgoing_count=0,
             class_fact={"super": "Ljava/lang/Object;", "interfaces": []},
         )
-        self.assertEqual("E0_ANCHOR_ONLY", anchor_only["static_evidence_level"])
-        self.assertEqual(["protocol_anchor"], anchor_only["evidence_families"])
+        self.assertEqual("E0_ROLE_MATCH_ONLY", anchor_only["static_evidence_level"])
+        self.assertEqual([], anchor_only["evidence_families"])
         self.assertFalse(anchor_only["runtime_confirmed"])
         self.assertFalse(anchor_only["hook_authorized"])
+
+        literal_anchor = AUDIT.static_candidate_evidence(
+            {
+                "roles": [{"role": "request", "anchors": ["/api/v0/chat/completion"]}],
+                "strings": ["/api/v0/chat/completion"],
+                "invokes": [],
+            },
+            incoming_count=0, outgoing_count=0, class_fact=None,
+        )
+        self.assertEqual("E0_ONE_STATIC_FAMILY", literal_anchor["static_evidence_level"])
+        self.assertEqual(["protocol_anchor"], literal_anchor["evidence_families"])
 
         corroborated = AUDIT.static_candidate_evidence(
             {
