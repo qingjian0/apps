@@ -204,3 +204,9 @@ Manifest 身份来自 `audit/universal-hook/version-identity.json`：
 
 ---
 Generated from repository evidence at HEAD `3769fb3b99047bb41ceb52c322c04c93aeda710b`.
+
+
+## 调用链文档入口
+
+完整调用链、逐版本方法签名、resolver 接受/拒绝原因、SSE parser/dispatcher 歧义和 code289 设备 observer 证据已直接并入主文档：[docs/universal-hook/README.md](README.md#调用链与逐版本方法证据总表)。该主文档是调用链细节的唯一人工维护入口；机器原始证据仍保留在 audit/universal-hook/ 下。
+
