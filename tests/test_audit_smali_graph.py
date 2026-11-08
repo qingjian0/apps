@@ -1538,6 +1538,43 @@ class CallerControlFlowReturnBoundaryTest(unittest.TestCase):
         self.assertEqual(5, summary["queue_states_processed"])
         self.assertFalse(summary["context_expansion_complete"])
 
+        # More roots than storage slots must not silently exceed the configured cap.
+        crowded_roots = [
+            method(
+                "Lx/CrowdedRoot{};".format(index), "entry",
+                [call("Lx/CrowdedCallee{};".format(index), 0)],
+                roles=[{"role": "request", "anchors": ["root{}".format(index)]}],
+            )
+            for index in range(3)
+        ]
+        crowded_callees = [
+            method(
+                "Lx/CrowdedCallee{};".format(index), "run",
+                receivers=[receiver("Lx/CrowdedCallee{};->value:Ljava/lang/Object;".format(index))],
+            )
+            for index in range(3)
+        ]
+        crowded = AUDIT.build_interprocedural_points_to_graph(
+            crowded_roots + crowded_callees,
+            max_records=2, root_scope="semantic-candidates",
+        )
+        crowded_summary = crowded["summary"]
+        crowded_rows = {
+            row["root_method_key"]: row
+            for row in crowded_summary["root_diagnostics"]["top_hot_roots"]
+        }
+        self.assertEqual(3, crowded_summary["root_method_count"])
+        self.assertEqual(1, crowded_summary["per_root_record_limit"])
+        self.assertEqual(0, crowded_summary["per_root_record_limit_min"])
+        self.assertEqual(2, crowded_summary["call_context_records_stored"])
+        self.assertEqual(2, crowded_summary["contextual_receiver_records_stored"])
+        self.assertLessEqual(crowded_summary["call_context_records_stored"], 2)
+        self.assertLessEqual(crowded_summary["contextual_receiver_records_stored"], 2)
+        self.assertEqual(1, sum(row["call_contexts_dropped"] for row in crowded_rows.values()))
+        self.assertEqual(1, sum(row["receiver_records_dropped"] for row in crowded_rows.values()))
+        self.assertTrue(all(row["queue_states_processed"] > 0 for row in crowded_rows.values()))
+        self.assertTrue(crowded_summary["records_truncated"])
+
     def test_interprocedural_points_to_rejects_unknown_root_scope(self):
         with self.assertRaises(ValueError):
             AUDIT.build_interprocedural_points_to_graph([], root_scope="guessed")
