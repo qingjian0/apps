@@ -283,3 +283,8 @@ Kotlin StaticProgramGraph / StaticAuditCli 已读取参数/返回值边索引；
 ### Points-to storage cap edge case (2026-11-08)
 
 The per-root quota is now a deterministic quotient/remainder partition of the configured record-family budget. Per-root quotas differ by at most one. If there are more roots than slots, some roots receive a zero storage quota; those roots are still fully traversed and their dropped-record/incomplete diagnostics are retained. This preserves the hard global cap instead of silently exceeding it with a minimum-one-slot rule. Call-context and contextual-receiver record families each have their own global cap and independent per-root counters. The summary reports both stored counts, the maximum/minimum per-root quota, and each root's actual quota. Regression coverage includes three roots competing for two slots.
+
+
+### Kotlin ingestion: protocol anchors must be literal (2026-11-08)
+
+Kotlin StaticAuditJsonReader now reads the method-level strings array and passes it to StaticEvidenceMapper. A role anchor is eligible for PROTOCOL_ANCHOR only when the exact anchor also occurs in that method's literal string constants, and generic weak-only anchors remain excluded. Anchor-frequency normalization counts only literal anchors. A role match inferred from an invoke/API token may remain a discovery hint, but it cannot be promoted into protocol evidence by itself. Resolver policy still requires independent evidence families and role-specific required families; this change prevents a static role label from satisfying the protocol-anchor requirement without a real literal.
