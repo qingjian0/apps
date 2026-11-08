@@ -216,3 +216,42 @@ JADX 反编译失败必须保留退出码和错误日志；Smali 是控制流复
 
 
 Kotlin StaticProgramGraph / StaticAuditCli 已读取参数/返回值边索引；只有 summary 明确确认边文件未截断时才导入。跨方法 DATA_FLOW 证据仅由参数/返回值边产生；相同字段槽的读写共现只作诊断，不再满足 DATA_FLOW 证据合同。对应 Python 与 Kotlin Actions 正在验证。
+
+## Points-to root 预算隔离（2026-11-08）
+
+### 问题证据
+
+此前五版本产物的 Points-to 汇总均达到全局 `200,000` 条存储上限，造成 root 之间竞争同一份记录配额。旧产物记录的丢弃量如下：
+
+| 版本标签 | 丢弃调用上下文 | 丢弃接收者记录 | 旧结果 |
+|---|---:|---:|---|
+| 2.7.1 | 297,015 | 356,902 | 截断 |
+| 2.7.2 | 293,713 | 350,910 | 截断 |
+| 2.7.3（APK 身份待确认） | 274,960 | 358,167 | 截断 |
+| 2.7.4 | 295,126 | 344,386 | 截断 |
+| 2.7.5 | 298,548 | 360,962 | 截断 |
+
+### 修复策略
+
+- `max_records` 作为该版本 Points-to 记录的总预算基数。
+- 计算 `per_root_record_limit = max(1, max_records // root_count)`，调用上下文和接收者记录分别按 root 计数、分别应用配额。
+- 一个热点 root 达到自身存储配额后，只增加该 root 的 dropped 计数并标记分析不完整；不得占用其他 root 的配额。
+- **存储截断不再中断分析遍历**：即使某条调用上下文记录未存储，也继续处理其 callee、递归/深度诊断和后续独立调用点。
+- `root_diagnostics` 保留每个 root 的 seen/stored/dropped 计数；整体 `records_truncated` 和 `context_expansion_complete` 仍严格反映不完整情况。
+- Kotlin Semantic Core 只在整体摘要和 JSONL 记录数一致且完整时加载 Points-to；该数据仍是诊断信息，不得生成 `DATA_FLOW` 证据或授权 Hook。
+
+当 root 数量大于请求的总预算时，为保证每个 root 至少有一个独立记录槽，实际总存储数可能略高于 `max_records`；这是一项有意的最小配额策略，摘要会同时给出总预算与每 root 配额，不能把它误读成严格全局硬上限。
+
+### 回归覆盖
+
+新增 Python 回归构造一个拥有两个调用点的热点 root，以及一个拥有独立调用点的第二 root，验证：
+1. 两个 root 各自拥有独立配额；
+2. 热点 root 超额不会耗尽第二 root 的配额；
+3. 超额记录不存储，但对应 callee 仍继续遍历；
+4. dropped 记录会使整体完整性保持 false。
+
+对应修改位于 `scripts/audit_deepseek_apk.py` 和 `tests/test_audit_smali_graph.py`。代码已提交到 `work/deepseek-universal-hook-audit`；Python CI、五版本重审及 Kotlin 回归需以新提交对应的 Actions 结果为准，未通过前不得标记通过。
+
+### APK 身份阻断项
+
+旧审计产物中的 `deepseek 273.apk` 虽被标为 2.7.3，但 Manifest 实际为 `versionName=2.5.2`、`versionCode=273`。扫描结果可以保留为该 APK 的静态证据，但不能作为已确认的 DeepSeek 2.7.3 版本审计。重新审计时必须继续将其隔离在可信跨版本匹配之外，直到替换 APK 或取得可核对的构建身份依据。
