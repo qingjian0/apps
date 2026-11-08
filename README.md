@@ -1226,3 +1226,17 @@ nativeCalculateDeepSeekHashV1Pow(String base, String challenge, long difficulty)
 
 
 - Points-to storage quotas use deterministic quotient/remainder allocation. When roots outnumber record slots, zero-quota roots are still traversed and diagnosed; the global cap is never exceeded. Call-context and contextual-receiver record families have independent caps.
+
+
+## 最终审计交付（2026-11-08）
+
+本轮五版本静态审计、版本身份隔离、Points-to root 预算修复、E0–E3 候选证据分级和旧探针日志根因分析已统一归档。最终交付入口：[Universal Hook 最终审计与交接报告](docs/universal-hook/FINAL-AUDIT-AND-HANDOFF-2026-11-08.md)。
+
+关键结论：
+- Matrix Run [#203](https://github.com/qingjian0/apps/actions/runs/42448208970) 五版本任务与 aggregate 均成功；产物对应提交 `3769fb3b99047bb41ceb52c322c04c93aeda710b`。
+- 输入标签 2.7.3 的 APK Manifest 实际为 2.5.2 / code273，已从可信跨版本匹配隔离。
+- E0–E3 是静态证据等级，不代表 runtime-confirmed 或 Hook authorized；当前静态产物两项计数均为 0。
+- Points-to 存储硬上限与 root 公平配额已验证，但上下文展开仍可能不完整，必须保持 diagnostic-only / fail-closed。
+- `dsprobe.log` 证实 2.7.2/code289-cn 宿主误选 2.7.1 full mapping，随后 unmapped 类名触发 ClassNotFoundException；探针源码修复和真机回归仍未交付。
+- 最新 PR HEAD 的两个 CI workflow 为 `action_required`，不可写成通过；详见最终交接报告。
+
