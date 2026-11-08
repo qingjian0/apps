@@ -6,6 +6,15 @@
 
 “通用通杀”在工程上定义为：**同一套语义解析器和 Hook 生命周期管理器，能够在不同宿主版本中自动定位同一业务角色；每个版本可以有独立的候选描述符，但不需要人工维护一套完全独立的 Hook 代码。** 不承诺一个固定类名/方法名适配所有版本。
 
+## 跨项目实施与交接
+
+- [跨项目实施手册](IMPLEMENTATION-HANDBOOK.md)：目标模块结构、依赖方向、Resolver/Backend/Bridge 合同、各项目接入顺序、验收标准。
+- [SDK 接口合同](SDK-CONTRACT.md)：跨仓库稳定 API、类型语义、错误模型、线程/生命周期和契约测试。
+- [AI 工程执行任务书](AI-IMPLEMENTATION-PROMPT.md)：可直接交给其他 AI 的执行指令，要求先核对现状再按 P0–P6 实施。
+- [最终审计与交接报告](FINAL-AUDIT-AND-HANDOFF-2026-11-08.md)：真实代码/静态证据/设备验证边界。
+
+上述实施手册和 SDK 文件定义目标合同；接口在代码实现、编译和契约测试完成前，不得标记为 Stable 或已交付。
+
 ## 新一代引擎架构
 
 - [Runtime Semantic Hook Engine 架构与验收规范](ENGINE-ARCHITECTURE.md)
