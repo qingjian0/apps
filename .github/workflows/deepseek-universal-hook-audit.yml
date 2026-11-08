@@ -111,6 +111,19 @@ jobs:
           assert s["dex_count"] > 0 and s["class_count"] > 0 and s["method_count"] > 0, "empty DEX analysis"
           manifests = [x.get("manifest", {}) for x in s.get("component_metadata", [])]
           assert any(m.get("package") == "com.deepseek.chat" for m in manifests), "target package missing from decoded manifests"
+          # Each record family has its own hard global cap; zero-quota roots must still be traversed.
+          for scope in ("interprocedural_points_to", "interprocedural_points_to_candidate_scope"):
+              p = s[scope]
+              limit = p["record_limit"]
+              assert p["call_context_records_stored"] <= limit, f"{scope}: call-context cap exceeded"
+              assert p["contextual_receiver_records_stored"] <= limit, f"{scope}: receiver cap exceeded"
+              assert p["per_root_record_limit_min"] >= 0
+              assert p["per_root_record_limit"] - p["per_root_record_limit_min"] <= 1
+              assert p["root_diagnostics"]["root_count"] == p["root_method_count"]
+          grades = s["candidate_static_evidence_level_counts"]
+          assert sum(grades.values()) == s["candidate_method_count"], "candidate evidence grades do not cover all candidates"
+          assert s["candidate_runtime_confirmed_count"] == 0, "static audit cannot claim runtime confirmation"
+          assert s["candidate_hook_authorized_count"] == 0, "static audit cannot authorize Hooks"
           # Some distributed APKs omit versionCode/versionName; package + DEX/APK digests remain mandatory.
           PY
           gzip -t "audit/${{ matrix.version }}/methods.jsonl.gz"
