@@ -1546,5 +1546,35 @@ class CallerControlFlowReturnBoundaryTest(unittest.TestCase):
             AUDIT.build_interprocedural_points_to_graph([], max_records=0)
 
 
+    def test_static_candidate_evidence_grade_requires_independent_families_and_never_authorizes_hook(self):
+        anchor_only = AUDIT.static_candidate_evidence(
+            {"roles": [{"role": "request"}], "invokes": []},
+            incoming_count=0, outgoing_count=0,
+            class_fact={"super": "Ljava/lang/Object;", "interfaces": []},
+        )
+        self.assertEqual("E0_ANCHOR_ONLY", anchor_only["static_evidence_level"])
+        self.assertEqual(["protocol_anchor"], anchor_only["evidence_families"])
+        self.assertFalse(anchor_only["runtime_confirmed"])
+        self.assertFalse(anchor_only["hook_authorized"])
+
+        corroborated = AUDIT.static_candidate_evidence(
+            {
+                "roles": [{"role": "request"}],
+                "invokes": ["Lkotlinx/coroutines/flow/Flow;->collect()V"],
+                "control_flow": {"cfg": {"complete": True, "edge_count": 2}},
+                "object_points_to": {"complete": True, "singleton_receiver_count": 1},
+            },
+            incoming_count=3, outgoing_count=2,
+            class_fact={"super": "Lx/Base;", "interfaces": ["Lx/Role;"]},
+        )
+        self.assertEqual("E3_FOUR_OR_MORE_STATIC_FAMILIES", corroborated["static_evidence_level"])
+        self.assertGreaterEqual(corroborated["evidence_family_count"], 4)
+        self.assertIn("call_graph", corroborated["evidence_families"])
+        self.assertIn("stable_api_calls", corroborated["evidence_families"])
+        self.assertIn("intraprocedural_points_to", corroborated["evidence_families"])
+        self.assertFalse(corroborated["runtime_confirmed"])
+        self.assertFalse(corroborated["hook_authorized"])
+
+
 if __name__ == "__main__":
     unittest.main()
