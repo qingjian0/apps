@@ -1223,3 +1223,6 @@ nativeCalculateDeepSeekHashV1Pow(String base, String challenge, long difficulty)
 - 工作分支：`work/deepseek-universal-hook-audit`
 
 设计原则：以业务语义角色定位 Hook，通过调用图、完整方法描述符、类型结构、稳定框架调用、协议锚点和字节码形状交叉验证；未知版本、候选歧义和 ClassLoader 解析失败时 fail-closed。静态分析、动态观察和真机 Hook 验证分开标记。自动审计结果将直接写回本仓库 `audit/`，不以本地文件作为交付。
+
+
+- Points-to storage quotas use deterministic quotient/remainder allocation. When roots outnumber record slots, zero-quota roots are still traversed and diagnosed; the global cap is never exceeded. Call-context and contextual-receiver record families have independent caps.
